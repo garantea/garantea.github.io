@@ -178,11 +178,22 @@
   }
 
   .points { list-style: none; margin: clamp(14px, 2.6vh, 26px) 0 0; padding: 0; }
+  /*
+    HER MADDE TEK SATIR — dil ne olursa olsun.
+
+    `white-space: nowrap` satırın sarmasını engelliyor. Tek başına yeterli değildi: dar
+    bir ekranda satır ekrandan taşıp kırpılırdı. Bu yüzden yazı boyutu `vw`YE bağlı —
+    ekran daralınca metin sarmak yerine KÜÇÜLÜYOR. Alt sınır (.6rem) okunabilirliğin
+    dibi; onun altına inmek yerine çok dar ekranlarda taşmayı kabul ediyoruz.
+
+    Yan fayda: iki dil de tam bir satır tuttuğu için `min-height`e gerek kalmadı —
+    yükseklik zaten dilden bağımsız.
+  */
   .points li {
     padding: clamp(8px, 1.4vh, 12px) 0;
     border-top: 1px solid var(--line);
-    font-size: clamp(.85rem, 1.7vh, .97rem);
-    min-height: 3.4em;
+    font-size: clamp(.6rem, 1.15vw + .34rem, .97rem);
+    white-space: nowrap;
   }
   .points li:last-child { border-bottom: 1px solid var(--line); }
   .points b { font-weight: 600; }
@@ -215,18 +226,43 @@
     padding: 2px 7px; border-radius: 999px; background: rgba(255,255,255,.2);
   }
 
+  /*
+    GİZLİLİK BUTONU: zeminin küçültülmüş hâli — aynı üç renk, aynı yavaşlık.
+
+    Buton mağaza butonlarının SAĞINDA duruyor ve tek canlı olan o; pasif iki butonun
+    yanında hareketli bir zemin, tıklanabilir olanı kendiliğinden işaret ediyor.
+
+    Hareket `background-position` ile: degradenin kendisi butonun üç katı genişlikte ve
+    içeride kayıyor. `background` animasyonu değil — renk duraklarını canlandırmak
+    tarayıcıyı her karede degradeyi yeniden üretmeye zorlar; konum kaydırmak ise ucuz.
+
+    Renkler ZEMİNDEKİYLE aynı sırada okunuyor: beyaz → mavi → kırmızı. Yazı koyu kalıyor,
+    çünkü açık tonlarda beyaz yazı hareket sırasında bazı karelerde okunmaz oluyordu.
+  */
   .ghost {
     display: inline-flex; align-items: center; justify-content: center;
     min-width: 168px;   /* "Gizlilik Politikası" / "Privacy Policy" ortak genişlik */
     padding: clamp(10px, 1.6vh, 13px) clamp(16px, 2vw, 22px);
-    border-radius: 999px; border: 1px solid var(--line);
+    border-radius: 999px; border: 1px solid rgba(37, 99, 235, .28);
     color: var(--fg); text-decoration: none; cursor: pointer;
     font: inherit; font-size: clamp(.83rem, 1.65vh, .93rem); font-weight: 600;
-    background: rgba(255,255,255,.65);
     white-space: nowrap;
-    transition: border-color .18s ease, color .18s ease;
+    background-image: linear-gradient(100deg,
+      #ffffff 0%, #eaf1ff 18%, #cfe0ff 34%, #ffffff 50%,
+      #ffe3e0 66%, #ffd0cb 78%, #ffffff 100%);
+    background-size: 300% 100%;
+    background-position: 0% 50%;
+    animation: sweep 9s ease-in-out infinite alternate;
+    transition: border-color .18s ease, box-shadow .18s ease;
   }
-  .ghost:hover { border-color: var(--blue); color: var(--blue); }
+  @keyframes sweep {
+    from { background-position: 0% 50%; }
+    to   { background-position: 100% 50%; }
+  }
+  .ghost:hover {
+    border-color: var(--blue);
+    box-shadow: 0 8px 22px -12px rgba(37, 99, 235, .7);
+  }
 
   /* ─── Telefon ───────────────────────────────────────────────── */
 
@@ -242,16 +278,16 @@
     border-radius: clamp(26px, 3.4vh, 40px);
     background: #fff;
     border: 1px solid var(--line);
-    /* HAFİF SAĞA YATIK. 3 derece: eğim fark edilecek kadar var, okumayı zorlaştıracak
+    /* HAFİF SOLA YATIK. 3 derece: eğim fark edilecek kadar var, okumayı zorlaştıracak
        kadar değil. Gölge de eğimle birlikte dönüyor, telefon zeminden kopuk durmuyor. */
-    transform: rotate(3deg);
+    transform: rotate(-3deg);
     box-shadow: 0 44px 90px -34px rgba(15, 23, 42, .4), 0 8px 22px -10px rgba(15, 23, 42, .14);
     overflow: hidden;
   }
   @media (max-width: 899px) {
     /* Tek sütuna inince telefon ortada duruyor ve eğim azalıyor: dar ekranda 3 derece,
        kenar boşluklarını gözle görülür biçimde eşitsizleştiriyor. */
-    .phone { transform: rotate(1.5deg); width: clamp(210px, 52vw, 300px); }
+    .phone { transform: rotate(-1.5deg); width: clamp(210px, 52vw, 300px); }
   }
 
   /*
@@ -285,13 +321,17 @@
 
   /* ─── Alt şerit ─────────────────────────────────────────────── */
 
+  /*
+    ALT ŞERİT ŞEFFAF. Beyaz zemini ve üstündeki çizgisi vardı; sayfanın altına yapışmış
+    ayrı bir kutu gibi duruyor ve hareketli zemini tam orada kesiyordu. Artık zemin
+    kesintisiz akıyor, şerit yalnızca metinden ibaret.
+  */
   footer {
-    border-top: 1px solid var(--line);
     padding: clamp(9px, 1.6vh, 15px) clamp(18px, 5vw, 52px);
     display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
     gap: 6px 18px;
     font-size: clamp(.74rem, 1.4vh, .84rem); color: var(--muted);
-    background: rgba(255,255,255,.6);
+    background: transparent;
   }
   footer a { color: var(--muted); text-decoration: none; }
   footer a:hover { color: var(--blue); }
@@ -415,8 +455,20 @@
         <path d="M 155 105 C 190 105, 185 145, 140 148" fill="none" stroke="#1a73e8"
               stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
 
-        <ellipse cx="100" cy="95" rx="56" ry="14" fill="url(#inside)"/>
-        <ellipse cx="100" cy="95" rx="56" ry="14" fill="none" stroke="url(#cup)" stroke-width="2.5"/>
+        <!--
+          AĞIZ ÇEMBERİ GÖVDEYLE AYNI ÖLÇÜDE (59/15).
+
+          DÜZELTİLEN TASARIM HATASI: çember 56/14 idi, gövdenin üst yayı ise 59/15. Yani
+          çember gövdenin İÇİNDE, üç birim daha dar kalıyordu; iki kenarda gövdenin mavi
+          silueti çemberin dışına taşıyor ve ağız, fincanın üstüne oturmuş ayrı bir halka
+          gibi duruyordu. Artık çember gövdenin sınırının TAM ÜSTÜNDE.
+
+          Fincanın et kalınlığı yine okunuyor ama artık doğru yerden: KOYU İÇ daraltıldı
+          (55/13.5), çember değil. Kenarda kalan ince şerit fincanın ağzı — dışarıda
+          kalan bir boşluk değil.
+        -->
+        <ellipse cx="100" cy="95" rx="55" ry="13.5" fill="url(#inside)"/>
+        <ellipse cx="100" cy="95" rx="59" ry="15" fill="none" stroke="url(#cup)" stroke-width="2.5"/>
 
         <g mask="url(#fade)">
           <g class="doc">
