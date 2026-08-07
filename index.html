@@ -6,28 +6,31 @@
 <title>GaranTea — Garanti Takip Asistanınız</title>
 <meta name="description" content="GaranTea, cihazlarınızın garanti sürelerini takip eder. Faturanızı saklar, süre dolmadan önce hatırlatır, cihaz değiştirdiğinizde kayıtlarınız kaybolmaz.">
 <meta name="theme-color" content="#2563eb">
-
 <meta property="og:title" content="GaranTea — Garanti Takip Asistanınız">
 <meta property="og:description" content="Faturalarınız tek yerde, garanti süreniz hep göz önünde.">
 <meta property="og:type" content="website">
 
 <!--
-  TEK EKRAN, KAYDIRMASIZ.
+  ─── SAYFANIN ÜÇ KURALI ──────────────────────────────────────────
 
-  Sayfanın tamamı `100dvh` içine sığacak biçimde kuruldu: bütün ölçüler `clamp()` ile
-  ekran boyutuna bağlı, sabit piksel yok. `dvh` (`vh` değil) bilinçli — mobil tarayıcıda
-  adres çubuğu kayarken `vh` sabit kalıyor ve sayfanın altı kırpılıyor.
+  1. TEK EKRAN. Bütün ölçüler `clamp()` ile ekran boyutuna bağlı; sabit piksel yok.
+     `100dvh` kullanılıyor (`100vh` değil) — mobilde adres çubuğu kayarken `vh` sabit
+     kalıyor ve sayfanın altı kırpılıyor. `overflow` yine de gizlenmedi: çok kısa bir
+     pencerede içeriği kırpmak, kaydırmaya izin vermekten kötü olurdu (metin ULAŞILAMAZ
+     olur). Kaydırma "gerekmiyor", ama imkânsız da değil.
 
-  `overflow` yine de gizlenmedi. Çok kısa bir pencerede (yatay çevrilmiş küçük telefon)
-  içeriği kırpmak, kaydırmaya izin vermekten daha kötü: metnin bir kısmı ULAŞILAMAZ olur.
-  Kaydırma "gerekmiyor", ama imkânsız da değil.
+  2. RENKLER UYGULAMANIN. src/theme/theme.ts ile birebir, açık ve koyu tema dahil.
+
+  3. ANİMASYONLAR CSS. Simge de telefon da tek bir JS satırı olmadan dönüyor; sayfada
+     çalışan yegâne betik dil değiştirme. Animasyon için JS gerekseydi, betik
+     yüklenene kadar sayfa donuk durur ve JS kapalıyken hiç canlanmazdı.
 -->
 <style>
   *, *::before, *::after { box-sizing: border-box; }
 
   :root {
     color-scheme: light dark;
-    /* Uygulamanın açık tema paleti (src/theme/theme.ts ile birebir). */
+    /* Uygulamanın AÇIK teması (src/theme/theme.ts). */
     --primary: #2563eb;
     --fg: #0f172a;
     --muted-fg: #64748b;
@@ -35,12 +38,12 @@
     --card: #ffffff;
     --border: #e2e8f0;
     --surface: #f8fafc;
-    --shadow: 0 24px 60px -20px rgba(15, 23, 42, .28);
+    --shadow: 0 26px 64px -22px rgba(15, 23, 42, .3);
   }
 
   @media (prefers-color-scheme: dark) {
     :root {
-      /* Uygulamanın koyu teması. */
+      /* Uygulamanın KOYU teması. */
       --primary: #3b82f6;
       --fg: #f1f5f9;
       --muted-fg: #94a3b8;
@@ -48,7 +51,7 @@
       --card: #111827;
       --border: #1e293b;
       --surface: #1e293b;
-      --shadow: 0 24px 60px -20px rgba(0, 0, 0, .6);
+      --shadow: 0 26px 64px -22px rgba(0, 0, 0, .65);
     }
   }
 
@@ -56,272 +59,392 @@
     margin: 0;
     min-height: 100dvh;
     display: grid;
-    grid-template-rows: 1fr auto;
+    grid-template-rows: auto 1fr auto;
     background: var(--bg);
     color: var(--fg);
     font: 16px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
   }
 
-  /*
-    Zemindeki iki yumuşak ışık lekesi. Düz beyaz bir zemin, uygulamanın kendi mavisini
-    hiç taşımıyordu; renk katmanın kendisinden değil arkasından geliyor ki metnin
-    okunurluğu hiçbir yerde düşmesin.
-  */
+  /* Renk zeminden değil ARKASINDAN geliyor; metnin okunurluğu hiçbir yerde düşmesin. */
   body::before {
     content: "";
-    position: fixed;
-    inset: 0;
-    z-index: -1;
+    position: fixed; inset: 0; z-index: -1;
     background:
-      radial-gradient(60ch 40ch at 12% -10%, color-mix(in srgb, var(--primary) 14%, transparent), transparent 70%),
-      radial-gradient(50ch 36ch at 100% 108%, color-mix(in srgb, var(--primary) 11%, transparent), transparent 70%);
+      radial-gradient(60ch 40ch at 10% -12%, color-mix(in srgb, var(--primary) 15%, transparent), transparent 70%),
+      radial-gradient(52ch 38ch at 102% 110%, color-mix(in srgb, var(--primary) 12%, transparent), transparent 70%);
   }
+
+  /* ─── Dil düğmesi ───────────────────────────────────────────── */
+
+  .topbar {
+    display: flex; justify-content: flex-end;
+    padding: clamp(12px, 2vh, 20px) clamp(20px, 5vw, 48px) 0;
+  }
+  .lang {
+    display: inline-flex;
+    padding: 3px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: color-mix(in srgb, var(--card) 70%, transparent);
+    backdrop-filter: blur(6px);
+  }
+  .lang button {
+    appearance: none; border: 0; cursor: pointer;
+    padding: 5px 13px;
+    border-radius: 999px;
+    background: transparent;
+    color: var(--muted-fg);
+    font: inherit; font-size: .8rem; font-weight: 600;
+    letter-spacing: .02em;
+    transition: background .18s ease, color .18s ease;
+  }
+  .lang button[aria-pressed="true"] { background: var(--primary); color: #fff; }
+  .lang button:hover:not([aria-pressed="true"]) { color: var(--fg); }
+
+  /* ─── Yerleşim ──────────────────────────────────────────────── */
 
   main {
-    width: min(1080px, 100%);
+    width: min(1120px, 100%);
     margin: 0 auto;
-    padding: clamp(16px, 3.5vh, 40px) clamp(20px, 5vw, 48px);
+    padding: clamp(10px, 2vh, 28px) clamp(20px, 5vw, 48px) clamp(14px, 2.5vh, 32px);
     display: grid;
     align-content: center;
-    gap: clamp(20px, 4vh, 44px);
-    /* İki sütun yalnızca gerçekten YER VARSA; dar ekranda tek sütuna iniyor. */
+    gap: clamp(18px, 3.5vh, 40px);
     grid-template-columns: 1fr;
   }
-
-  @media (min-width: 900px) and (min-height: 560px) {
-    main {
-      grid-template-columns: 1.05fr .95fr;
-      align-items: center;
-    }
+  @media (min-width: 920px) and (min-height: 600px) {
+    main { grid-template-columns: 1.08fr .92fr; align-items: center; }
   }
 
-  /* ─── Sol sütun ─────────────────────────────────────────────── */
+  /* ─── Marka: animasyonlu simge + yazı ───────────────────────── */
 
   .brand {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: clamp(12px, 2.5vh, 22px);
+    display: flex; align-items: center;
+    gap: clamp(12px, 1.6vw, 20px);
+    margin-bottom: clamp(12px, 2.4vh, 24px);
   }
-
-  .mark {
-    width: clamp(38px, 5.4vh, 52px);
-    aspect-ratio: 1;
-    border-radius: 30%;
-    display: grid;
-    place-items: center;
-    background: linear-gradient(145deg, var(--primary), color-mix(in srgb, var(--primary) 62%, #0f172a));
-    box-shadow: 0 10px 24px -10px color-mix(in srgb, var(--primary) 75%, transparent);
-    flex: none;
-  }
-  .mark svg { width: 58%; height: 58%; }
-
+  .logo { width: clamp(74px, 12.5vh, 124px); aspect-ratio: 1; flex: none; overflow: visible; }
   .wordmark {
-    font-size: clamp(1.25rem, 2.6vh, 1.6rem);
-    font-weight: 700;
-    letter-spacing: -.02em;
+    font-size: clamp(1.9rem, 5.2vh, 3.1rem);
+    font-weight: 700; letter-spacing: -.035em; line-height: 1;
   }
+  .tagline {
+    margin-top: 5px;
+    font-size: clamp(.8rem, 1.6vh, .95rem);
+    color: var(--muted-fg);
+  }
+
+  /*
+    SİMGE ANİMASYONU — uygulamadakiyle AYNI zamanlama (src/lib/logoTimeline.ts):
+    4 saniyelik tur, belge yukarıdan gelip fincanın içine iniyor, ardından buhar yükseliyor.
+    Değerler oradaki `DOC_Y`, `DOC_OPACITY` ve `STEAM` kanallarından birebir alındı; iki
+    taraf ayrışırsa aynı marka iki ayrı yerde farklı davranır.
+  */
+  .doc { animation: docDrop 4s linear infinite; }
+  @keyframes docDrop {
+    0%   { transform: translate(75px, 15px);  opacity: 0; }
+    5%   { transform: translate(75px, 15px);  opacity: 1; }
+    45%  { transform: translate(75px, 120px); opacity: 1; }
+    100% { transform: translate(75px, 120px); opacity: 0; }
+  }
+
+  .steam { animation: steam 4s linear infinite; }
+  @keyframes steam {
+    0%, 45%  { transform: translateY(15px); opacity: 0; }
+    75%      { transform: translateY(-15px); opacity: .7; }
+    100%     { transform: translateY(-15px); opacity: 0; }
+  }
+  /* Çubuklar kademeli: hepsi aynı anda kalksaydı buhar değil, yükselen bir blok olurdu. */
+  .steam:nth-of-type(2) { animation-delay: -.08s; }
+  .steam:nth-of-type(3) { animation-delay: -.16s; }
+  .steam:nth-of-type(4) { animation-delay: -.24s; }
+  .steam:nth-of-type(5) { animation-delay: -.32s; }
+
+  /* ─── Sol sütun metni ───────────────────────────────────────── */
 
   h1 {
     margin: 0;
-    font-size: clamp(1.85rem, 5.4vh, 3.4rem);
-    line-height: 1.08;
-    letter-spacing: -.035em;
-    font-weight: 700;
+    font-size: clamp(1.6rem, 4.6vh, 2.9rem);
+    line-height: 1.1; letter-spacing: -.035em; font-weight: 700;
     text-wrap: balance;
   }
   h1 em { font-style: normal; color: var(--primary); }
 
   .lede {
-    margin: clamp(10px, 2vh, 18px) 0 0;
-    font-size: clamp(.98rem, 2.1vh, 1.18rem);
+    margin: clamp(9px, 1.8vh, 16px) 0 0;
+    font-size: clamp(.92rem, 1.95vh, 1.1rem);
     color: var(--muted-fg);
     max-width: 46ch;
     text-wrap: pretty;
   }
 
   .points {
-    list-style: none;
-    margin: clamp(16px, 3vh, 30px) 0 0;
-    padding: 0;
-    display: grid;
-    gap: clamp(8px, 1.6vh, 14px);
+    list-style: none; margin: clamp(14px, 2.6vh, 26px) 0 0; padding: 0;
+    display: grid; gap: clamp(7px, 1.4vh, 13px);
   }
   .points li {
-    display: grid;
-    grid-template-columns: auto 1fr;
-    gap: 11px;
-    align-items: start;
-    font-size: clamp(.9rem, 1.85vh, 1.02rem);
+    display: grid; grid-template-columns: auto 1fr; gap: 10px; align-items: start;
+    font-size: clamp(.86rem, 1.75vh, .99rem);
   }
-  .points svg {
-    width: 1.15em; height: 1.15em;
-    margin-top: .18em;
-    color: var(--primary);
-    flex: none;
-  }
+  .points svg { width: 1.15em; height: 1.15em; margin-top: .2em; color: var(--primary); flex: none; }
   .points b { font-weight: 600; }
   .points span { color: var(--muted-fg); }
 
   .actions {
-    margin-top: clamp(18px, 3.4vh, 34px);
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 12px;
+    margin-top: clamp(15px, 3vh, 30px);
+    display: flex; flex-wrap: wrap; align-items: center; gap: 11px;
   }
-
   .cta {
-    display: inline-flex;
-    align-items: center;
-    gap: 9px;
-    padding: clamp(10px, 1.7vh, 14px) clamp(18px, 2.4vw, 26px);
+    display: inline-flex; align-items: center; gap: 9px;
+    padding: clamp(9px, 1.6vh, 13px) clamp(17px, 2.2vw, 24px);
     border-radius: 999px;
-    background: var(--primary);
-    color: #fff;
-    font-weight: 600;
-    font-size: clamp(.92rem, 1.85vh, 1rem);
+    background: var(--primary); color: #fff;
+    font-weight: 600; font-size: clamp(.88rem, 1.75vh, .98rem);
     text-decoration: none;
     box-shadow: 0 14px 30px -14px color-mix(in srgb, var(--primary) 85%, transparent);
     transition: transform .18s ease, box-shadow .18s ease;
   }
-  .cta:hover { transform: translateY(-2px); box-shadow: 0 20px 38px -16px color-mix(in srgb, var(--primary) 85%, transparent); }
-
+  .cta:hover { transform: translateY(-2px); }
   .cta--ghost {
-    background: transparent;
-    color: var(--fg);
-    border: 1px solid var(--border);
-    box-shadow: none;
+    background: transparent; color: var(--fg);
+    border: 1px solid var(--border); box-shadow: none;
   }
-  .cta--ghost:hover { border-color: var(--primary); color: var(--primary); box-shadow: none; }
-
+  .cta--ghost:hover { border-color: var(--primary); color: var(--primary); }
   .soon {
-    font-size: .74rem;
-    font-weight: 700;
-    letter-spacing: .06em;
-    padding: 2px 8px;
-    border-radius: 999px;
-    background: rgba(255, 255, 255, .22);
+    font-size: .7rem; font-weight: 700; letter-spacing: .06em;
+    padding: 2px 8px; border-radius: 999px; background: rgba(255,255,255,.22);
   }
 
-  /* ─── Sağ sütun: telefon ────────────────────────────────────── */
+  /* ─── Sağ sütun: dönen uygulama ekranları ───────────────────── */
 
   .preview { display: grid; place-items: center; }
-
-  /* Küçük ekranda telefon gizleniyor: yer kalmıyor ve asıl mesaj METİN. */
-  @media (max-width: 899px), (max-height: 559px) {
-    .preview { display: none; }
-  }
+  /* Yer kalmadığında telefon gizleniyor; asıl mesaj metin. */
+  @media (max-width: 919px), (max-height: 599px) { .preview { display: none; } }
 
   .phone {
-    width: clamp(210px, 27vh, 290px);
-    aspect-ratio: 9 / 18.5;
-    border-radius: clamp(28px, 4vh, 40px);
+    position: relative;
+    width: clamp(216px, 29vh, 296px);
+    aspect-ratio: 9 / 18.7;
+    border-radius: clamp(30px, 4.2vh, 42px);
     background: var(--card);
     border: 1px solid var(--border);
     box-shadow: var(--shadow);
-    padding: clamp(12px, 1.8vh, 18px);
-    display: grid;
-    grid-template-rows: auto auto 1fr;
-    gap: clamp(8px, 1.4vh, 14px);
+    padding: clamp(13px, 1.9vh, 19px);
     overflow: hidden;
-    transform: rotate(-1.6deg);
+    transform: rotate(-1.5deg);
   }
 
-  .phone-top {
+  /*
+    EKRANLAR ÜST ÜSTE DURUYOR ve sırayla beliriyor. Dördü de aynı ızgara hücresinde:
+    telefonun yüksekliği en uzun ekrana göre sabit kalıyor, geçişte kutu zıplamıyor.
+
+    Tur 20 saniye, ekran başına 5 saniye — okunacak kadar yavaş. Gecikmeler POZİTİF:
+    negatif verilseydi sayfa açılır açılmaz üç ekran turun ortasından başlar ve ilk
+    izlenim yarım kalmış bir geçiş olurdu.
+  */
+  .screens { display: grid; height: 100%; }
+  .screen {
+    grid-area: 1 / 1;
+    display: grid; grid-template-rows: auto auto 1fr; gap: clamp(8px, 1.3vh, 13px);
+    align-content: start;
+    opacity: 0;
+    animation: cycle 20s ease-in-out infinite;
+  }
+  .screen:nth-child(2) { animation-delay: 5s; }
+  .screen:nth-child(3) { animation-delay: 10s; }
+  .screen:nth-child(4) { animation-delay: 15s; }
+  @keyframes cycle {
+    0%          { opacity: 0; transform: translateY(10px); }
+    3%, 22%     { opacity: 1; transform: none; }
+    25%, 100%   { opacity: 0; transform: translateY(-10px); }
+  }
+
+  .scr-top {
     display: flex; align-items: center; justify-content: space-between;
-    font-size: .72rem; color: var(--muted-fg);
+    font-size: .7rem; color: var(--muted-fg);
   }
-  .phone-title { font-weight: 700; color: var(--fg); font-size: .95rem; letter-spacing: -.01em; }
+  .scr-title { font-weight: 700; color: var(--fg); font-size: .93rem; letter-spacing: -.015em; }
 
-  .stat {
-    border-radius: 16px;
-    padding: clamp(9px, 1.4vh, 13px);
-    background: linear-gradient(135deg, var(--primary), color-mix(in srgb, var(--primary) 65%, #0f172a));
+  .banner {
+    border-radius: 15px; padding: clamp(9px, 1.4vh, 13px);
+    background: linear-gradient(135deg, var(--primary), color-mix(in srgb, var(--primary) 62%, #0f172a));
     color: #fff;
   }
-  .stat b { display: block; font-size: clamp(1.3rem, 2.6vh, 1.7rem); line-height: 1.1; letter-spacing: -.02em; }
-  .stat span { font-size: .72rem; opacity: .88; }
+  .banner b { display: block; font-size: clamp(1.15rem, 2.4vh, 1.5rem); line-height: 1.15; letter-spacing: -.02em; }
+  .banner span { font-size: .68rem; opacity: .9; }
 
-  .cards { display: grid; gap: clamp(6px, 1vh, 10px); align-content: start; }
+  .rows { display: grid; gap: clamp(5px, .9vh, 9px); align-content: start; }
 
-  .dev {
-    display: grid;
-    grid-template-columns: auto 1fr auto;
-    align-items: center;
-    gap: 9px;
-    padding: clamp(7px, 1.1vh, 11px);
-    border-radius: 13px;
-    background: var(--surface);
-    border: 1px solid var(--border);
+  .row {
+    display: grid; grid-template-columns: auto 1fr auto;
+    align-items: center; gap: 9px;
+    padding: clamp(6px, 1vh, 10px);
+    border-radius: 12px;
+    background: var(--surface); border: 1px solid var(--border);
   }
-  .dev .ic {
-    width: 26px; aspect-ratio: 1; border-radius: 8px;
+  .row .ic {
+    width: 25px; aspect-ratio: 1; border-radius: 8px;
     display: grid; place-items: center;
     background: color-mix(in srgb, var(--primary) 13%, transparent);
     color: var(--primary);
   }
-  .dev .ic svg { width: 15px; height: 15px; }
-  .dev .nm { font-size: .78rem; font-weight: 600; letter-spacing: -.01em; }
-  .dev .sub { font-size: .66rem; color: var(--muted-fg); }
+  .row .ic svg { width: 14px; height: 14px; }
+  .row .nm { font-size: .75rem; font-weight: 600; letter-spacing: -.01em; }
+  .row .sub { font-size: .63rem; color: var(--muted-fg); }
   .pill {
-    font-size: .62rem; font-weight: 700; padding: 3px 7px; border-radius: 999px;
+    font-size: .6rem; font-weight: 700; padding: 3px 7px; border-radius: 999px;
     background: color-mix(in srgb, var(--primary) 13%, transparent);
-    color: var(--primary);
-    white-space: nowrap;
+    color: var(--primary); white-space: nowrap;
   }
-  .pill--warn {
-    background: color-mix(in srgb, #f59e0b 18%, transparent);
-    color: #b45309;
-  }
+  .pill--warn { background: color-mix(in srgb, #f59e0b 20%, transparent); color: #b45309; }
   @media (prefers-color-scheme: dark) { .pill--warn { color: #fbbf24; } }
+
+  /* Cihaz detayı ekranı */
+  .detail-hero {
+    display: grid; place-items: center; gap: 6px;
+    padding: clamp(10px, 1.7vh, 16px);
+    border-radius: 15px; background: var(--surface); border: 1px solid var(--border);
+  }
+  .detail-hero .big { font-size: clamp(1.35rem, 2.7vh, 1.7rem); font-weight: 700; letter-spacing: -.03em; color: var(--primary); }
+  .detail-hero .cap { font-size: .64rem; color: var(--muted-fg); }
+  .bar { height: 6px; border-radius: 999px; background: var(--border); overflow: hidden; }
+  .bar i { display: block; height: 100%; width: 22%; border-radius: 999px; background: var(--primary); }
+  .kv { display: flex; justify-content: space-between; font-size: .68rem; padding: 5px 2px; border-bottom: 1px solid var(--border); }
+  .kv span { color: var(--muted-fg); }
+  .kv b { font-weight: 600; }
+
+  /* Bildirim ekranı */
+  .notif {
+    display: grid; grid-template-columns: auto 1fr; gap: 9px;
+    padding: clamp(9px, 1.5vh, 13px);
+    border-radius: 14px; background: var(--card);
+    border: 1px solid var(--border);
+    box-shadow: 0 10px 24px -14px rgba(15,23,42,.35);
+  }
+  .notif .ic { width: 26px; aspect-ratio: 1; border-radius: 8px; display: grid; place-items: center; background: color-mix(in srgb, var(--primary) 14%, transparent); color: var(--primary); }
+  .notif .ic svg { width: 15px; height: 15px; }
+  .notif .t { font-size: .72rem; font-weight: 700; }
+  .notif .d { font-size: .64rem; color: var(--muted-fg); }
 
   /* ─── Alt şerit ─────────────────────────────────────────────── */
 
   footer {
     border-top: 1px solid var(--border);
-    padding: clamp(10px, 1.8vh, 16px) clamp(20px, 5vw, 48px);
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px 18px;
-    font-size: clamp(.78rem, 1.5vh, .88rem);
+    padding: clamp(9px, 1.6vh, 15px) clamp(20px, 5vw, 48px);
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+    gap: 7px 18px;
+    font-size: clamp(.75rem, 1.45vh, .86rem);
     color: var(--muted-fg);
   }
   footer a { color: var(--muted-fg); text-decoration: none; border-bottom: 1px solid transparent; }
   footer a:hover { color: var(--primary); border-bottom-color: currentColor; }
-  footer nav { display: flex; flex-wrap: wrap; gap: 8px 18px; }
-  /* Gizlilik bağlantısı alt şeritteki DİĞER bağlantılardan ayrılıyor: mağaza incelemesi
-     ve kullanıcı bu sayfada onu arıyor. */
+  footer nav { display: flex; flex-wrap: wrap; gap: 7px 18px; }
+  /* Gizlilik bağlantısı diğerlerinden ayrılıyor: mağaza incelemesi ve kullanıcı onu arıyor. */
   footer .privacy { color: var(--fg); font-weight: 600; }
 
+  /*
+    HAREKET AZALTMA. Sürekli dönen iki animasyon var; vestibüler duyarlılığı olan
+    kullanıcı için bu bir rahatsızlık kaynağı. Kapatıldığında ekranlar sırayla değil,
+    ilki sabit duruyor — içerik kaybolmuyor.
+  */
   @media (prefers-reduced-motion: reduce) {
-    * { transition: none !important; }
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+    .screen { opacity: 0; }
+    .screen:first-child { opacity: 1; }
+    .doc { opacity: 0; }
   }
 </style>
 </head>
 <body>
 
+<div class="topbar">
+  <div class="lang" role="group" aria-label="Dil / Language">
+    <button type="button" data-lang="tr" aria-pressed="true">Türkçe</button>
+    <button type="button" data-lang="en" aria-pressed="false">English</button>
+  </div>
+</div>
+
 <main>
   <div>
     <div class="brand">
-      <div class="mark" aria-hidden="true">
-        <!-- Kalkan: uygulamanın "güvence altında" fikri. -->
-        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-          <path d="m9 12 2 2 4-4"/>
-        </svg>
+      <!--
+        Uygulamanın SİMGESİ, birebir aynı vektör (src/components/GaranTeaLogo.tsx).
+        Basitleştirilmiş bir kopya çizmek, aynı markayı iki ayrı yerde iki farklı biçimde
+        göstermek olurdu.
+      -->
+      <svg class="logo" viewBox="0 0 200 200" role="img" aria-label="GaranTea">
+        <defs>
+          <linearGradient id="docFade" x1="0" y1="80" x2="0" y2="105" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#fff"/><stop offset="100%" stop-color="#000"/>
+          </linearGradient>
+          <linearGradient id="cupGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#053582"/><stop offset="20%" stop-color="#0B57D0"/>
+            <stop offset="80%" stop-color="#4285F4"/><stop offset="100%" stop-color="#8ab4f8"/>
+          </linearGradient>
+          <linearGradient id="insideCupGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#03204e"/><stop offset="20%" stop-color="#053582"/>
+            <stop offset="80%" stop-color="#0B57D0"/><stop offset="100%" stop-color="#1a73e8"/>
+          </linearGradient>
+          <linearGradient id="saucerGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#1a73e8"/><stop offset="100%" stop-color="#0f4185"/>
+          </linearGradient>
+          <linearGradient id="docGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#EA4335"/><stop offset="100%" stop-color="#B31412"/>
+          </linearGradient>
+          <!-- Belgeyi fincanın ağzında eriten perde. Uygulamada Android'de çalışmayan
+               `Mask` burada sorunsuz: tarayıcı desteği tam. -->
+          <mask id="fadeMask" maskUnits="userSpaceOnUse" x="0" y="0" width="200" height="200">
+            <rect x="0" y="0" width="200" height="200" fill="url(#docFade)"/>
+          </mask>
+        </defs>
+
+        <ellipse cx="100" cy="176" rx="65" ry="8" fill="#e2e8f0" opacity=".55"/>
+        <ellipse cx="100" cy="165" rx="80" ry="16" fill="url(#saucerGradient)"/>
+        <ellipse cx="100" cy="165" rx="50" ry="10" fill="#1558b0" opacity="0.6"/>
+        <ellipse cx="100" cy="165" rx="49" ry="9" fill="none" stroke="#8ab4f8" stroke-width="1.5"/>
+        <ellipse cx="100" cy="165" rx="40" ry="8" fill="#0f4185" opacity="0.5"/>
+
+        <path d="M 155 105 C 190 105, 185 145, 140 148" fill="none" stroke="#1a73e8"
+              stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+
+        <ellipse cx="100" cy="95" rx="56" ry="14" fill="url(#insideCupGradient)"/>
+        <ellipse cx="100" cy="95" rx="56" ry="14" fill="none" stroke="url(#cupGradient)" stroke-width="2.5"/>
+
+        <g mask="url(#fadeMask)">
+          <g class="doc">
+            <rect x="0" y="0" width="50" height="70" rx="6" fill="url(#docGradient)"/>
+            <rect x="0" y="0" width="50" height="2" rx="1" fill="#fff" opacity="0.4"/>
+            <rect x="12" y="14" width="26" height="4" rx="2" fill="#fff"/>
+            <rect x="12" y="24" width="16" height="4" rx="2" fill="#fff"/>
+            <rect x="12" y="34" width="22" height="4" rx="2" fill="#fff"/>
+            <rect x="12" y="44" width="12" height="4" rx="2" fill="#fff"/>
+          </g>
+        </g>
+
+        <!-- Ön gövde belgeden SONRA çiziliyor; belgenin üstünü örten şey bu. -->
+        <path d="M 41 95 A 59 15 0 0 0 159 95 C 159 150, 135 165, 100 165 C 65 165, 41 150, 41 95 Z"
+              fill="url(#cupGradient)" stroke="url(#cupGradient)" stroke-width="2.5" stroke-linejoin="round"/>
+
+        <rect class="steam" x="70"  y="65" width="6" height="14" rx="3" fill="#8ab4f8"/>
+        <rect class="steam" x="84"  y="60" width="6" height="20" rx="3" fill="#669df6"/>
+        <rect class="steam" x="97"  y="55" width="6" height="26" rx="3" fill="#4285f4"/>
+        <rect class="steam" x="110" y="60" width="6" height="20" rx="3" fill="#669df6"/>
+        <rect class="steam" x="124" y="65" width="6" height="14" rx="3" fill="#8ab4f8"/>
+      </svg>
+
+      <div>
+        <div class="wordmark">GaranTea</div>
+        <div class="tagline" data-tr="Garanti Takip Asistanınız" data-en="Warranty Tracking Assistant">Garanti Takip Asistanınız</div>
       </div>
-      <div class="wordmark">GaranTea</div>
     </div>
 
-    <h1>Garantisi bitmeden <em>haberin olsun</em>.</h1>
+    <h1 data-tr="Garantisi bitmeden &lt;em&gt;haberin olsun&lt;/em&gt;." data-en="Know &lt;em&gt;before&lt;/em&gt; the warranty ends.">Garantisi bitmeden <em>haberin olsun</em>.</h1>
 
-    <p class="lede">
-      Aldığın her cihazın faturasını ve garanti süresini tek yerde topla.
-      GaranTea süreyi senin yerine takip eder, zamanı gelince hatırlatır.
+    <p class="lede"
+       data-tr="Aldığın her cihazın faturasını ve garanti süresini tek yerde topla. GaranTea süreyi senin yerine takip eder, zamanı gelince hatırlatır — telefonunu değiştirsen bile kayıtların yerinde kalır."
+       data-en="Keep every device's receipt and warranty period in one place. GaranTea tracks the time for you and reminds you when it matters — and your records stay put even when you change phones.">
+      Aldığın her cihazın faturasını ve garanti süresini tek yerde topla. GaranTea süreyi senin yerine takip eder, zamanı gelince hatırlatır — telefonunu değiştirsen bile kayıtların yerinde kalır.
     </p>
 
     <ul class="points">
@@ -329,78 +452,158 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <rect x="3" y="4" width="18" height="16" rx="2"/><path d="M8 2v4M16 2v4M3 10h18"/>
         </svg>
-        <div><b>Süre dolmadan uyarı.</b> <span>Garantisi bitmek üzere olan cihaz için bildirim gelir; tarihi hatırlamak zorunda kalmazsın.</span></div>
+        <div>
+          <b data-tr="Süre dolmadan uyarı." data-en="A warning before it expires.">Süre dolmadan uyarı.</b>
+          <span data-tr="Garantisi bitmek üzere olan cihaz için bildirim gelir; tarihi hatırlamak zorunda kalmazsın." data-en="You get a notification while there is still time to act — no dates to memorise."> Garantisi bitmek üzere olan cihaz için bildirim gelir; tarihi hatırlamak zorunda kalmazsın.</span>
+        </div>
       </li>
       <li>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M8 13h8M8 17h5"/>
         </svg>
-        <div><b>Faturan kaybolmaz.</b> <span>Fatura ve garanti belgelerini fotoğraf ya da PDF olarak sakla; servise gittiğinde yanında olsun.</span></div>
+        <div>
+          <b data-tr="Faturan kaybolmaz." data-en="Your receipt never gets lost.">Faturan kaybolmaz.</b>
+          <span data-tr="Fatura ve garanti belgelerini fotoğraf ya da PDF olarak sakla; servise gittiğinde yanında olsun." data-en="Store receipts and warranty documents as photos or PDFs, ready when you walk into a service centre."> Fatura ve garanti belgelerini fotoğraf ya da PDF olarak sakla; servise gittiğinde yanında olsun.</span>
+        </div>
       </li>
       <li>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/>
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/>
         </svg>
-        <div><b>Telefon değişse de durur.</b> <span>Kayıtların hesabına bağlı; yeni cihazında giriş yaptığın anda hepsi yerinde.</span></div>
-      </li>
-      <li>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-        </svg>
-        <div><b>Verin satılmaz.</b> <span>Konum, mikrofon ve rehber izni hiç istenmez. Ne topladığımız aşağıdaki metinde madde madde yazılı.</span></div>
+        <div>
+          <b data-tr="Verin satılmaz." data-en="Your data is not for sale.">Verin satılmaz.</b>
+          <span data-tr="Konum, mikrofon ve rehber izni hiç istenmez. Ne topladığımız gizlilik metninde madde madde yazılı." data-en="Location, microphone and contacts are never requested. What we do collect is listed line by line in the privacy policy."> Konum, mikrofon ve rehber izni hiç istenmez. Ne topladığımız gizlilik metninde madde madde yazılı.</span>
+        </div>
       </li>
     </ul>
 
     <div class="actions">
-      <!--
-        Mağaza bağlantısı henüz YOK. Çalışmayan bir bağlantı vermektense butonu pasif
-        bırakmak dürüst: uygulama içindeki "Yakında" rozetleriyle de aynı dil.
-      -->
-      <span class="cta" role="text">
-        Google Play <span class="soon">YAKINDA</span>
+      <!-- Mağaza bağlantısı henüz yok; çalışmayan bir bağlantı vermektense pasif bırakmak
+           dürüst ve uygulama içindeki "Yakında" rozetleriyle aynı dil. -->
+      <span class="cta">
+        Google Play <span class="soon" data-tr="YAKINDA" data-en="SOON">YAKINDA</span>
       </span>
-      <a class="cta cta--ghost" href="privacy.html">Gizlilik Politikası</a>
+      <a class="cta cta--ghost" href="privacy.html" data-tr="Gizlilik Politikası" data-en="Privacy Policy">Gizlilik Politikası</a>
     </div>
   </div>
 
   <!--
-    Telefon görseli CSS ile çiziliyor; ekran görüntüsü dosyası YOK. Sebebi pratik: görsel
-    dosya, arayüz her değiştiğinde eskiyen ve kimsenin güncellemeyi hatırlamadığı bir
-    kopya olurdu. Buradaki temsilî kart, uygulamanın renk ve biçim dilini taşıyor.
+    Telefon ve içindeki ekranlar CSS ile çiziliyor; ekran görüntüsü DOSYASI yok. Bir PNG,
+    arayüz her değiştiğinde eskiyen ve kimsenin güncellemeyi hatırlamadığı bir kopya olurdu.
   -->
   <div class="preview" aria-hidden="true">
     <div class="phone">
-      <div class="phone-top">
-        <span class="phone-title">Cihazlarım</span>
-        <span>4 kayıt</span>
-      </div>
+      <div class="screens">
 
-      <div class="stat">
-        <b>2 cihaz</b>
-        <span>garantisi bu ay bitiyor</span>
-      </div>
+        <!-- 1 · Cihaz listesi -->
+        <div class="screen">
+          <div class="scr-top">
+            <span class="scr-title" data-tr="Cihazlarım" data-en="My Devices">Cihazlarım</span>
+            <span data-tr="4 kayıt" data-en="4 records">4 kayıt</span>
+          </div>
+          <div class="banner">
+            <b data-tr="2 cihaz" data-en="2 devices">2 cihaz</b>
+            <span data-tr="garantisi bu ay bitiyor" data-en="expiring this month">garantisi bu ay bitiyor</span>
+          </div>
+          <div class="rows">
+            <div class="row">
+              <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/></svg></div>
+              <div><div class="nm">iPhone 15 Pro</div><div class="sub">Apple · 20.09.2023</div></div>
+              <span class="pill" data-tr="14 ay" data-en="14 mo">14 ay</span>
+            </div>
+            <div class="row">
+              <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></div>
+              <div><div class="nm">OLED TV C3</div><div class="sub">LG · 15.06.2024</div></div>
+              <span class="pill" data-tr="22 ay" data-en="22 mo">22 ay</span>
+            </div>
+            <div class="row">
+              <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="2" width="18" height="20" rx="2"/><circle cx="12" cy="13" r="4"/><path d="M7 6h.01"/></svg></div>
+              <div><div class="nm" data-tr="Çamaşır Makinesi" data-en="Washing Machine">Çamaşır Makinesi</div><div class="sub">Bosch · 01.08.2023</div></div>
+              <span class="pill pill--warn" data-tr="18 gün" data-en="18 days">18 gün</span>
+            </div>
+            <div class="row">
+              <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M2 20h20"/></svg></div>
+              <div><div class="nm">MacBook Pro M3</div><div class="sub">Apple · 01.11.2023</div></div>
+              <span class="pill" data-tr="9 ay" data-en="9 mo">9 ay</span>
+            </div>
+          </div>
+        </div>
 
-      <div class="cards">
-        <div class="dev">
-          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/></svg></div>
-          <div><div class="nm">iPhone 15 Pro</div><div class="sub">Apple · 20.09.2023</div></div>
-          <span class="pill">14 ay</span>
+        <!-- 2 · Cihaz detayı -->
+        <div class="screen">
+          <div class="scr-top">
+            <span class="scr-title" data-tr="Garanti Detayı" data-en="Warranty Detail">Garanti Detayı</span>
+            <span>Bosch</span>
+          </div>
+          <div class="detail-hero">
+            <div class="big" data-tr="18 gün" data-en="18 days">18 gün</div>
+            <div class="cap" data-tr="garanti süresi kaldı" data-en="of warranty left">garanti süresi kaldı</div>
+            <div class="bar" style="width:100%"><i></i></div>
+          </div>
+          <div class="rows">
+            <div class="kv"><span data-tr="Cihaz" data-en="Device">Cihaz</span><b data-tr="Çamaşır Makinesi" data-en="Washing Machine">Çamaşır Makinesi</b></div>
+            <div class="kv"><span data-tr="Satın alma" data-en="Purchased">Satın alma</span><b>01.08.2023</b></div>
+            <div class="kv"><span data-tr="Garanti" data-en="Warranty">Garanti</span><b data-tr="36 ay" data-en="36 months">36 ay</b></div>
+            <div class="kv"><span data-tr="Fatura" data-en="Receipt">Fatura</span><b data-tr="Eklendi" data-en="Attached">Eklendi</b></div>
+            <div class="kv"><span data-tr="Yer" data-en="Room">Yer</span><b data-tr="Banyo" data-en="Bathroom">Banyo</b></div>
+          </div>
         </div>
-        <div class="dev">
-          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></div>
-          <div><div class="nm">OLED TV C3</div><div class="sub">LG · 15.06.2024</div></div>
-          <span class="pill">22 ay</span>
+
+        <!-- 3 · Fatura ekleme -->
+        <div class="screen">
+          <div class="scr-top">
+            <span class="scr-title" data-tr="Fatura Ekle" data-en="Add Receipt">Fatura Ekle</span>
+          </div>
+          <div class="banner">
+            <b data-tr="Faturanı yükle" data-en="Upload a receipt">Faturanı yükle</b>
+            <span data-tr="belgeler cihazına bağlı kalır" data-en="documents stay linked to the device">belgeler cihazına bağlı kalır</span>
+          </div>
+          <div class="rows">
+            <div class="row">
+              <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div>
+              <div><div class="nm" data-tr="Kamera ile tara" data-en="Scan with camera">Kamera ile tara</div><div class="sub" data-tr="kenarlar otomatik düzelir" data-en="edges corrected automatically">kenarlar otomatik düzelir</div></div>
+              <span></span>
+            </div>
+            <div class="row">
+              <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg></div>
+              <div><div class="nm" data-tr="Fotoğraf yükle" data-en="Upload photo">Fotoğraf yükle</div><div class="sub" data-tr="galeriden seç" data-en="pick from gallery">galeriden seç</div></div>
+              <span></span>
+            </div>
+            <div class="row">
+              <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg></div>
+              <div><div class="nm" data-tr="PDF ekle" data-en="Add PDF">PDF ekle</div><div class="sub" data-tr="dijital faturan" data-en="your digital invoice">dijital faturan</div></div>
+              <span></span>
+            </div>
+          </div>
         </div>
-        <div class="dev">
-          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="2" width="18" height="20" rx="2"/><circle cx="12" cy="13" r="4"/><path d="M7 6h.01"/></svg></div>
-          <div><div class="nm">Çamaşır Makinesi</div><div class="sub">Bosch · 01.08.2023</div></div>
-          <span class="pill pill--warn">18 gün</span>
+
+        <!-- 4 · Hatırlatma -->
+        <div class="screen">
+          <div class="scr-top">
+            <span class="scr-title" data-tr="Hatırlatmalar" data-en="Reminders">Hatırlatmalar</span>
+            <span data-tr="açık" data-en="on">açık</span>
+          </div>
+          <div class="notif">
+            <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></div>
+            <div>
+              <div class="t">GaranTea</div>
+              <div class="d" data-tr="Çamaşır Makinesi garantisi 18 gün sonra doluyor." data-en="Washing Machine warranty expires in 18 days.">Çamaşır Makinesi garantisi 18 gün sonra doluyor.</div>
+            </div>
+          </div>
+          <div class="rows">
+            <div class="row">
+              <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div>
+              <div><div class="nm" data-tr="30 gün kala" data-en="30 days before">30 gün kala</div><div class="sub" data-tr="ilk hatırlatma" data-en="first reminder">ilk hatırlatma</div></div>
+              <span class="pill">✓</span>
+            </div>
+            <div class="row">
+              <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div>
+              <div><div class="nm" data-tr="7 gün kala" data-en="7 days before">7 gün kala</div><div class="sub" data-tr="son uyarı" data-en="final warning">son uyarı</div></div>
+              <span class="pill">✓</span>
+            </div>
+          </div>
         </div>
-        <div class="dev">
-          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M2 20h20"/></svg></div>
-          <div><div class="nm">MacBook Pro M3</div><div class="sub">Apple · 01.11.2023</div></div>
-          <span class="pill">9 ay</span>
-        </div>
+
       </div>
     </div>
   </div>
@@ -409,11 +612,54 @@
 <footer>
   <span>© 2026 GaranTea</span>
   <nav>
-    <a class="privacy" href="privacy.html">Gizlilik Politikası</a>
+    <a class="privacy" href="privacy.html" data-tr="Gizlilik Politikası" data-en="Privacy Policy">Gizlilik Politikası</a>
     <a href="privacy.html#en">Privacy Policy (EN)</a>
     <a href="mailto:appgarantea@gmail.com">appgarantea@gmail.com</a>
   </nav>
 </footer>
+
+<script>
+/*
+  DİL DEĞİŞTİRME — sayfadaki tek betik.
+
+  Metinler `data-tr` / `data-en` özniteliklerinde duruyor; ikinci bir HTML kopyası YOK.
+  İki ayrı sayfa tutmak, biri güncellendiğinde diğerinin sessizce eskimesi demekti — aynı
+  gerekçeyle gizlilik metni de tek kaynaktan üretiliyor.
+
+  Varsayılan tarayıcı diline bakıyor: Türkçe değilse İngilizce açılıyor. Seçim
+  `localStorage`'da saklanıyor, ziyaretçi her gelişte yeniden seçmek zorunda kalmasın.
+*/
+(function () {
+  var STORE_KEY = 'garantea-lang';
+
+  function apply(lang) {
+    document.documentElement.lang = lang;
+
+    document.querySelectorAll('[data-' + lang + ']').forEach(function (el) {
+      /*
+        `innerHTML` KULLANILIYOR çünkü başlıkta vurgu etiketi (<em>) var. Kaynak yalnızca
+        bu dosyanın kendi öznitelikleri — kullanıcıdan gelen hiçbir veri buraya girmiyor.
+      */
+      el.innerHTML = el.getAttribute('data-' + lang);
+    });
+
+    document.querySelectorAll('.lang button').forEach(function (btn) {
+      btn.setAttribute('aria-pressed', String(btn.dataset.lang === lang));
+    });
+
+    try { localStorage.setItem(STORE_KEY, lang); } catch (e) { /* gizli sekme: sorun değil */ }
+  }
+
+  var saved = null;
+  try { saved = localStorage.getItem(STORE_KEY); } catch (e) {}
+  var initial = saved || ((navigator.language || 'tr').toLowerCase().indexOf('tr') === 0 ? 'tr' : 'en');
+  apply(initial);
+
+  document.querySelectorAll('.lang button').forEach(function (btn) {
+    btn.addEventListener('click', function () { apply(btn.dataset.lang); });
+  });
+})();
+</script>
 
 </body>
 </html>
