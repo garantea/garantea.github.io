@@ -1,0 +1,419 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GaranTea — Garanti Takip Asistanınız</title>
+<meta name="description" content="GaranTea, cihazlarınızın garanti sürelerini takip eder. Faturanızı saklar, süre dolmadan önce hatırlatır, cihaz değiştirdiğinizde kayıtlarınız kaybolmaz.">
+<meta name="theme-color" content="#2563eb">
+
+<meta property="og:title" content="GaranTea — Garanti Takip Asistanınız">
+<meta property="og:description" content="Faturalarınız tek yerde, garanti süreniz hep göz önünde.">
+<meta property="og:type" content="website">
+
+<!--
+  TEK EKRAN, KAYDIRMASIZ.
+
+  Sayfanın tamamı `100dvh` içine sığacak biçimde kuruldu: bütün ölçüler `clamp()` ile
+  ekran boyutuna bağlı, sabit piksel yok. `dvh` (`vh` değil) bilinçli — mobil tarayıcıda
+  adres çubuğu kayarken `vh` sabit kalıyor ve sayfanın altı kırpılıyor.
+
+  `overflow` yine de gizlenmedi. Çok kısa bir pencerede (yatay çevrilmiş küçük telefon)
+  içeriği kırpmak, kaydırmaya izin vermekten daha kötü: metnin bir kısmı ULAŞILAMAZ olur.
+  Kaydırma "gerekmiyor", ama imkânsız da değil.
+-->
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+
+  :root {
+    color-scheme: light dark;
+    /* Uygulamanın açık tema paleti (src/theme/theme.ts ile birebir). */
+    --primary: #2563eb;
+    --fg: #0f172a;
+    --muted-fg: #64748b;
+    --bg: #ffffff;
+    --card: #ffffff;
+    --border: #e2e8f0;
+    --surface: #f8fafc;
+    --shadow: 0 24px 60px -20px rgba(15, 23, 42, .28);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      /* Uygulamanın koyu teması. */
+      --primary: #3b82f6;
+      --fg: #f1f5f9;
+      --muted-fg: #94a3b8;
+      --bg: #0b1220;
+      --card: #111827;
+      --border: #1e293b;
+      --surface: #1e293b;
+      --shadow: 0 24px 60px -20px rgba(0, 0, 0, .6);
+    }
+  }
+
+  body {
+    margin: 0;
+    min-height: 100dvh;
+    display: grid;
+    grid-template-rows: 1fr auto;
+    background: var(--bg);
+    color: var(--fg);
+    font: 16px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /*
+    Zemindeki iki yumuşak ışık lekesi. Düz beyaz bir zemin, uygulamanın kendi mavisini
+    hiç taşımıyordu; renk katmanın kendisinden değil arkasından geliyor ki metnin
+    okunurluğu hiçbir yerde düşmesin.
+  */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background:
+      radial-gradient(60ch 40ch at 12% -10%, color-mix(in srgb, var(--primary) 14%, transparent), transparent 70%),
+      radial-gradient(50ch 36ch at 100% 108%, color-mix(in srgb, var(--primary) 11%, transparent), transparent 70%);
+  }
+
+  main {
+    width: min(1080px, 100%);
+    margin: 0 auto;
+    padding: clamp(16px, 3.5vh, 40px) clamp(20px, 5vw, 48px);
+    display: grid;
+    align-content: center;
+    gap: clamp(20px, 4vh, 44px);
+    /* İki sütun yalnızca gerçekten YER VARSA; dar ekranda tek sütuna iniyor. */
+    grid-template-columns: 1fr;
+  }
+
+  @media (min-width: 900px) and (min-height: 560px) {
+    main {
+      grid-template-columns: 1.05fr .95fr;
+      align-items: center;
+    }
+  }
+
+  /* ─── Sol sütun ─────────────────────────────────────────────── */
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: clamp(12px, 2.5vh, 22px);
+  }
+
+  .mark {
+    width: clamp(38px, 5.4vh, 52px);
+    aspect-ratio: 1;
+    border-radius: 30%;
+    display: grid;
+    place-items: center;
+    background: linear-gradient(145deg, var(--primary), color-mix(in srgb, var(--primary) 62%, #0f172a));
+    box-shadow: 0 10px 24px -10px color-mix(in srgb, var(--primary) 75%, transparent);
+    flex: none;
+  }
+  .mark svg { width: 58%; height: 58%; }
+
+  .wordmark {
+    font-size: clamp(1.25rem, 2.6vh, 1.6rem);
+    font-weight: 700;
+    letter-spacing: -.02em;
+  }
+
+  h1 {
+    margin: 0;
+    font-size: clamp(1.85rem, 5.4vh, 3.4rem);
+    line-height: 1.08;
+    letter-spacing: -.035em;
+    font-weight: 700;
+    text-wrap: balance;
+  }
+  h1 em { font-style: normal; color: var(--primary); }
+
+  .lede {
+    margin: clamp(10px, 2vh, 18px) 0 0;
+    font-size: clamp(.98rem, 2.1vh, 1.18rem);
+    color: var(--muted-fg);
+    max-width: 46ch;
+    text-wrap: pretty;
+  }
+
+  .points {
+    list-style: none;
+    margin: clamp(16px, 3vh, 30px) 0 0;
+    padding: 0;
+    display: grid;
+    gap: clamp(8px, 1.6vh, 14px);
+  }
+  .points li {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 11px;
+    align-items: start;
+    font-size: clamp(.9rem, 1.85vh, 1.02rem);
+  }
+  .points svg {
+    width: 1.15em; height: 1.15em;
+    margin-top: .18em;
+    color: var(--primary);
+    flex: none;
+  }
+  .points b { font-weight: 600; }
+  .points span { color: var(--muted-fg); }
+
+  .actions {
+    margin-top: clamp(18px, 3.4vh, 34px);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    padding: clamp(10px, 1.7vh, 14px) clamp(18px, 2.4vw, 26px);
+    border-radius: 999px;
+    background: var(--primary);
+    color: #fff;
+    font-weight: 600;
+    font-size: clamp(.92rem, 1.85vh, 1rem);
+    text-decoration: none;
+    box-shadow: 0 14px 30px -14px color-mix(in srgb, var(--primary) 85%, transparent);
+    transition: transform .18s ease, box-shadow .18s ease;
+  }
+  .cta:hover { transform: translateY(-2px); box-shadow: 0 20px 38px -16px color-mix(in srgb, var(--primary) 85%, transparent); }
+
+  .cta--ghost {
+    background: transparent;
+    color: var(--fg);
+    border: 1px solid var(--border);
+    box-shadow: none;
+  }
+  .cta--ghost:hover { border-color: var(--primary); color: var(--primary); box-shadow: none; }
+
+  .soon {
+    font-size: .74rem;
+    font-weight: 700;
+    letter-spacing: .06em;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, .22);
+  }
+
+  /* ─── Sağ sütun: telefon ────────────────────────────────────── */
+
+  .preview { display: grid; place-items: center; }
+
+  /* Küçük ekranda telefon gizleniyor: yer kalmıyor ve asıl mesaj METİN. */
+  @media (max-width: 899px), (max-height: 559px) {
+    .preview { display: none; }
+  }
+
+  .phone {
+    width: clamp(210px, 27vh, 290px);
+    aspect-ratio: 9 / 18.5;
+    border-radius: clamp(28px, 4vh, 40px);
+    background: var(--card);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+    padding: clamp(12px, 1.8vh, 18px);
+    display: grid;
+    grid-template-rows: auto auto 1fr;
+    gap: clamp(8px, 1.4vh, 14px);
+    overflow: hidden;
+    transform: rotate(-1.6deg);
+  }
+
+  .phone-top {
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: .72rem; color: var(--muted-fg);
+  }
+  .phone-title { font-weight: 700; color: var(--fg); font-size: .95rem; letter-spacing: -.01em; }
+
+  .stat {
+    border-radius: 16px;
+    padding: clamp(9px, 1.4vh, 13px);
+    background: linear-gradient(135deg, var(--primary), color-mix(in srgb, var(--primary) 65%, #0f172a));
+    color: #fff;
+  }
+  .stat b { display: block; font-size: clamp(1.3rem, 2.6vh, 1.7rem); line-height: 1.1; letter-spacing: -.02em; }
+  .stat span { font-size: .72rem; opacity: .88; }
+
+  .cards { display: grid; gap: clamp(6px, 1vh, 10px); align-content: start; }
+
+  .dev {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 9px;
+    padding: clamp(7px, 1.1vh, 11px);
+    border-radius: 13px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+  }
+  .dev .ic {
+    width: 26px; aspect-ratio: 1; border-radius: 8px;
+    display: grid; place-items: center;
+    background: color-mix(in srgb, var(--primary) 13%, transparent);
+    color: var(--primary);
+  }
+  .dev .ic svg { width: 15px; height: 15px; }
+  .dev .nm { font-size: .78rem; font-weight: 600; letter-spacing: -.01em; }
+  .dev .sub { font-size: .66rem; color: var(--muted-fg); }
+  .pill {
+    font-size: .62rem; font-weight: 700; padding: 3px 7px; border-radius: 999px;
+    background: color-mix(in srgb, var(--primary) 13%, transparent);
+    color: var(--primary);
+    white-space: nowrap;
+  }
+  .pill--warn {
+    background: color-mix(in srgb, #f59e0b 18%, transparent);
+    color: #b45309;
+  }
+  @media (prefers-color-scheme: dark) { .pill--warn { color: #fbbf24; } }
+
+  /* ─── Alt şerit ─────────────────────────────────────────────── */
+
+  footer {
+    border-top: 1px solid var(--border);
+    padding: clamp(10px, 1.8vh, 16px) clamp(20px, 5vw, 48px);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px 18px;
+    font-size: clamp(.78rem, 1.5vh, .88rem);
+    color: var(--muted-fg);
+  }
+  footer a { color: var(--muted-fg); text-decoration: none; border-bottom: 1px solid transparent; }
+  footer a:hover { color: var(--primary); border-bottom-color: currentColor; }
+  footer nav { display: flex; flex-wrap: wrap; gap: 8px 18px; }
+  /* Gizlilik bağlantısı alt şeritteki DİĞER bağlantılardan ayrılıyor: mağaza incelemesi
+     ve kullanıcı bu sayfada onu arıyor. */
+  footer .privacy { color: var(--fg); font-weight: 600; }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<main>
+  <div>
+    <div class="brand">
+      <div class="mark" aria-hidden="true">
+        <!-- Kalkan: uygulamanın "güvence altında" fikri. -->
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          <path d="m9 12 2 2 4-4"/>
+        </svg>
+      </div>
+      <div class="wordmark">GaranTea</div>
+    </div>
+
+    <h1>Garantisi bitmeden <em>haberin olsun</em>.</h1>
+
+    <p class="lede">
+      Aldığın her cihazın faturasını ve garanti süresini tek yerde topla.
+      GaranTea süreyi senin yerine takip eder, zamanı gelince hatırlatır.
+    </p>
+
+    <ul class="points">
+      <li>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect x="3" y="4" width="18" height="16" rx="2"/><path d="M8 2v4M16 2v4M3 10h18"/>
+        </svg>
+        <div><b>Süre dolmadan uyarı.</b> <span>Garantisi bitmek üzere olan cihaz için bildirim gelir; tarihi hatırlamak zorunda kalmazsın.</span></div>
+      </li>
+      <li>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M8 13h8M8 17h5"/>
+        </svg>
+        <div><b>Faturan kaybolmaz.</b> <span>Fatura ve garanti belgelerini fotoğraf ya da PDF olarak sakla; servise gittiğinde yanında olsun.</span></div>
+      </li>
+      <li>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/>
+        </svg>
+        <div><b>Telefon değişse de durur.</b> <span>Kayıtların hesabına bağlı; yeni cihazında giriş yaptığın anda hepsi yerinde.</span></div>
+      </li>
+      <li>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        </svg>
+        <div><b>Verin satılmaz.</b> <span>Konum, mikrofon ve rehber izni hiç istenmez. Ne topladığımız aşağıdaki metinde madde madde yazılı.</span></div>
+      </li>
+    </ul>
+
+    <div class="actions">
+      <!--
+        Mağaza bağlantısı henüz YOK. Çalışmayan bir bağlantı vermektense butonu pasif
+        bırakmak dürüst: uygulama içindeki "Yakında" rozetleriyle de aynı dil.
+      -->
+      <span class="cta" role="text">
+        Google Play <span class="soon">YAKINDA</span>
+      </span>
+      <a class="cta cta--ghost" href="privacy.html">Gizlilik Politikası</a>
+    </div>
+  </div>
+
+  <!--
+    Telefon görseli CSS ile çiziliyor; ekran görüntüsü dosyası YOK. Sebebi pratik: görsel
+    dosya, arayüz her değiştiğinde eskiyen ve kimsenin güncellemeyi hatırlamadığı bir
+    kopya olurdu. Buradaki temsilî kart, uygulamanın renk ve biçim dilini taşıyor.
+  -->
+  <div class="preview" aria-hidden="true">
+    <div class="phone">
+      <div class="phone-top">
+        <span class="phone-title">Cihazlarım</span>
+        <span>4 kayıt</span>
+      </div>
+
+      <div class="stat">
+        <b>2 cihaz</b>
+        <span>garantisi bu ay bitiyor</span>
+      </div>
+
+      <div class="cards">
+        <div class="dev">
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/></svg></div>
+          <div><div class="nm">iPhone 15 Pro</div><div class="sub">Apple · 20.09.2023</div></div>
+          <span class="pill">14 ay</span>
+        </div>
+        <div class="dev">
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></div>
+          <div><div class="nm">OLED TV C3</div><div class="sub">LG · 15.06.2024</div></div>
+          <span class="pill">22 ay</span>
+        </div>
+        <div class="dev">
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="2" width="18" height="20" rx="2"/><circle cx="12" cy="13" r="4"/><path d="M7 6h.01"/></svg></div>
+          <div><div class="nm">Çamaşır Makinesi</div><div class="sub">Bosch · 01.08.2023</div></div>
+          <span class="pill pill--warn">18 gün</span>
+        </div>
+        <div class="dev">
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M2 20h20"/></svg></div>
+          <div><div class="nm">MacBook Pro M3</div><div class="sub">Apple · 01.11.2023</div></div>
+          <span class="pill">9 ay</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <span>© 2026 GaranTea</span>
+  <nav>
+    <a class="privacy" href="privacy.html">Gizlilik Politikası</a>
+    <a href="privacy.html#en">Privacy Policy (EN)</a>
+    <a href="mailto:appgarantea@gmail.com">appgarantea@gmail.com</a>
+  </nav>
+</footer>
+
+</body>
+</html>

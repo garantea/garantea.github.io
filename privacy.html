@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GaranTea — Gizlilik Politikası / Privacy Policy</title>
+<meta name="theme-color" content="#2563eb">
+<style>
+  /* Renkler açılış sayfasıyla ORTAK (src/theme/theme.ts). İki sayfa aynı siteye ait
+     görünmeliydi; ayrı paletler onları iki ayrı yer gibi gösterirdi. */
+  :root {
+    color-scheme: light dark;
+    --primary: #2563eb; --fg: #0f172a; --muted-fg: #64748b;
+    --bg: #ffffff; --border: #e2e8f0;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --primary: #3b82f6; --fg: #f1f5f9; --muted-fg: #94a3b8;
+      --bg: #0b1220; --border: #1e293b;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0 auto; padding: clamp(20px, 5vw, 40px) clamp(20px, 5vw, 24px) 64px;
+    max-width: 760px;
+    font: 16px/1.65 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    color: var(--fg); background: var(--bg);
+    -webkit-font-smoothing: antialiased;
+  }
+  /* Geri bağlantısı ÜSTTE: politikaya doğrudan bir bağlantıyla gelen kullanıcı (mağaza
+     listelemesinden) siteye dönmenin bir yolu olduğunu görmeli. */
+  .back {
+    display: inline-flex; align-items: center; gap: 7px;
+    font-size: .9rem; color: var(--muted-fg); text-decoration: none;
+    margin-bottom: 28px;
+  }
+  .back:hover { color: var(--primary); }
+  h1 { font-size: clamp(1.5rem, 4vw, 1.9rem); margin: 0 0 4px; letter-spacing: -.025em; }
+  h2 { font-size: 1.08rem; margin-top: 34px; letter-spacing: -.01em; }
+  .meta { color: var(--muted-fg); font-size: .9rem; margin-top: 0; }
+  hr { border: 0; border-top: 1px solid var(--border); margin: 56px 0; }
+  ul { padding-left: 20px; }
+  li { margin-bottom: 6px; }
+  a { color: var(--primary); }
+  p { text-wrap: pretty; }
+</style>
+</head>
+<body>
+<a class="back" href="index.html">← GaranTea</a>
+
+<h1>GaranTea — Gizlilik Politikası</h1>
+<p class="meta">Yürürlük tarihi: 2026-08-05 · İletişim: <a href="mailto:appgarantea@gmail.com">appgarantea@gmail.com</a></p>
+<section><h2>Kısaca</h2><p>GaranTea, cihazlarınızın garanti sürelerini takip etmenizi sağlar. Bunun için yalnızca bu işi yapmak üzere gereken verileri toplarız.</p><p>Verilerinizi satmıyoruz. Reklam ağlarına, veri simsarlarına ya da üçüncü taraflara pazarlama amacıyla aktarmıyoruz.</p><p>Konumunuza, mikrofonunuza, rehberinize ve mesajlarınıza erişmiyoruz. Uygulama bu izinleri hiç istemez.</p></section>
+<section><h2>Hangi verileri işliyoruz</h2><ul><li>Telefon numaranız. Hesabınızı oluşturmak ve girişte kimliğinizi doğrulamak için. Doğrulama SMS'i Google Firebase Authentication üzerinden gönderilir.</li><li>Adınız ve varsa profil fotoğrafınız. Yalnızca uygulama içinde sizi karşılamak için; ikisi de isteğe bağlıdır.</li><li>Kaydettiğiniz cihaz bilgileri: cihaz adı, markası, seri numarası, satın alma tarihi, garanti süresi, fiyatı ve satın aldığınız yer.</li><li>Yüklediğiniz fatura ve garanti belgesi görselleri veya PDF dosyaları.</li><li>Uygulama tercihleriniz: dil, tema, bildirim ayarları ve kredi bakiyeniz.</li><li>Cihazınızın bölge/dil ayarı. Yalnızca uygulamayı ilk açtığınızda arayüz dilini seçmek için okunur; saklanmaz ve kimseye gönderilmez.</li></ul></section>
+<section><h2>Neden işliyoruz</h2><p>Yukarıdaki verilerin tamamı uygulamanın işlevini yerine getirmesi içindir: garanti sürenizi hesaplamak, süre dolmadan önce sizi uyarmak, faturanıza ihtiyaç duyduğunuzda ona ulaşabilmenizi sağlamak ve cihaz değiştirdiğinizde kayıtlarınızın kaybolmamasını sağlamak.</p><p>Bu verileri profilleme, davranışsal reklamcılık veya sizinle ilgisiz herhangi bir amaç için kullanmıyoruz.</p></section>
+<section><h2>İzinler</h2><ul><li>Kamera: yalnızca siz fatura fotoğrafı çekmeyi seçtiğinizde açılır.</li><li>Fotoğraflar ve dosyalar: yalnızca siz galeriden bir fatura veya belge seçtiğinizde okunur. Galerinizin geri kalanına erişilmez.</li><li>Bildirimler: garanti süresi dolmak üzere olan cihazlarınız için hatırlatma göndermek üzere. Reddedebilirsiniz; uygulamanın geri kalanı çalışmaya devam eder.</li></ul><p>Her izin, o izne ihtiyaç duyulan anda istenir ve reddedilebilir. Reddettiğiniz bir izin yüzünden uygulamayı kullanamaz hâle gelmezsiniz; yalnızca o izne bağlı özellik çalışmaz.</p></section>
+<section><h2>Verileriniz nerede saklanıyor</h2><p>Kayıtlarınız hem cihazınızda hem de hesabınıza bağlı olarak Google Firebase altyapısında (Cloud Firestore ve Cloud Storage) tutulur. Bu, uygulamayı silip yeniden kurduğunuzda veya cihaz değiştirdiğinizde verilerinizin kaybolmamasını sağlar.</p><p>Bulut tarafındaki kayıtlarınıza yalnızca sizin hesabınız erişebilir; güvenlik kuralları başka bir kullanıcının verilerinizi okumasını engeller.</p><p>Firebase, Google Cloud sunucularında çalışır ve verileriniz Türkiye dışındaki veri merkezlerinde işlenebilir.</p></section>
+<section><h2>Kullandığımız üçüncü taraf hizmetler</h2><ul><li>Google Firebase — kimlik doğrulama, veri ve dosya saklama.</li><li>Google AdMob — yalnızca sizin izlemeyi seçtiğiniz ödüllü reklamlar. Reklam gösterimi için AdMob cihazınızdan reklam kimliği gibi teknik veriler toplayabilir; uygulama bu reklamları kişiselleştirilmemiş olarak talep eder.</li><li>RevenueCat — uygulama içi satın alımların doğrulanması. Kart bilgileriniz bize hiçbir zaman ulaşmaz; ödeme tamamen Google Play veya App Store tarafından yürütülür.</li></ul><p>Bu hizmetlerin kendi gizlilik politikaları geçerlidir.</p></section>
+<section><h2>Ne kadar süreyle saklıyoruz</h2><p>Verilerinizi hesabınız var olduğu sürece saklarız. Hesabınızı sildiğinizde cihaz kayıtlarınız, fatura görselleriniz ve profil bilgileriniz hem cihazınızdan hem de bulut tarafından silinir.</p><p>Uygulamayı yalnızca cihazınızdan kaldırmak hesabınızı silmez; bulut kaydınız durur ve tekrar giriş yaptığınızda geri gelir.</p></section>
+<section><h2>Haklarınız</h2><p>Verilerinize erişme, düzeltme ve silinmesini isteme hakkınız vardır.</p><p>Silme işlemini uygulama içinden kendiniz yapabilirsiniz: Profil &gt; Hesabımı Sil. Bu işlem geri alınamaz.</p><p>Dilerseniz aşağıdaki adrese yazarak da talepte bulunabilirsiniz.</p></section>
+<section><h2>Çocuklar</h2><p>GaranTea 13 yaşın altındaki çocuklara yönelik değildir ve bilerek bu yaş grubundan veri toplamayız.</p></section>
+<section><h2>Değişiklikler</h2><p>Bu politika zaman zaman güncellenebilir. Esaslı bir değişiklik olduğunda metni uygulama içinde bir kez daha onayınıza sunarız.</p></section>
+<section><h2>İletişim</h2><p>Gizlilikle ilgili her türlü soru ve talebiniz için bize yazabilirsiniz:</p></section>
+
+<hr>
+
+<!-- id="en" bir çapa: açılış sayfasının alt şeridi doğrudan İngilizce metne bağlanıyor. -->
+<h1 id="en">GaranTea — Privacy Policy</h1>
+<p class="meta">Effective date: 2026-08-05 · Contact: <a href="mailto:appgarantea@gmail.com">appgarantea@gmail.com</a></p>
+<section><h2>In short</h2><p>GaranTea helps you keep track of your devices' warranty periods. We collect only the data needed to do that.</p><p>We do not sell your data. We do not share it with ad networks, data brokers or any third party for marketing.</p><p>We do not access your location, microphone, contacts or messages. The app never asks for those permissions.</p></section>
+<section><h2>What we process</h2><ul><li>Your phone number, to create your account and verify you at sign-in. The verification SMS is sent through Google Firebase Authentication.</li><li>Your name and, if you set one, your profile photo. Used only to greet you inside the app; both are optional.</li><li>The device records you create: name, brand, serial number, purchase date, warranty length, price and place of purchase.</li><li>The receipt and warranty documents you upload, as images or PDF files.</li><li>Your app preferences: language, theme, notification settings and credit balance.</li><li>Your device's region/language setting. Read only once, when you first open the app, to pick the interface language. It is not stored or transmitted.</li></ul></section>
+<section><h2>Why we process it</h2><p>All of the above exists to make the app work: to calculate your remaining warranty, to warn you before it expires, to give you your receipt when you need it, and to keep your records when you change devices.</p><p>We do not use this data for profiling, behavioural advertising or any purpose unrelated to you.</p></section>
+<section><h2>Permissions</h2><ul><li>Camera: opens only when you choose to photograph a receipt.</li><li>Photos and files: read only when you pick a receipt or document from your library. The rest of your library is not accessed.</li><li>Notifications: to remind you about devices whose warranty is about to expire. You may decline; the rest of the app keeps working.</li></ul><p>Every permission is requested at the moment it is needed and may be declined. Declining a permission never locks you out of the app — only the feature that depends on it stops working.</p></section>
+<section><h2>Where your data is stored</h2><p>Your records are kept both on your device and, tied to your account, on Google Firebase (Cloud Firestore and Cloud Storage). This is what keeps your data from disappearing when you reinstall the app or switch phones.</p><p>Only your own account can reach your cloud records; security rules prevent other users from reading them.</p><p>Firebase runs on Google Cloud servers and your data may be processed in data centres outside your country.</p></section>
+<section><h2>Third-party services we use</h2><ul><li>Google Firebase — authentication, data and file storage.</li><li>Google AdMob — only the rewarded ads you choose to watch. AdMob may collect technical data such as an advertising identifier from your device; the app requests these ads as non-personalised.</li><li>RevenueCat — verification of in-app purchases. Your card details never reach us; payment is handled entirely by Google Play or the App Store.</li></ul><p>These services are governed by their own privacy policies.</p></section>
+<section><h2>How long we keep it</h2><p>We keep your data for as long as your account exists. When you delete your account, your device records, receipt images and profile information are removed from both your device and the cloud.</p><p>Removing the app from your phone does not delete your account; your cloud record remains and returns when you sign in again.</p></section>
+<section><h2>Your rights</h2><p>You have the right to access, correct and delete your data.</p><p>You can delete everything yourself from inside the app: Profile &gt; Delete My Account. This cannot be undone.</p><p>You may also write to the address below to make a request.</p></section>
+<section><h2>Children</h2><p>GaranTea is not directed at children under 13 and we do not knowingly collect data from them.</p></section>
+<section><h2>Changes</h2><p>This policy may be updated from time to time. When a material change is made, we will ask you to review and accept the text once more inside the app.</p></section>
+<section><h2>Contact</h2><p>For any privacy question or request, write to us:</p></section>
+</body>
+</html>
