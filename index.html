@@ -147,7 +147,14 @@
   .wordmark { font-size: clamp(2.2rem, 6vh, 3.6rem); font-weight: 700; letter-spacing: -.04em; line-height: 1; }
   .wordmark .g { color: var(--blue); }
   .wordmark .t { color: var(--red); }
-  .tagline { margin-top: 7px; font-size: clamp(.82rem, 1.6vh, .98rem); color: var(--muted); }
+  /* Slogan TEK SATIR: "Garanti Takip Asistanınız" İngilizcesinden uzun ve dar ekranda
+     sararak marka bloğunu yükseltiyordu — yani yalnızca Türkçede simge ile yazı hizası
+     kayıyordu. */
+  .tagline {
+    margin-top: 7px; color: var(--muted);
+    font-size: clamp(.7rem, .9vw + .38rem, .98rem);
+    white-space: nowrap;
+  }
 
   /* ─── Metin ─────────────────────────────────────────────────── */
 
@@ -552,18 +559,26 @@
       Keep the receipts and warranty periods of all your devices in one place. GaranTea tracks the remaining time on your behalf and notifies you when it matters.
     </p>
 
+    <!--
+      SATIRLAR İKİ DİLDE DE YAKIN UZUNLUKTA yazıldı (her biri ~65-72 karakter).
+
+      Gerekçesi biçimsel değil: satırlar tek satıra zorlandığı için (`nowrap`), belirgin
+      biçimde uzun bir çeviri dar ekranda daha erken taşardı. Yani aynı ekranda Türkçe
+      metin kırpılırken İngilizce sığardı — "sadece dil farkı" olması gereken yerde bir
+      DAVRANIŞ farkı. Uzunlukları eşitlemek bunu kaynağında kaldırıyor.
+    -->
     <ul class="points">
       <li>
         <b data-tr="Süresi dolmadan bildirim." data-en="A notice before expiry.">A notice before expiry.</b>
-        <span data-tr="Hatırlatma, işlem yapmak için hâlâ vaktiniz varken ulaşır." data-en="The reminder arrives while there is still time to act."> The reminder arrives while there is still time to act.</span>
+        <span data-tr="İşlem yapmak için vaktiniz varken ulaşır." data-en="It arrives while there is still time to act."> It arrives while there is still time to act.</span>
       </li>
       <li>
         <b data-tr="Faturalarınız kaybolmaz." data-en="Your receipts are not lost.">Your receipts are not lost.</b>
-        <span data-tr="Belgeler cihaz kaydına bağlı kalır ve gerektiğinde yanınızdadır." data-en="Documents stay attached to the device record and are available when required."> Documents stay attached to the device record and are available when required.</span>
+        <span data-tr="Belgeler cihaz kaydına bağlı kalır." data-en="Documents stay attached to the device record."> Documents stay attached to the device record.</span>
       </li>
       <li>
         <b data-tr="Verileriniz satılmaz." data-en="Your data is not sold.">Your data is not sold.</b>
-        <span data-tr="Konum, mikrofon ve rehber erişimi hiçbir zaman talep edilmez." data-en="Location, microphone and contact access are never requested."> Location, microphone and contact access are never requested.</span>
+        <span data-tr="Konum, mikrofon ve rehber erişimi istenmez." data-en="Location, microphone and contacts are not accessed."> Location, microphone and contacts are not accessed.</span>
       </li>
     </ul>
 
