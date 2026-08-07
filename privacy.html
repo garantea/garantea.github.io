@@ -5,19 +5,19 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>GaranTea — Gizlilik Politikası / Privacy Policy</title>
 <meta name="theme-color" content="#2563eb">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
 <style>
-  /* Renkler açılış sayfasıyla ORTAK (src/theme/theme.ts). İki sayfa aynı siteye ait
-     görünmeliydi; ayrı paletler onları iki ayrı yer gibi gösterirdi. */
+  /*
+    Renkler açılış sayfasıyla ORTAK. İki sayfa aynı siteye ait görünmeliydi; ayrı
+    paletler onları iki ayrı yer gibi gösterirdi.
+
+    YALNIZCA AÇIK TEMA: bu metin sitede beyaz zeminli bir modal içinde de gösteriliyor
+    (bkz. index.html). Koyu bir varyant, aynı metnin iki farklı zeminde görünmesi demekti.
+  */
   :root {
-    color-scheme: light dark;
+    color-scheme: light;
     --primary: #2563eb; --fg: #0f172a; --muted-fg: #64748b;
-    --bg: #ffffff; --border: #e2e8f0;
-  }
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --primary: #3b82f6; --fg: #f1f5f9; --muted-fg: #94a3b8;
-      --bg: #0b1220; --border: #1e293b;
-    }
+    --bg: #ffffff; --border: #e6eaf2;
   }
   * { box-sizing: border-box; }
   body {
@@ -47,6 +47,13 @@
 </head>
 <body>
 <a class="back" href="index.html">← GaranTea</a>
+
+<!--
+  METİN id="policy" İÇİNDE ve bu SARMALAYICI ZORUNLU: açılış sayfası bu dosyayı çekip
+  yalnızca bu düğümü modalın içine koyuyor. Metnin ikinci bir kopyası çıkarılsaydı, biri
+  güncellendiğinde diğeri sessizce eskirdi — bu betiğin var olma sebebinin aynısı.
+-->
+<div id="policy">
 
 <h1>GaranTea — Gizlilik Politikası</h1>
 <p class="meta">Yürürlük tarihi: 2026-08-05 · İletişim: <a href="mailto:appgarantea@gmail.com">appgarantea@gmail.com</a></p>
@@ -78,5 +85,7 @@
 <section><h2>Children</h2><p>GaranTea is not directed at children under 13 and we do not knowingly collect data from them.</p></section>
 <section><h2>Changes</h2><p>This policy may be updated from time to time. When a material change is made, we will ask you to review and accept the text once more inside the app.</p></section>
 <section><h2>Contact</h2><p>For any privacy question or request, write to us:</p></section>
+
+</div>
 </body>
 </html>

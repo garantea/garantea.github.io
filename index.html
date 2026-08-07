@@ -1,36 +1,36 @@
 <!doctype html>
-<html lang="tr">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>GaranTea — Garanti Takip Asistanınız</title>
-<meta name="description" content="GaranTea, cihazlarınızın garanti sürelerini takip eder. Faturanızı saklar, süre dolmadan önce hatırlatır, cihaz değiştirdiğinizde kayıtlarınız kaybolmaz.">
+<title>GaranTea — Warranty Tracking Assistant</title>
+<meta name="description" content="GaranTea keeps track of your devices' warranty periods. It stores your receipt, reminds you before the warranty expires, and keeps your records when you change phones.">
 <meta name="theme-color" content="#2563eb">
-<meta property="og:title" content="GaranTea — Garanti Takip Asistanınız">
-<meta property="og:description" content="Faturalarınız tek yerde, garanti süreniz hep göz önünde.">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<meta property="og:title" content="GaranTea — Warranty Tracking Assistant">
+<meta property="og:description" content="Your receipts in one place, your warranty always in sight.">
 <meta property="og:type" content="website">
 
 <!--
   ─── SAYFANIN KURALLARI ──────────────────────────────────────────
 
-  TEK EKRAN. Bütün ölçüler `clamp()` ile ekran boyutuna bağlı; sabit piksel yok. `100dvh`
-  kullanılıyor (`100vh` değil) — mobilde adres çubuğu kayarken `vh` sabit kalıyor ve
-  sayfanın altı kırpılıyor. `overflow` yine de gizlenmedi: çok kısa bir pencerede içeriği
-  kırpmak, kaydırmaya izin vermekten kötü olurdu.
+  TEK EKRAN, ama YALNIZCA yer varken. Ölçüler `clamp()` ile ekrana bağlı ve telefonda
+  yerleşim tek sütuna iniyor. `100dvh` kullanılıyor (`100vh` değil): mobilde adres çubuğu
+  kayarken `vh` sabit kalıyor ve sayfanın altı kırpılıyor. `overflow` gizlenmedi — çok
+  kısa bir pencerede içeriği kırpmak, kaydırmaya izin vermekten kötü olurdu.
 
-  YALNIZCA AÇIK TEMA. Uygulama koyu temayı destekliyor ama bu sayfa beyaz zemin + kırmızı
-  ve mavi üzerine kurulu; koyu bir varyant aynı kimliği taşımazdı. Sayfa bilinçli olarak
-  tek bir görünüme bağlanıyor, bu yüzden `color-scheme: light`.
+  YALNIZCA AÇIK TEMA. Sayfa beyaz + kırmızı + mavi üzerine kurulu; koyu bir varyant aynı
+  kimliği taşımazdı.
 
-  ANİMASYONLAR SAF CSS. Sayfadaki tek betik dil değiştirme. Animasyon JS'e bağlı olsaydı
-  betik yüklenene kadar sayfa donuk durur, JS kapalıyken hiç canlanmazdı.
+  ANİMASYONLAR SAF CSS. Tek betik dil değiştirme ve gizlilik modalı. Animasyon JS'e bağlı
+  olsaydı betik yüklenene kadar sayfa donuk durur, JS kapalıyken hiç canlanmazdı.
 -->
 <style>
   *, *::before, *::after { box-sizing: border-box; }
 
   :root {
     color-scheme: light;
-    /* Marka renkleri UYGULAMADAN: simgedeki fincan mavisi ve belge kırmızısı
+    /* Marka renkleri UYGULAMADAN: fincan mavisi ve belge kırmızısı
        (src/components/GaranTeaLogo.tsx), arayüz mavisi (src/theme/theme.ts). */
     --blue: #2563eb;
     --blue-deep: #0B57D0;
@@ -40,7 +40,7 @@
     --line: #e6eaf2;
   }
 
-  html, body { height: 100%; }
+  html { height: 100%; }
 
   body {
     margin: 0;
@@ -55,56 +55,67 @@
   }
 
   /*
-    ─── HAREKETLİ ZEMİN ───────────────────────────────────────────
+    ─── ZEMİN: BEYAZ → KIRMIZI + MAVİ ─────────────────────────────
 
-    Üç yumuşak leke (mavi, kırmızı, yine mavi) beyazın üstünde yavaşça sürükleniyor.
-    İki şey bilinçli:
+    Sol üst KÖŞE HER ZAMAN BEYAZ, renk sağ alta doğru yığılıyor. Bunu sağlayan şey iki
+    lekenin de sağ-alt yarıda doğması ve hareket aralıklarının onları hiçbir zaman sol
+    üste taşımaması: `drift` dönüşümleri yalnızca birkaç vw/vh oynatıyor, lekenin merkezi
+    ekranın sağ alt çeyreğinde kalıyor.
 
-      · DOYGUNLUK DÜŞÜK ve lekeler çok büyük. Küçük ve canlı lekeler dönen bir ekran
-        koruyucuya benzerdi; büyük ve soluk olanlar rengi zemine yayıyor, metnin
-        okunurluğunu hiçbir karede düşürmüyor.
-      · SÜRE UZUN (28–36 sn) ve `ease-in-out` + `alternate`. Hareket fark edilmeli ama
-        takip edilmemeli; hızlı bir döngü gözü sayfadan alır.
+    Sol üstte ayrıca beyaz bir örtü var (`.wash`): lekelerin yumuşak kenarı oraya kadar
+    uzansa bile bastırıyor. Başlığın ve simgenin durduğu yer bu — metnin arkasındaki
+    zeminin sabit kalması okunurluğun tek garantisi.
 
-    `filter: blur()` yerine radyal degradelerin kendi yumuşak kenarı kullanılıyor:
-    blur, sürekli dönen bir katmanda GPU'yu boşuna meşgul ediyor.
+    DOYGUNLUK DÜŞÜK, SÜRE UZUN (26–34 sn), `ease-in-out` + `alternate`: hareket fark
+    edilmeli ama takip edilmemeli. `filter: blur()` yerine radyal degradelerin kendi
+    yumuşak kenarı kullanılıyor — blur, sürekli dönen bir katmanda GPU'yu boşuna meşgul
+    ediyor.
   */
-  .bg { position: fixed; inset: -20%; z-index: -1; pointer-events: none; }
-  .bg span {
-    position: absolute;
-    border-radius: 50%;
-    will-change: transform;
-  }
-  .bg .b1 {
-    width: 70vmax; height: 70vmax; top: -18%; left: -12%;
-    background: radial-gradient(circle at 50% 50%, rgba(37, 99, 235, .22), rgba(37, 99, 235, 0) 62%);
-    animation: drift1 32s ease-in-out infinite alternate;
-  }
-  .bg .b2 {
-    width: 62vmax; height: 62vmax; bottom: -22%; right: -14%;
-    background: radial-gradient(circle at 50% 50%, rgba(234, 67, 53, .18), rgba(234, 67, 53, 0) 62%);
-    animation: drift2 36s ease-in-out infinite alternate;
-  }
-  .bg .b3 {
-    width: 52vmax; height: 52vmax; top: 32%; left: 46%;
-    background: radial-gradient(circle at 50% 50%, rgba(11, 87, 208, .14), rgba(11, 87, 208, 0) 62%);
-    animation: drift3 28s ease-in-out infinite alternate;
-  }
-  @keyframes drift1 { from { transform: translate3d(0,0,0) scale(1); } to { transform: translate3d(12vw, 8vh, 0) scale(1.12); } }
-  @keyframes drift2 { from { transform: translate3d(0,0,0) scale(1.08); } to { transform: translate3d(-14vw, -9vh, 0) scale(1); } }
-  @keyframes drift3 { from { transform: translate3d(0,0,0) scale(1); } to { transform: translate3d(-9vw, 11vh, 0) scale(1.15); } }
+  .bg { position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; }
+  .bg span { position: absolute; border-radius: 50%; will-change: transform; }
 
-  /* ─── Dil düğmesi ───────────────────────────────────────────── */
+  .bg .red {
+    width: 92vmax; height: 92vmax; right: -26vmax; bottom: -34vmax;
+    background: radial-gradient(circle at 50% 50%, rgba(234, 67, 53, .30), rgba(234, 67, 53, 0) 64%);
+    animation: driftA 30s ease-in-out infinite alternate;
+  }
+  .bg .blue {
+    width: 86vmax; height: 86vmax; right: -14vmax; bottom: -12vmax;
+    background: radial-gradient(circle at 50% 50%, rgba(37, 99, 235, .30), rgba(37, 99, 235, 0) 64%);
+    animation: driftB 26s ease-in-out infinite alternate;
+  }
+  .bg .deep {
+    width: 66vmax; height: 66vmax; right: 6vmax; bottom: -26vmax;
+    background: radial-gradient(circle at 50% 50%, rgba(11, 87, 208, .22), rgba(11, 87, 208, 0) 62%);
+    animation: driftC 34s ease-in-out infinite alternate;
+  }
+  /* Sol üstü beyaz tutan örtü. Köşegen boyunca sönüyor ki geçiş bir kenar çizgisi gibi
+     görünmesin. */
+  .bg .wash {
+    inset: 0; width: 100%; height: 100%; border-radius: 0;
+    background: linear-gradient(135deg, #fff 0%, rgba(255,255,255,.92) 26%, rgba(255,255,255,.45) 52%, rgba(255,255,255,0) 74%);
+  }
 
-  .topbar { display: flex; justify-content: flex-end; padding: clamp(12px, 2vh, 20px) clamp(20px, 5vw, 52px) 0; }
+  @keyframes driftA { from { transform: translate3d(0,0,0) scale(1); }    to { transform: translate3d(-7vw, -5vh, 0) scale(1.14); } }
+  @keyframes driftB { from { transform: translate3d(0,0,0) scale(1.1); }  to { transform: translate3d(-4vw, 6vh, 0) scale(1); } }
+  @keyframes driftC { from { transform: translate3d(0,0,0) scale(1); }    to { transform: translate3d(-9vw, -7vh, 0) scale(1.18); } }
+
+  /* ─── Üst şerit ─────────────────────────────────────────────── */
+
+  .topbar { display: flex; justify-content: flex-end; padding: clamp(12px, 2vh, 20px) clamp(18px, 5vw, 52px) 0; }
   .lang {
     display: inline-flex; padding: 3px; border-radius: 999px;
-    border: 1px solid var(--line); background: rgba(255,255,255,.72);
+    border: 1px solid var(--line); background: rgba(255,255,255,.75);
     backdrop-filter: blur(8px);
   }
   .lang button {
     appearance: none; border: 0; cursor: pointer;
-    padding: 5px 14px; border-radius: 999px; background: transparent;
+    /*
+      SABİT GENİŞLİK. "Türkçe" ve "English" farklı uzunlukta; genişlik içeriğe
+      bırakılsaydı dil değişince düğme kutusu büyüyüp küçülür, sağdaki hizalama oynardı.
+    */
+    min-width: 84px;
+    padding: 6px 12px; border-radius: 999px; background: transparent;
     color: var(--muted); font: inherit; font-size: .8rem; font-weight: 600;
     transition: background .18s ease, color .18s ease;
   }
@@ -114,57 +125,64 @@
   /* ─── Yerleşim ──────────────────────────────────────────────── */
 
   main {
-    width: min(1140px, 100%);
+    width: min(1180px, 100%);
     margin: 0 auto;
-    padding: clamp(8px, 1.6vh, 24px) clamp(20px, 5vw, 52px) clamp(12px, 2vh, 28px);
+    padding: clamp(8px, 1.6vh, 24px) clamp(18px, 5vw, 52px) clamp(14px, 2vh, 28px);
     display: grid; align-content: center;
-    gap: clamp(16px, 3vh, 44px);
+    gap: clamp(20px, 3vh, 48px);
     grid-template-columns: 1fr;
   }
-  @media (min-width: 940px) and (min-height: 600px) {
-    main { grid-template-columns: 1.06fr .94fr; align-items: center; }
+  /* Tablet ve üstü: iki sütun. Eşik hem genişliğe hem YÜKSEKLİĞE bakıyor — yatay
+     çevrilmiş bir telefon geniştir ama iki sütunu sığdıracak kadar uzun değildir. */
+  @media (min-width: 900px) and (min-height: 620px) {
+    main { grid-template-columns: 1.02fr .98fr; align-items: center; }
   }
 
   /* ─── Marka ─────────────────────────────────────────────────── */
 
-  .brand { display: flex; align-items: center; gap: clamp(14px, 1.8vw, 24px); margin-bottom: clamp(14px, 2.6vh, 28px); }
-  .logo { width: clamp(88px, 15vh, 152px); aspect-ratio: 1; flex: none; overflow: visible; }
+  .brand { display: flex; align-items: center; gap: clamp(12px, 1.8vw, 22px); margin-bottom: clamp(14px, 2.4vh, 26px); }
+  .logo { width: clamp(96px, 17vh, 176px); aspect-ratio: 1; flex: none; overflow: visible; }
 
-  /*
-    YAZI İKİ RENKLİ, uygulamadaki kelime işaretiyle birebir: "Garan" mavi, "Tea" kırmızı.
-    Tek bir degrade de kırmızı-mavi olurdu ama harflerin nerede renk değiştireceği
-    rastgele kalırdı; kesme noktası anlamlı — okunuşu ikiye ayıran yer.
-  */
-  .wordmark { font-size: clamp(2.1rem, 5.6vh, 3.4rem); font-weight: 700; letter-spacing: -.04em; line-height: 1; }
+  /* Kelime işareti UYGULAMADAKİYLE aynı: "Garan" mavi, "Tea" kırmızı. */
+  .wordmark { font-size: clamp(2.2rem, 6vh, 3.6rem); font-weight: 700; letter-spacing: -.04em; line-height: 1; }
   .wordmark .g { color: var(--blue); }
   .wordmark .t { color: var(--red); }
-  .tagline { margin-top: 6px; font-size: clamp(.82rem, 1.6vh, .96rem); color: var(--muted); }
+  .tagline { margin-top: 7px; font-size: clamp(.82rem, 1.6vh, .98rem); color: var(--muted); }
 
   /* ─── Metin ─────────────────────────────────────────────────── */
 
+  /*
+    DİL DEĞİŞİNCE YERLEŞİM OYNAMASIN.
+
+    Türkçe metinler İngilizcelerden düzenli olarak uzun; yükseklik içeriğe bırakılsaydı
+    başlık iki satırdan üçe çıkar, altındaki her şey — maddeler, butonlar — aşağı kayardı.
+    Dil düğmesine basmak sayfayı yeniden dizmemeli.
+
+    Çözüm `min-height`: kutular İKİ DİLİN DE en uzun hâline göre yer ayırıyor, kısa olan
+    dilde altta boşluk kalıyor. Sabit `height` DEĞİL — dar bir ekranda satır sayısı
+    artarsa metnin kırpılması gerekirdi.
+  */
   h1 {
     margin: 0;
-    font-size: clamp(1.55rem, 4.4vh, 2.75rem);
+    font-size: clamp(1.5rem, 4.2vh, 2.7rem);
     line-height: 1.12; letter-spacing: -.035em; font-weight: 700;
     text-wrap: balance;
+    min-height: 2.24em;   /* iki satır */
   }
 
   .lede {
     margin: clamp(10px, 1.8vh, 16px) 0 0;
-    font-size: clamp(.92rem, 1.9vh, 1.08rem);
-    color: var(--muted); max-width: 44ch; text-wrap: pretty;
+    font-size: clamp(.92rem, 1.9vh, 1.06rem);
+    color: var(--muted); max-width: 46ch; text-wrap: pretty;
+    min-height: 4.5em;    /* üç satır */
   }
 
-  /*
-    Maddeler SADE: simge yok, yalnızca ince bir ayraç çizgi. Simgeler eklendiğinde satırlar
-    bir "özellik ızgarasına" dönüşüyor ve sayfa reklam broşürü havasına giriyordu; burada
-    amaç üç cümleyi sakin biçimde okutmak.
-  */
-  .points { list-style: none; margin: clamp(16px, 2.8vh, 28px) 0 0; padding: 0; display: grid; gap: 0; }
+  .points { list-style: none; margin: clamp(14px, 2.6vh, 26px) 0 0; padding: 0; }
   .points li {
-    padding: clamp(8px, 1.5vh, 13px) 0;
+    padding: clamp(8px, 1.4vh, 12px) 0;
     border-top: 1px solid var(--line);
-    font-size: clamp(.86rem, 1.75vh, .98rem);
+    font-size: clamp(.85rem, 1.7vh, .97rem);
+    min-height: 3.4em;
   }
   .points li:last-child { border-bottom: 1px solid var(--line); }
   .points b { font-weight: 600; }
@@ -172,68 +190,93 @@
 
   /* ─── Butonlar ──────────────────────────────────────────────── */
 
-  .actions { margin-top: clamp(16px, 3vh, 30px); display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+  .actions { margin-top: clamp(16px, 2.8vh, 30px); display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
 
   .store {
-    display: inline-flex; align-items: center; gap: 9px;
-    padding: clamp(9px, 1.6vh, 13px) clamp(15px, 1.9vw, 20px);
+    display: inline-flex; align-items: center; justify-content: center; gap: 9px;
+    padding: clamp(10px, 1.6vh, 13px) clamp(15px, 1.8vw, 20px);
     border-radius: 999px;
     background: var(--fg); color: #fff;
-    font-size: clamp(.84rem, 1.7vh, .94rem); font-weight: 600;
+    font-size: clamp(.83rem, 1.65vh, .93rem); font-weight: 600;
+    white-space: nowrap;
     /*
-      MAĞAZA BUTONLARI PASİF. Uygulama henüz hiçbir mağazada değil; çalışmayan bir
-      bağlantı vermektense butonu sönük bırakmak dürüst ve uygulamanın kendi "Yakında"
-      rozetleriyle aynı dil. `<a>` değil `<span>`: tıklanacak bir hedef yok.
+      MAĞAZA BUTONLARI PASİF: uygulama henüz hiçbir mağazada değil. Çalışmayan bir
+      bağlantı vermektense sönük bırakmak dürüst ve uygulamanın kendi "Yakında"
+      rozetleriyle aynı dil. `<a>` değil `<span>` — tıklanacak bir hedef yok.
     */
     opacity: .5;
   }
-  .store svg { width: 1.15em; height: 1.15em; }
+  .store svg { width: 1.15em; height: 1.15em; flex: none; }
   .store .soon {
+    /* "YAKINDA" ile "SOON" farklı uzunlukta; sabit genişlik olmadan butonlar dil
+       değişince yeniden ölçülür ve satır düzeni oynardı. */
+    min-width: 66px; text-align: center;
     font-size: .62rem; font-weight: 700; letter-spacing: .07em;
     padding: 2px 7px; border-radius: 999px; background: rgba(255,255,255,.2);
   }
 
   .ghost {
-    display: inline-flex; align-items: center;
-    padding: clamp(9px, 1.6vh, 13px) clamp(16px, 2vw, 22px);
+    display: inline-flex; align-items: center; justify-content: center;
+    min-width: 168px;   /* "Gizlilik Politikası" / "Privacy Policy" ortak genişlik */
+    padding: clamp(10px, 1.6vh, 13px) clamp(16px, 2vw, 22px);
     border-radius: 999px; border: 1px solid var(--line);
-    color: var(--fg); text-decoration: none;
-    font-size: clamp(.84rem, 1.7vh, .94rem); font-weight: 600;
-    background: rgba(255,255,255,.6);
+    color: var(--fg); text-decoration: none; cursor: pointer;
+    font: inherit; font-size: clamp(.83rem, 1.65vh, .93rem); font-weight: 600;
+    background: rgba(255,255,255,.65);
+    white-space: nowrap;
     transition: border-color .18s ease, color .18s ease;
   }
   .ghost:hover { border-color: var(--blue); color: var(--blue); }
 
-  /* ─── Telefon: gerçek uygulama ekranları ────────────────────── */
+  /* ─── Telefon ───────────────────────────────────────────────── */
 
   .preview { display: grid; place-items: center; }
-  @media (max-width: 939px), (max-height: 599px) { .preview { display: none; } }
+  /* Çok kısa ekranlarda (yatay telefon) telefon gizleniyor: yer kalmıyor ve asıl mesaj
+     metin. Dar ama UZUN ekranlarda (dikey telefon) görünmeye devam ediyor. */
+  @media (max-height: 560px) { .preview { display: none; } }
 
   .phone {
     position: relative;
-    width: clamp(224px, 30vh, 306px);
-    aspect-ratio: 460 / 948;      /* ekran görüntülerinin kırpılmış oranı */
-    border-radius: clamp(26px, 3.6vh, 38px);
+    width: clamp(230px, 38vh, 372px);
+    aspect-ratio: 620 / 1279;
+    border-radius: clamp(26px, 3.4vh, 40px);
     background: #fff;
     border: 1px solid var(--line);
-    box-shadow: 0 40px 80px -32px rgba(15, 23, 42, .35), 0 6px 18px -8px rgba(15, 23, 42, .12);
+    /* HAFİF SAĞA YATIK. 3 derece: eğim fark edilecek kadar var, okumayı zorlaştıracak
+       kadar değil. Gölge de eğimle birlikte dönüyor, telefon zeminden kopuk durmuyor. */
+    transform: rotate(3deg);
+    box-shadow: 0 44px 90px -34px rgba(15, 23, 42, .4), 0 8px 22px -10px rgba(15, 23, 42, .14);
     overflow: hidden;
+  }
+  @media (max-width: 899px) {
+    /* Tek sütuna inince telefon ortada duruyor ve eğim azalıyor: dar ekranda 3 derece,
+       kenar boşluklarını gözle görülür biçimde eşitsizleştiriyor. */
+    .phone { transform: rotate(1.5deg); width: clamp(210px, 52vw, 300px); }
   }
 
   /*
-    EKRANLAR ÜST ÜSTE ve sırayla beliriyor. Tur 20 saniye, ekran başına 5 — bir ekranı
-    okumaya yetecek kadar yavaş. Gecikmeler POZİTİF: negatif verilseydi sayfa açılır
-    açılmaz üç ekran turun ortasından başlar ve ilk izlenim yarım kalmış bir geçiş olurdu.
+    EKRANLAR `<img>` DEĞİL, ZEMİN GÖRÜNTÜSÜ.
+
+    Sebebi: sağ tık > "Resmi kaydet" ve sürükleyip masaüstüne bırakma bir zemin
+    görüntüsünde çalışmıyor. Bu bir KORUMA DEĞİL, caydırıcı — dosyalar sunucudan
+    servis edildiği için adresini bilen herkes indirebilir. Statik bir sitede bunun
+    başka türlüsü yok (ayrıntı: aşağıdaki `contextmenu` notu).
+
+    Üst üste duruyorlar ve sırayla beliriyorlar. Tur 20 saniye, ekran başına 5 — bir
+    ekranı okumaya yetecek kadar yavaş. Gecikmeler POZİTİF: negatif verilseydi sayfa
+    açılır açılmaz üç ekran turun ortasından başlar, ilk izlenim yarım kalmış bir geçiş
+    olurdu.
   */
-  .phone img {
+  .shot {
     position: absolute; inset: 0;
-    width: 100%; height: 100%; object-fit: cover;
+    background-size: cover; background-position: center;
     opacity: 0;
     animation: cycle 20s ease-in-out infinite;
+    user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
   }
-  .phone img:nth-of-type(2) { animation-delay: 5s; }
-  .phone img:nth-of-type(3) { animation-delay: 10s; }
-  .phone img:nth-of-type(4) { animation-delay: 15s; }
+  .shot:nth-of-type(2) { animation-delay: 5s; }
+  .shot:nth-of-type(3) { animation-delay: 10s; }
+  .shot:nth-of-type(4) { animation-delay: 15s; }
   @keyframes cycle {
     0%        { opacity: 0; }
     3%, 22%   { opacity: 1; }
@@ -244,45 +287,102 @@
 
   footer {
     border-top: 1px solid var(--line);
-    padding: clamp(9px, 1.6vh, 15px) clamp(20px, 5vw, 52px);
+    padding: clamp(9px, 1.6vh, 15px) clamp(18px, 5vw, 52px);
     display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
     gap: 6px 18px;
     font-size: clamp(.74rem, 1.4vh, .84rem); color: var(--muted);
-    background: rgba(255,255,255,.55);
+    background: rgba(255,255,255,.6);
   }
   footer a { color: var(--muted); text-decoration: none; }
   footer a:hover { color: var(--blue); }
 
+  /* ─── Gizlilik modalı ───────────────────────────────────────── */
+
   /*
-    Sürekli dönen üç zemin animasyonu ve bir ekran döngüsü var; vestibüler duyarlılığı
-    olan kullanıcı için bu bir rahatsızlık kaynağı. Kapatıldığında zemin sabit duruyor ve
-    ilk ekran görünür kalıyor — içerik kaybolmuyor.
+    Uygulamadaki gizlilik modalının web karşılığı: karartılmış zemin, ortada beyaz kart,
+    içeride kaydırılan metin.
+
+    METİN BURAYA KOPYALANMADI. Modal açılırken `privacy.html` çekiliyor ve içindeki
+    `#policy` düğümü alınıyor — yani sayfada gösterilen metin, mağazaya verilen adresteki
+    metnin TA KENDİSİ. İkinci bir kopya, biri güncellendiğinde diğerinin sessizce
+    eskimesi demekti.
   */
+  .modal {
+    position: fixed; inset: 0; z-index: 50;
+    display: none; place-items: center;
+    padding: clamp(12px, 3vh, 32px) clamp(12px, 4vw, 32px);
+    background: rgba(15, 23, 42, .45);
+    backdrop-filter: blur(3px);
+  }
+  .modal[open] { display: grid; }
+  .modal-card {
+    position: relative;
+    width: min(720px, 100%);
+    max-height: 100%;
+    background: #fff;               /* metin her zaman beyaz zeminde */
+    border-radius: clamp(16px, 2.4vh, 24px);
+    box-shadow: 0 40px 90px -30px rgba(15, 23, 42, .5);
+    display: grid; grid-template-rows: auto 1fr;
+    overflow: hidden;
+  }
+  .modal-head {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px; padding: 16px 18px;
+    border-bottom: 1px solid var(--line);
+  }
+  .modal-head strong { font-size: 1rem; letter-spacing: -.01em; }
+  .modal-close {
+    appearance: none; border: 1px solid var(--line); background: #fff; cursor: pointer;
+    width: 34px; height: 34px; border-radius: 999px; color: var(--muted);
+    font-size: 1.1rem; line-height: 1; display: grid; place-items: center;
+  }
+  .modal-close:hover { color: var(--fg); border-color: var(--fg); }
+  .modal-body {
+    overflow-y: auto; -webkit-overflow-scrolling: touch;
+    padding: clamp(14px, 2.4vh, 24px) clamp(16px, 3vw, 28px);
+    font-size: .92rem; line-height: 1.62;
+  }
+  .modal-body h1 { font-size: 1.25rem; margin: 0 0 4px; min-height: 0; }
+  .modal-body h2 { font-size: 1rem; margin-top: 26px; }
+  .modal-body .meta { color: var(--muted); font-size: .84rem; margin-top: 0; }
+  .modal-body hr { border: 0; border-top: 1px solid var(--line); margin: 40px 0; }
+  .modal-body ul { padding-left: 20px; }
+  .modal-body li { margin-bottom: 6px; }
+  .modal-body a { color: var(--blue); }
+  .modal-body .back { display: none; }   /* modal içinde "geri" bağlantısının işi yok */
+
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation: none !important; transition: none !important; }
-    .phone img { opacity: 0; }
-    .phone img:first-of-type { opacity: 1; }
+    .shot { opacity: 0; }
+    .shot:first-of-type { opacity: 1; }
     .doc { opacity: 0; }
   }
 </style>
 </head>
 <body>
 
-<div class="bg" aria-hidden="true"><span class="b1"></span><span class="b2"></span><span class="b3"></span></div>
+<div class="bg" aria-hidden="true">
+  <span class="red"></span><span class="blue"></span><span class="deep"></span><span class="wash"></span>
+</div>
 
 <div class="topbar">
-  <div class="lang" role="group" aria-label="Dil / Language">
-    <button type="button" data-lang="tr" aria-pressed="true">Türkçe</button>
-    <button type="button" data-lang="en" aria-pressed="false">English</button>
+  <div class="lang" role="group" aria-label="Language">
+    <button type="button" data-lang="en" aria-pressed="true">English</button>
+    <button type="button" data-lang="tr" aria-pressed="false">Türkçe</button>
   </div>
 </div>
 
 <main>
   <div>
     <div class="brand">
-      <!-- Uygulamanın simgesi, birebir aynı vektör ve aynı zamanlama
-           (src/components/GaranTeaLogo.tsx + src/lib/logoTimeline.ts): 4 saniyelik tur,
-           belge fincana iniyor, ardından buhar yükseliyor. -->
+      <!--
+        Uygulamanın simgesi. Öncekinde uyuşmazlıklar vardı ve hepsi düzeltildi:
+          · tabağın altındaki gri gölge kaldırıldı — beyaz zeminde kirli bir leke gibi
+            duruyordu, uygulamada ise koyu bir arka planın üstünde,
+          · kulpun `stroke-linejoin` değeri eksikti, uçları uygulamadakinden keskindi,
+          · buhar çubukları uygulamadaki `opacity` değerleriyle eşleşmiyordu.
+        Zamanlama `src/lib/logoTimeline.ts` ile birebir: 4 saniyelik tur.
+      -->
       <svg class="logo" viewBox="0 0 200 200" role="img" aria-label="GaranTea">
         <defs>
           <linearGradient id="docFade" x1="0" y1="80" x2="0" y2="105" gradientUnits="userSpaceOnUse">
@@ -307,12 +407,14 @@
           </mask>
         </defs>
 
-        <ellipse cx="100" cy="176" rx="65" ry="8" fill="#e2e8f0" opacity=".5"/>
         <ellipse cx="100" cy="165" rx="80" ry="16" fill="url(#saucer)"/>
         <ellipse cx="100" cy="165" rx="50" ry="10" fill="#1558b0" opacity=".6"/>
         <ellipse cx="100" cy="165" rx="49" ry="9" fill="none" stroke="#8ab4f8" stroke-width="1.5"/>
         <ellipse cx="100" cy="165" rx="40" ry="8" fill="#0f4185" opacity=".5"/>
-        <path d="M 155 105 C 190 105, 185 145, 140 148" fill="none" stroke="#1a73e8" stroke-width="10" stroke-linecap="round"/>
+
+        <path d="M 155 105 C 190 105, 185 145, 140 148" fill="none" stroke="#1a73e8"
+              stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+
         <ellipse cx="100" cy="95" rx="56" ry="14" fill="url(#inside)"/>
         <ellipse cx="100" cy="95" rx="56" ry="14" fill="none" stroke="url(#cup)" stroke-width="2.5"/>
 
@@ -330,11 +432,11 @@
         <path d="M 41 95 A 59 15 0 0 0 159 95 C 159 150, 135 165, 100 165 C 65 165, 41 150, 41 95 Z"
               fill="url(#cup)" stroke="url(#cup)" stroke-width="2.5" stroke-linejoin="round"/>
 
-        <rect class="steam" x="70"  y="65" width="6" height="14" rx="3" fill="#8ab4f8"/>
-        <rect class="steam" x="84"  y="60" width="6" height="20" rx="3" fill="#669df6"/>
-        <rect class="steam" x="97"  y="55" width="6" height="26" rx="3" fill="#4285f4"/>
-        <rect class="steam" x="110" y="60" width="6" height="20" rx="3" fill="#669df6"/>
-        <rect class="steam" x="124" y="65" width="6" height="14" rx="3" fill="#8ab4f8"/>
+        <rect class="steam s1" x="70"  y="65" width="6" height="14" rx="3" fill="#8ab4f8"/>
+        <rect class="steam s2" x="84"  y="60" width="6" height="20" rx="3" fill="#669df6"/>
+        <rect class="steam s3" x="97"  y="55" width="6" height="26" rx="3" fill="#4285f4"/>
+        <rect class="steam s4" x="110" y="60" width="6" height="20" rx="3" fill="#669df6"/>
+        <rect class="steam s5" x="124" y="65" width="6" height="14" rx="3" fill="#8ab4f8"/>
 
         <style>
           .doc { animation: docDrop 4s linear infinite; }
@@ -344,80 +446,89 @@
             45%  { transform: translate(75px, 120px); opacity: 1; }
             100% { transform: translate(75px, 120px); opacity: 0; }
           }
+          /*
+            Buhar: her çubuğun kendi zamanlaması ve KENDİ EN YÜKSEK SAYDAMLIĞI var —
+            ortadaki en belirgin, kenardakiler soluk (src/lib/logoTimeline.ts `STEAM`).
+            Hepsine aynı değer verilseydi buhar değil, yükselen bir çit görünürdü.
+          */
           .steam { animation: steam 4s linear infinite; }
           @keyframes steam {
-            0%, 45% { transform: translateY(15px); opacity: 0; }
-            75%     { transform: translateY(-15px); opacity: .7; }
+            0%, 45% { transform: translateY(15px);  opacity: 0; }
+            75%     { transform: translateY(-15px); opacity: var(--peak, .7); }
             100%    { transform: translateY(-15px); opacity: 0; }
           }
-          .steam:nth-of-type(2) { animation-delay: -.08s; }
-          .steam:nth-of-type(3) { animation-delay: -.16s; }
-          .steam:nth-of-type(4) { animation-delay: -.24s; }
-          .steam:nth-of-type(5) { animation-delay: -.32s; }
+          .s1 { --peak: .70; animation-duration: 4s; }
+          .s2 { --peak: .85; animation-delay: -.2s; }
+          .s3 { --peak: .95; animation-delay: -.1s; }
+          .s4 { --peak: .85; animation-delay: -.3s; }
+          .s5 { --peak: .70; animation-delay: -.4s; }
         </style>
       </svg>
 
       <div>
         <div class="wordmark"><span class="g">Garan</span><span class="t">Tea</span></div>
-        <div class="tagline" data-tr="Garanti Takip Asistanınız" data-en="Warranty Tracking Assistant">Garanti Takip Asistanınız</div>
+        <div class="tagline" data-tr="Garanti Takip Asistanınız" data-en="Warranty Tracking Assistant">Warranty Tracking Assistant</div>
       </div>
     </div>
 
-    <h1 data-tr="Garantisi bitmeden haberin olsun." data-en="Know before the warranty ends.">Garantisi bitmeden haberin olsun.</h1>
+    <h1 data-tr="Garantisi bitmeden haberin olsun." data-en="Know before the warranty ends.">Know before the warranty ends.</h1>
 
     <p class="lede"
        data-tr="Her cihazın faturasını ve garanti süresini tek yerde topla. GaranTea süreyi senin yerine takip eder, zamanı gelince hatırlatır."
        data-en="Keep every device's receipt and warranty period in one place. GaranTea tracks the time for you and reminds you when it matters.">
-      Her cihazın faturasını ve garanti süresini tek yerde topla. GaranTea süreyi senin yerine takip eder, zamanı gelince hatırlatır.
+      Keep every device's receipt and warranty period in one place. GaranTea tracks the time for you and reminds you when it matters.
     </p>
 
     <ul class="points">
       <li>
-        <b data-tr="Süre dolmadan uyarı." data-en="A warning before it expires.">Süre dolmadan uyarı.</b>
-        <span data-tr="Bildirim, hâlâ vaktin varken gelir." data-en="The notification arrives while there is still time to act."> Bildirim, hâlâ vaktin varken gelir.</span>
+        <b data-tr="Süre dolmadan uyarı." data-en="A warning before it expires.">A warning before it expires.</b>
+        <span data-tr="Bildirim, hâlâ vaktin varken gelir." data-en="The notification arrives while there is still time to act."> The notification arrives while there is still time to act.</span>
       </li>
       <li>
-        <b data-tr="Faturan kaybolmaz." data-en="Your receipt never gets lost.">Faturan kaybolmaz.</b>
-        <span data-tr="Belgeler cihaza bağlı durur; servise giderken yanında." data-en="Documents stay attached to the device, ready when you need them."> Belgeler cihaza bağlı durur; servise giderken yanında.</span>
+        <b data-tr="Faturan kaybolmaz." data-en="Your receipt never gets lost.">Your receipt never gets lost.</b>
+        <span data-tr="Belgeler cihaza bağlı durur; servise giderken yanında." data-en="Documents stay attached to the device, ready when you need them."> Documents stay attached to the device, ready when you need them.</span>
       </li>
       <li>
-        <b data-tr="Verin satılmaz." data-en="Your data is not for sale.">Verin satılmaz.</b>
-        <span data-tr="Konum, mikrofon ve rehber izni hiç istenmez." data-en="Location, microphone and contacts are never requested."> Konum, mikrofon ve rehber izni hiç istenmez.</span>
+        <b data-tr="Verin satılmaz." data-en="Your data is not for sale.">Your data is not for sale.</b>
+        <span data-tr="Konum, mikrofon ve rehber izni hiç istenmez." data-en="Location, microphone and contacts are never requested."> Location, microphone and contacts are never requested.</span>
       </li>
     </ul>
 
     <div class="actions">
       <span class="store">
         <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3.6 1.8a1 1 0 0 0-.5.9v18.6a1 1 0 0 0 .5.9l10-10.2zM14.9 12.9l2.7 2.8-10.9 6.2zm3.9-4L21.9 11c.7.4.7 1.5 0 1.9l-3.1 1.8-3-3zM14.9 11 4.7 1.6l12.9 7.3z"/></svg>
-        Google Play <span class="soon" data-tr="YAKINDA" data-en="SOON">YAKINDA</span>
+        Google Play <span class="soon" data-tr="YAKINDA" data-en="SOON">SOON</span>
       </span>
 
       <span class="store">
         <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.4 12.7c0-2.3 1.9-3.4 2-3.5-1.1-1.6-2.8-1.8-3.4-1.8-1.4-.1-2.8.9-3.5.9s-1.8-.9-3-.8c-1.5 0-2.9.9-3.7 2.3-1.6 2.7-.4 6.8 1.1 9 .8 1.1 1.7 2.3 2.9 2.2 1.2 0 1.6-.7 3-.7s1.8.7 3 .7c1.3 0 2.1-1.1 2.8-2.2.9-1.3 1.3-2.5 1.3-2.6 0 0-2.5-1-2.5-3.5zM14.2 5.9c.6-.8 1.1-1.9 1-3-1 0-2.1.6-2.8 1.4-.6.7-1.2 1.8-1 2.9 1.1.1 2.2-.5 2.8-1.3z"/></svg>
-        App Store <span class="soon" data-tr="YAKINDA" data-en="SOON">YAKINDA</span>
+        App Store <span class="soon" data-tr="YAKINDA" data-en="SOON">SOON</span>
       </span>
 
-      <a class="ghost" href="privacy.html" data-tr="Gizlilik Politikası" data-en="Privacy Policy">Gizlilik Politikası</a>
+      <!--
+        `<a href="privacy.html">` OLARAK KALIYOR, `<button>` değil.
+
+        JS modalı açıp adresi değiştiriyor; ama betik yüklenmeden tıklanırsa ya da hiç
+        çalışmazsa bağlantı normal davranıp gerçek sayfayı açıyor. Gizlilik metnine
+        ulaşmak JS'e bağlı olmamalı — mağaza incelemesi de buraya bakıyor.
+      -->
+      <a class="ghost" id="privacy-open" href="privacy.html" data-tr="Gizlilik Politikası" data-en="Privacy Policy">Privacy Policy</a>
     </div>
   </div>
 
   <!--
-    GERÇEK EKRAN GÖRÜNTÜLERİ. Daha önce burada CSS ile çizilmiş temsilî ekranlar vardı;
-    yakın duruyorlardı ama uygulamanın kendisi değillerdi. Bunlar çalışan uygulamadan
-    alındı (durum çubuğu ve gezinme çizgisi kırpıldı — ikisi de uygulamanın parçası değil).
+    GERÇEK EKRAN GÖRÜNTÜLERİ — çalışan uygulamadan alındı (durum çubuğu ve gezinme
+    çizgisi kırpıldı; ikisi de uygulamanın parçası değil).
 
     Dile göre AYRI SET var: uygulama arayüzü de çevrildiği için, Türkçe siteye İngilizce
-    ekran koymak sayfayı yarı çevrilmiş gösterirdi. Kaynaklar dil değişince değişiyor.
-
-    `loading="eager"` ilk ekranda: döngü hemen başlıyor, geç yüklenen bir ilk kare boş
-    telefon demek olurdu.
+    ekran koymak sayfayı yarı çevrilmiş gösterirdi.
   -->
   <div class="preview">
-    <div class="phone">
-      <img data-tr="screens/tr-01-home.jpg" data-en="screens/en-01-home.jpg" src="screens/tr-01-home.jpg" alt="GaranTea" loading="eager" decoding="async">
-      <img data-tr="screens/tr-02-detail.jpg" data-en="screens/en-02-detail.jpg" src="screens/tr-02-detail.jpg" alt="" loading="lazy" decoding="async">
-      <img data-tr="screens/tr-03-add.jpg" data-en="screens/en-03-add.jpg" src="screens/tr-03-add.jpg" alt="" loading="lazy" decoding="async">
-      <img data-tr="screens/tr-04-credit.jpg" data-en="screens/en-04-credit.jpg" src="screens/tr-04-credit.jpg" alt="" loading="lazy" decoding="async">
+    <div class="phone" id="phone">
+      <div class="shot" data-tr="screens/tr-01-home.jpg"   data-en="screens/en-01-home.jpg"></div>
+      <div class="shot" data-tr="screens/tr-02-detail.jpg" data-en="screens/en-02-detail.jpg"></div>
+      <div class="shot" data-tr="screens/tr-03-add.jpg"    data-en="screens/en-03-add.jpg"></div>
+      <div class="shot" data-tr="screens/tr-04-credit.jpg" data-en="screens/en-04-credit.jpg"></div>
     </div>
   </div>
 </main>
@@ -427,17 +538,27 @@
   <a href="mailto:appgarantea@gmail.com">appgarantea@gmail.com</a>
 </footer>
 
+<div class="modal" id="privacy-modal" role="dialog" aria-modal="true" aria-label="Privacy Policy">
+  <div class="modal-card">
+    <div class="modal-head">
+      <strong data-tr="Gizlilik Politikası" data-en="Privacy Policy">Privacy Policy</strong>
+      <button class="modal-close" id="privacy-close" type="button" aria-label="Close">&times;</button>
+    </div>
+    <div class="modal-body" id="privacy-body">
+      <p class="meta" data-tr="Yükleniyor…" data-en="Loading…">Loading…</p>
+    </div>
+  </div>
+</div>
+
 <script>
-/*
-  DİL DEĞİŞTİRME — sayfadaki tek betik.
-
-  Metinler `data-tr` / `data-en` özniteliklerinde; ikinci bir HTML kopyası YOK. İki ayrı
-  sayfa tutmak, biri güncellendiğinde diğerinin sessizce eskimesi demekti.
-
-  Aynı öznitelikler ekran görüntülerinde de kullanılıyor: `<img>` için değişen şey metin
-  değil `src`. Ayrım basit — düğüm bir görüntüyse kaynağı, değilse içeriği güncelleniyor.
-*/
 (function () {
+  /* ───────────────────────── DİL ─────────────────────────
+     Metinler `data-tr` / `data-en` özniteliklerinde; ikinci bir HTML kopyası YOK. Aynı
+     öznitelikler ekran görüntülerinde de kullanılıyor — orada değişen şey metin değil
+     zemin görüntüsü.
+
+     VARSAYILAN İNGİLİZCE: sayfa dünyaya açık ve mağaza incelemesi de İngilizce okuyor.
+     Tarayıcı diline bakılmıyor; kullanıcının seçimi ise hatırlanıyor. */
   var KEY = 'garantea-lang';
 
   function apply(lang) {
@@ -445,7 +566,7 @@
 
     document.querySelectorAll('[data-' + lang + ']').forEach(function (el) {
       var value = el.getAttribute('data-' + lang);
-      if (el.tagName === 'IMG') el.src = value;
+      if (el.classList.contains('shot')) el.style.backgroundImage = 'url("' + value + '")';
       else el.textContent = value;
     });
 
@@ -458,11 +579,78 @@
 
   var saved = null;
   try { saved = localStorage.getItem(KEY); } catch (e) {}
-  apply(saved || ((navigator.language || 'tr').toLowerCase().indexOf('tr') === 0 ? 'tr' : 'en'));
+  apply(saved === 'tr' ? 'tr' : 'en');
 
   document.querySelectorAll('.lang button').forEach(function (btn) {
     btn.addEventListener('click', function () { apply(btn.dataset.lang); });
   });
+
+  /* ──────────────────── GİZLİLİK MODALI ────────────────────
+     Uygulamadaki modalın karşılığı. Metin `privacy.html`den ÇEKİLİYOR: sayfada gösterilen
+     ile mağazaya verilen adresteki metin aynı dosyadan geliyor.
+
+     ADRES DE DEĞİŞİYOR (`#privacy`): modal açıkken bağlantı paylaşılabilir ve geri tuşu
+     modalı kapatır — kullanıcının beklediği davranış bu. */
+  var modal = document.getElementById('privacy-modal');
+  var body  = document.getElementById('privacy-body');
+  var loaded = false;
+
+  function load() {
+    if (loaded) return;
+    loaded = true;
+    fetch('privacy.html')
+      .then(function (r) { if (!r.ok) throw new Error(r.status); return r.text(); })
+      .then(function (html) {
+        var doc = new DOMParser().parseFromString(html, 'text/html');
+        var policy = doc.getElementById('policy');
+        if (!policy) throw new Error('policy bulunamadi');
+        body.innerHTML = policy.innerHTML;
+      })
+      .catch(function () {
+        /* Çekilemezse metni GİZLEMİYORUZ: gerçek sayfaya bir çıkış veriliyor.
+           Sessizce boş bir modal bırakmak, politikayı erişilemez kılmak olurdu. */
+        loaded = false;
+        var tr = document.documentElement.lang === 'tr';
+        body.innerHTML = '<p><a href="privacy.html">' +
+          (tr ? 'Gizlilik politikasını açmak için tıklayın.' : 'Open the privacy policy.') +
+          '</a></p>';
+      });
+  }
+
+  function open(push) {
+    load();
+    modal.setAttribute('open', '');
+    document.body.style.overflow = 'hidden';
+    if (push && location.hash !== '#privacy') history.pushState(null, '', '#privacy');
+  }
+
+  function close(pop) {
+    modal.removeAttribute('open');
+    document.body.style.overflow = '';
+    if (pop && location.hash === '#privacy') history.back();
+  }
+
+  document.getElementById('privacy-open').addEventListener('click', function (e) {
+    e.preventDefault();
+    open(true);
+  });
+  document.getElementById('privacy-close').addEventListener('click', function () { close(true); });
+  /* Dışarı dokunmak kapatıyor — uygulamadaki modallarla aynı kural. Kartın kendisine
+     yapılan dokunuş kapatmamalı, bu yüzden hedef kontrol ediliyor. */
+  modal.addEventListener('click', function (e) { if (e.target === modal) close(true); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && modal.hasAttribute('open')) close(true); });
+
+  window.addEventListener('hashchange', function () {
+    if (location.hash === '#privacy') open(false); else close(false);
+  });
+  if (location.hash === '#privacy') open(false);
+
+  /* ──────────────── EKRAN GÖRÜNTÜLERİ ────────────────
+     Sağ tık menüsü kapatılıyor. BU BİR KORUMA DEĞİL, caydırıcı: dosyalar sunucudan
+     servis ediliyor, adresini bilen ya da ağ sekmesine bakan herkes indirebilir. Statik
+     bir sitede bunun başka türlüsü yok — gerçekten erişilemez olmaları gerekiyorsa
+     görüntülerin sunucu tarafında yetkilendirilmesi gerekirdi. */
+  document.getElementById('phone').addEventListener('contextmenu', function (e) { e.preventDefault(); });
 })();
 </script>
 

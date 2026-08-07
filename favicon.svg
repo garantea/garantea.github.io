@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!--
+    Tarayıcı sekmesi ikonu: uygulamanın fincanı.
+
+    SEKME İKONU 16 PİKSEL. Sayfadaki tam simge (tabak, kulp, buhar, belge) o boyutta
+    tanınmaz bir lekeye dönüşüyor. Burada yalnızca fincan var ve viewBox gövdeye
+    yakınlaştırılmış — küçükken okunan tek biçim o. Aynı sebeple buhar da kalın çizildi.
+  -->
+  <defs>
+    <linearGradient id="c" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#053582"/>
+      <stop offset="20%" stop-color="#0B57D0"/>
+      <stop offset="80%" stop-color="#4285F4"/>
+      <stop offset="100%" stop-color="#8ab4f8"/>
+    </linearGradient>
+    <linearGradient id="i" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#03204e"/>
+      <stop offset="100%" stop-color="#1a73e8"/>
+    </linearGradient>
+  </defs>
+
+  <g transform="translate(100 108) scale(1.32) translate(-100 -108)">
+    <ellipse cx="100" cy="165" rx="72" ry="14" fill="#1a73e8"/>
+    <ellipse cx="100" cy="165" rx="44" ry="8" fill="#0f4185" opacity=".55"/>
+    <path d="M 155 105 C 190 105, 185 145, 140 148" fill="none" stroke="#1a73e8" stroke-width="12" stroke-linecap="round"/>
+    <ellipse cx="100" cy="95" rx="56" ry="14" fill="url(#i)"/>
+    <path d="M 41 95 A 59 15 0 0 0 159 95 C 159 150, 135 165, 100 165 C 65 165, 41 150, 41 95 Z" fill="url(#c)"/>
+    <rect x="84" y="52" width="8" height="22" rx="4" fill="#669df6"/>
+    <rect x="96" y="44" width="8" height="30" rx="4" fill="#4285f4"/>
+    <rect x="108" y="52" width="8" height="22" rx="4" fill="#669df6"/>
+  </g>
+</svg>
