@@ -174,7 +174,12 @@
     margin: clamp(10px, 1.8vh, 16px) 0 0;
     font-size: clamp(.92rem, 1.9vh, 1.06rem);
     color: var(--muted); max-width: 46ch; text-wrap: pretty;
-    min-height: 4.5em;    /* üç satır */
+    /*
+      DÖRT SATIRLIK YER. Türkçe metin İngilizcesinden uzun ve bir satır fazla sarıyor;
+      kutu içeriğe bırakılsaydı dil değişince altındaki maddeler ve butonlar kayardı.
+      Ayrılan yer İKİ DİLİN DE en uzun hâline göre.
+    */
+    min-height: 6em;
   }
 
   .points { list-style: none; margin: clamp(14px, 2.6vh, 26px) 0 0; padding: 0; }
@@ -201,10 +206,19 @@
 
   /* ─── Butonlar ──────────────────────────────────────────────── */
 
+  /*
+    BUTON SATIRI İKİ DİLDE DE AYNI. Genişlikler içeriğe bırakılsaydı Türkçe etiketler
+    (daha uzun) satırı farklı yerden kırar, İngilizcede yan yana duran üç buton
+    Türkçede alt alta düşerdi. Üçünün de genişliği sabit; `flex-wrap` yalnızca ekran
+    gerçekten dar olduğunda devreye giriyor ve o zaman İKİ DİLDE DE aynı noktada kırılıyor.
+  */
   .actions { margin-top: clamp(16px, 2.8vh, 30px); display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
 
   .store {
     display: inline-flex; align-items: center; justify-content: center; gap: 9px;
+    /* İki mağaza butonu da SABİT genişlikte: "Google Play" ile "App Store" farklı
+       uzunlukta ve eşitlenmeselerdi satır düzeni dile değil etikete göre kayardı. */
+    min-width: 196px;
     padding: clamp(10px, 1.6vh, 13px) clamp(15px, 1.8vw, 20px);
     border-radius: 999px;
     background: var(--fg); color: #fff;
@@ -241,7 +255,9 @@
   */
   .ghost {
     display: inline-flex; align-items: center; justify-content: center;
-    min-width: 168px;   /* "Gizlilik Politikası" / "Privacy Policy" ortak genişlik */
+    /* UZUN OLAN ETİKETE göre ölçülü: "Gizlilik Politikası" İngilizcesinden belirgin
+       biçimde geniş. Dar tutulsaydı buton Türkçede büyüyüp satırı farklı kırardı. */
+    min-width: 208px;
     padding: clamp(10px, 1.6vh, 13px) clamp(16px, 2vw, 22px);
     border-radius: 999px; border: 1px solid rgba(37, 99, 235, .28);
     color: var(--fg); text-decoration: none; cursor: pointer;
@@ -523,26 +539,31 @@
       </div>
     </div>
 
-    <h1 data-tr="Garantisi bitmeden haberin olsun." data-en="Know before the warranty ends.">Know before the warranty ends.</h1>
+    <!--
+      RESMİ ANLATIM. Metinler "sen" kipinden "siz" kipine alındı ve iddialı ifadeler
+      ("haberin olsun") yerini bilgi veren cümlelere bıraktı. İngilizcesi de aynı
+      ölçüde ölçülü: iki dil yalnızca yerleşim olarak değil TON olarak da eşleşmeli.
+    -->
+    <h1 data-tr="Garanti süresi dolmadan haberdar olun." data-en="Be informed before the warranty expires.">Be informed before the warranty expires.</h1>
 
     <p class="lede"
-       data-tr="Her cihazın faturasını ve garanti süresini tek yerde topla. GaranTea süreyi senin yerine takip eder, zamanı gelince hatırlatır."
-       data-en="Keep every device's receipt and warranty period in one place. GaranTea tracks the time for you and reminds you when it matters.">
-      Keep every device's receipt and warranty period in one place. GaranTea tracks the time for you and reminds you when it matters.
+       data-tr="Cihazlarınızın faturalarını ve garanti sürelerini tek bir yerde toplayın. GaranTea süreyi sizin adınıza takip eder ve zamanı geldiğinde hatırlatır."
+       data-en="Keep the receipts and warranty periods of all your devices in one place. GaranTea tracks the remaining time on your behalf and notifies you when it matters.">
+      Keep the receipts and warranty periods of all your devices in one place. GaranTea tracks the remaining time on your behalf and notifies you when it matters.
     </p>
 
     <ul class="points">
       <li>
-        <b data-tr="Süre dolmadan uyarı." data-en="A warning before it expires.">A warning before it expires.</b>
-        <span data-tr="Bildirim, hâlâ vaktin varken gelir." data-en="The notification arrives while there is still time to act."> The notification arrives while there is still time to act.</span>
+        <b data-tr="Süresi dolmadan bildirim." data-en="A notice before expiry.">A notice before expiry.</b>
+        <span data-tr="Hatırlatma, işlem yapmak için hâlâ vaktiniz varken ulaşır." data-en="The reminder arrives while there is still time to act."> The reminder arrives while there is still time to act.</span>
       </li>
       <li>
-        <b data-tr="Faturan kaybolmaz." data-en="Your receipt never gets lost.">Your receipt never gets lost.</b>
-        <span data-tr="Belgeler cihaza bağlı durur; servise giderken yanında." data-en="Documents stay attached to the device, ready when you need them."> Documents stay attached to the device, ready when you need them.</span>
+        <b data-tr="Faturalarınız kaybolmaz." data-en="Your receipts are not lost.">Your receipts are not lost.</b>
+        <span data-tr="Belgeler cihaz kaydına bağlı kalır ve gerektiğinde yanınızdadır." data-en="Documents stay attached to the device record and are available when required."> Documents stay attached to the device record and are available when required.</span>
       </li>
       <li>
-        <b data-tr="Verin satılmaz." data-en="Your data is not for sale.">Your data is not for sale.</b>
-        <span data-tr="Konum, mikrofon ve rehber izni hiç istenmez." data-en="Location, microphone and contacts are never requested."> Location, microphone and contacts are never requested.</span>
+        <b data-tr="Verileriniz satılmaz." data-en="Your data is not sold.">Your data is not sold.</b>
+        <span data-tr="Konum, mikrofon ve rehber erişimi hiçbir zaman talep edilmez." data-en="Location, microphone and contact access are never requested."> Location, microphone and contact access are never requested.</span>
       </li>
     </ul>
 
@@ -626,6 +647,10 @@
       btn.setAttribute('aria-pressed', String(btn.dataset.lang === lang));
     });
 
+    /* Modal AÇIKKEN dil değişirse metin de değişmeli; yoksa kullanıcı Türkçeye geçtiği
+       hâlde İngilizce politikayı okumaya devam ederdi. */
+    if (modal && modal.hasAttribute('open')) load(lang);
+
     try { localStorage.setItem(KEY, lang); } catch (e) { /* gizli sekme: sorun değil */ }
   }
 
@@ -645,32 +670,36 @@
      modalı kapatır — kullanıcının beklediği davranış bu. */
   var modal = document.getElementById('privacy-modal');
   var body  = document.getElementById('privacy-body');
-  var loaded = false;
+  /*
+    Çekilen metin ÖNBELLEĞE alınıyor ama dil başına ayrı: modal Türkçe açıldıktan sonra
+    dil İngilizceye çevrilip tekrar açılırsa metin de değişmeli. Tek bir "yüklendi"
+    bayrağı, ilk açılan dilin metnini kalıcı kılardı.
+  */
+  var cache = {};
 
-  function load() {
-    if (loaded) return;
-    loaded = true;
+  function load(lang) {
+    if (cache[lang]) { body.innerHTML = cache[lang]; return; }
     fetch('privacy.html')
       .then(function (r) { if (!r.ok) throw new Error(r.status); return r.text(); })
       .then(function (html) {
         var doc = new DOMParser().parseFromString(html, 'text/html');
-        var policy = doc.getElementById('policy');
+        // Yalnızca SEÇİLİ DİLİN bloğu; sayfanın kendisi ikisini birden gösteriyor.
+        var policy = doc.getElementById('policy-' + lang) || doc.getElementById('policy');
         if (!policy) throw new Error('policy bulunamadi');
-        body.innerHTML = policy.innerHTML;
+        cache[lang] = policy.innerHTML;
+        body.innerHTML = cache[lang];
       })
       .catch(function () {
         /* Çekilemezse metni GİZLEMİYORUZ: gerçek sayfaya bir çıkış veriliyor.
            Sessizce boş bir modal bırakmak, politikayı erişilemez kılmak olurdu. */
-        loaded = false;
-        var tr = document.documentElement.lang === 'tr';
         body.innerHTML = '<p><a href="privacy.html">' +
-          (tr ? 'Gizlilik politikasını açmak için tıklayın.' : 'Open the privacy policy.') +
+          (lang === 'tr' ? 'Gizlilik politikasını açmak için tıklayın.' : 'Open the privacy policy.') +
           '</a></p>';
       });
   }
 
   function open(push) {
-    load();
+    load(document.documentElement.lang === 'tr' ? 'tr' : 'en');
     modal.setAttribute('open', '');
     document.body.style.overflow = 'hidden';
     if (push && location.hash !== '#privacy') history.pushState(null, '', '#privacy');
