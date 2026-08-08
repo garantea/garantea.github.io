@@ -102,11 +102,11 @@
 
   /* ─── Üst şerit ─────────────────────────────────────────────── */
 
-  .topbar { display: flex; justify-content: flex-end; padding: clamp(13.2px, 2.2vh, 22px) clamp(19.8px, 5.5vw, 57.2px) 0; }
+  .topbar { display: flex; justify-content: flex-end; padding: clamp(12px, 2vh, 20px) clamp(18px, 5vw, 52px) 0; }
   .lang {
-    display: inline-flex; padding: 3.3px; border-radius: 999px;
-    border: 1.1px solid var(--line); background: rgba(255,255,255,.75);
-    backdrop-filter: blur(8.8px);
+    display: inline-flex; padding: 3px; border-radius: 999px;
+    border: 1px solid var(--line); background: rgba(255,255,255,.75);
+    backdrop-filter: blur(8px);
   }
   .lang button {
     appearance: none; border: 0; cursor: pointer;
@@ -114,9 +114,9 @@
       SABİT GENİŞLİK. "Türkçe" ve "English" farklı uzunlukta; genişlik içeriğe
       bırakılsaydı dil değişince düğme kutusu büyüyüp küçülür, sağdaki hizalama oynardı.
     */
-    min-width: 92.4px;
-    padding: 6.6px 13.2px; border-radius: 999px; background: transparent;
-    color: var(--muted); font: inherit; font-size: .88rem; font-weight: 600;
+    min-width: 84px;
+    padding: 6px 12px; border-radius: 999px; background: transparent;
+    color: var(--muted); font: inherit; font-size: .8rem; font-weight: 600;
     transition: background .18s ease, color .18s ease;
   }
   /*
@@ -135,11 +135,11 @@
   /* ─── Yerleşim ──────────────────────────────────────────────── */
 
   main {
-    width: min(1298px, 100%);
+    width: min(1180px, 100%);
     margin: 0 auto;
-    padding: clamp(8.8px, 1.76vh, 26.4px) clamp(19.8px, 5.5vw, 57.2px) clamp(15.4px, 2.2vh, 30.8px);
+    padding: clamp(8px, 1.6vh, 24px) clamp(18px, 5vw, 52px) clamp(14px, 2vh, 28px);
     display: grid; align-content: center;
-    gap: clamp(22px, 3.3vh, 52.8px);
+    gap: clamp(20px, 3vh, 48px);
     grid-template-columns: 1fr;
   }
   /* Tablet ve üstü: iki sütun. Eşik hem genişliğe hem YÜKSEKLİĞE bakıyor — yatay
@@ -150,19 +150,19 @@
 
   /* ─── Marka ─────────────────────────────────────────────────── */
 
-  .brand { display: flex; align-items: center; gap: clamp(13.2px, 1.98vw, 24.2px); margin-bottom: clamp(15.4px, 2.64vh, 28.6px); }
-  .logo { width: clamp(105.6px, 18.7vh, 193.6px); aspect-ratio: 1; flex: none; overflow: visible; }
+  .brand { display: flex; align-items: center; gap: clamp(12px, 1.8vw, 22px); margin-bottom: clamp(14px, 2.4vh, 26px); }
+  .logo { width: clamp(96px, 17vh, 176px); aspect-ratio: 1; flex: none; overflow: visible; }
 
   /* Kelime işareti UYGULAMADAKİYLE aynı: "Garan" mavi, "Tea" kırmızı. */
-  .wordmark { font-size: clamp(2.42rem, 6.6vh, 3.96rem); font-weight: 700; letter-spacing: -.04em; line-height: 1; }
+  .wordmark { font-size: clamp(2.2rem, 6vh, 3.6rem); font-weight: 700; letter-spacing: -.04em; line-height: 1; }
   .wordmark .g { color: var(--blue); }
   .wordmark .t { color: var(--red); }
   /* Slogan TEK SATIR: "Garanti Takip Asistanınız" İngilizcesinden uzun ve dar ekranda
      sararak marka bloğunu yükseltiyordu — yani yalnızca Türkçede simge ile yazı hizası
      kayıyordu. */
   .tagline {
-    margin-top: 7.7px; color: var(--muted);
-    font-size: clamp(.77rem, .99vw + .418rem, 1.078rem);
+    margin-top: 7px; color: var(--muted);
+    font-size: clamp(.7rem, .9vw + .38rem, .98rem);
     white-space: nowrap;
   }
 
@@ -181,15 +181,15 @@
   */
   h1 {
     margin: 0;
-    font-size: clamp(1.65rem, 4.62vh, 2.97rem);
+    font-size: clamp(1.5rem, 4.2vh, 2.7rem);
     line-height: 1.12; letter-spacing: -.035em; font-weight: 700;
     text-wrap: balance;
     min-height: 2.24em;   /* iki satır */
   }
 
   .lede {
-    margin: clamp(11px, 1.98vh, 17.6px) 0 0;
-    font-size: clamp(1.012rem, 2.09vh, 1.166rem);
+    margin: clamp(10px, 1.8vh, 16px) 0 0;
+    font-size: clamp(.92rem, 1.9vh, 1.06rem);
     color: var(--muted); max-width: 46ch; text-wrap: pretty;
     /*
       DÖRT SATIRLIK YER. Türkçe metin İngilizcesinden uzun ve bir satır fazla sarıyor;
@@ -199,25 +199,25 @@
     min-height: 6em;
   }
 
-  .points { list-style: none; margin: clamp(15.4px, 2.86vh, 28.6px) 0 0; padding: 0; }
+  .points { list-style: none; margin: clamp(14px, 2.6vh, 26px) 0 0; padding: 0; }
   /*
     HER MADDE TEK SATIR — dil ne olursa olsun.
 
     `white-space: nowrap` satırın sarmasını engelliyor. Tek başına yeterli değildi: dar
     bir ekranda satır ekrandan taşıp kırpılırdı. Bu yüzden yazı boyutu `vw`YE bağlı —
-    ekran daralınca metin sarmak yerine KÜÇÜLÜYOR. Alt sınır (.66rem) okunabilirliğin
+    ekran daralınca metin sarmak yerine KÜÇÜLÜYOR. Alt sınır (.6rem) okunabilirliğin
     dibi; onun altına inmek yerine çok dar ekranlarda taşmayı kabul ediyoruz.
 
     Yan fayda: iki dil de tam bir satır tuttuğu için `min-height`e gerek kalmadı —
     yükseklik zaten dilden bağımsız.
   */
   .points li {
-    padding: clamp(8.8px, 1.54vh, 13.2px) 0;
-    border-top: 1.1px solid var(--line);
-    font-size: clamp(.66rem, 1.265vw + .374rem, 1.067rem);
+    padding: clamp(8px, 1.4vh, 12px) 0;
+    border-top: 1px solid var(--line);
+    font-size: clamp(.6rem, 1.15vw + .34rem, .97rem);
     white-space: nowrap;
   }
-  .points li:last-child { border-bottom: 1.1px solid var(--line); }
+  .points li:last-child { border-bottom: 1px solid var(--line); }
   .points b { font-weight: 600; }
   .points span { color: var(--muted); }
 
@@ -236,18 +236,18 @@
     sarmak yerine küçülüyor (`.points li` ile aynı deyim). Alt sınır okunabilirliğin dibi.
   */
   .actions {
-    margin-top: clamp(17.6px, 3.08vh, 33px);
+    margin-top: clamp(16px, 2.8vh, 30px);
     display: flex; flex-wrap: nowrap; align-items: center;
-    gap: clamp(6px, .9vw, 11px);
+    gap: clamp(6px, .8vw, 10px);
   }
   .actions > * { flex: 1 1 0; min-width: 0; }
 
   .store {
-    display: inline-flex; align-items: center; justify-content: center; gap: clamp(5px, .7vw, 9.9px);
-    padding: clamp(11px, 1.76vh, 14.3px) clamp(8px, 1.4vw, 22px);
+    display: inline-flex; align-items: center; justify-content: center; gap: clamp(5px, .65vw, 9px);
+    padding: clamp(10px, 1.6vh, 13px) clamp(8px, 1.3vw, 20px);
     border-radius: 999px;
     background: var(--fg); color: #fff;
-    font-size: clamp(.6rem, 1.05vw + .18rem, 1.023rem); font-weight: 600;
+    font-size: clamp(.58rem, .95vw + .17rem, .93rem); font-weight: 600;
     white-space: nowrap;
     /*
       MAĞAZA BUTONLARI PASİF: uygulama henüz hiçbir mağazada değil. Çalışmayan bir
@@ -260,10 +260,11 @@
   .store .soon {
     /* Genişlik artık SABİT DEĞİL: butonun kendisi satırı eşit paylaştığı için rozetin
        "YAKINDA"/"SOON" farkı yerleşimi etkilemiyor. Sabit tutmak, dar ekranda rozetin
-       etiketi sıkıştırmasına yol açardı. */
+       etiketi sıkıştırmasına yol açardı. Ölçü `em` — buton yazısı küçülünce rozet de
+       onunla birlikte küçülüyor. */
     text-align: center; flex: none;
-    font-size: .682em; font-weight: 700; letter-spacing: .07em;
-    padding: 2.2px 7.7px; border-radius: 999px; background: rgba(255,255,255,.2);
+    font-size: .68em; font-weight: 700; letter-spacing: .07em;
+    padding: 2px 7px; border-radius: 999px; background: rgba(255,255,255,.2);
   }
   /* Çok dar ekranda rozet gizleniyor: üç butonun yan yana kalması etiketten daha
      önemli ve "Yakında" bilgisi butonların sönüklüğünden zaten okunuyor. */
@@ -287,10 +288,10 @@
     /* Genişlik satırdan geliyor (`.actions > *`), etiketten değil — mağaza butonlarıyla
        aynı kural. "Gizlilik Politikası" İngilizcesinden geniş ama artık bu farkın
        yerleşime etkisi yok. */
-    padding: clamp(11px, 1.76vh, 14.3px) clamp(8px, 1.4vw, 24.2px);
-    border-radius: 999px; border: 1.1px solid rgba(37, 99, 235, .28);
+    padding: clamp(10px, 1.6vh, 13px) clamp(8px, 1.3vw, 22px);
+    border-radius: 999px; border: 1px solid rgba(37, 99, 235, .28);
     color: var(--fg); text-decoration: none; cursor: pointer;
-    font: inherit; font-size: clamp(.6rem, 1.05vw + .18rem, 1.023rem); font-weight: 600;
+    font: inherit; font-size: clamp(.58rem, .95vw + .17rem, .93rem); font-weight: 600;
     white-space: nowrap;
     background-image: linear-gradient(100deg,
       #ffffff 0%, #eaf1ff 18%, #cfe0ff 34%, #ffffff 50%,
@@ -306,7 +307,7 @@
   }
   .ghost:hover {
     border-color: var(--blue);
-    box-shadow: 0 8.8px 24.2px -13.2px rgba(37, 99, 235, .7);
+    box-shadow: 0 8px 22px -12px rgba(37, 99, 235, .7);
   }
 
   /* ─── Telefon ───────────────────────────────────────────────── */
@@ -317,17 +318,20 @@
   @media (max-height: 560px) { .preview { display: none; } }
 
   /*
-    İKİ SÜTUNDA TELEFON SAĞA YASLI, ORTALI DEĞİL.
+    İKİ SÜTUNDA TELEFON SAĞA YASLI, ORTALI DEĞİL — ama sağ kenara YAPIŞIK DEĞİL.
 
-    Ortalıyken metin sütunuyla arasındaki boşluk, sağ kenarda kalan boşluktan azdı; telefon
-    yazılara yapışık, sağ tarafı ise boş duruyordu. Sağa yaslamak bu boşluğu yazılarla
-    telefon arasına aktarıyor — iki blok birbirinden ayrılıyor.
+    Ortalıyken metin sütunuyla arasındaki boşluk sağdaki boşluktan azdı; telefon yazılara
+    yapışık, sağı ise boş duruyordu. Sağa yaslamak bu boşluğu araya aktarıyor.
 
-    Sola eklenen boşluk `clamp` ile: sabit bir değer, 900 px eşiğinin hemen üstündeki dar
-    pencerelerde telefonu ekrandan taşırırdı.
+    Sağdaki pay olmadan bu sefer ters uca gidiyordu: telefon sayfanın sağ kenarına
+    dayanıyor ve yazılardan kopuyordu. İkisinin arasında duruyor.
   */
   @media (min-width: 900px) and (min-height: 620px) {
-    .preview { justify-items: end; padding-left: clamp(16px, 4vw, 72px); }
+    .preview {
+      justify-items: end;
+      padding-left: clamp(12px, 2.4vw, 40px);
+      padding-right: clamp(10px, 2.6vw, 52px);
+    }
   }
 
   .phone {
@@ -336,23 +340,23 @@
       ÖLÇÜ GENİŞLİKTEN DEĞİL YÜKSEKLİKTEN VERİLİYOR.
 
       Telefon 620×1279, yani boyu eninin iki katından fazla: genişliği büyütmek yüksekliği
-      iki katı hızla büyütüyor. Genişlik üzerinden bir kademe büyütüldüğünde sayfa 900 px
-      yüksekliğinde taşıp alt şeridi kesti — asıl kısıt hiçbir zaman genişlik değildi.
+      iki katı hızla büyütüyor. Genişlik üzerinden büyütüldüğünde sayfa 900 px yüksekliğinde
+      taşıp alt şeridi kesti — asıl kısıt hiçbir zaman genişlik değildi.
 
-      Yükseklikten verilince sınır doğrudan kontrol ediliyor: üst şerit, kenar boşlukları
-      ve alt şerit için kalan payı aşmıyor, ekran uzadıkça telefon da gerçekten büyüyor.
+      Yükseklikten verilince sınır doğrudan kontrol ediliyor: üst şerit, kenar boşlukları ve
+      alt şerit için kalan payı aşmıyor, ekran uzadıkça telefon da gerçekten büyüyor.
       `aspect-ratio` genişliği kendisi türetiyor.
     */
-    height: clamp(420px, 80vh, 880px);
+    height: clamp(400px, 78vh, 860px);
     width: auto;
     aspect-ratio: 620 / 1279;
-    border-radius: clamp(28.6px, 3.74vh, 44px);
+    border-radius: clamp(26px, 3.4vh, 40px);
     background: #fff;
-    border: 1.1px solid var(--line);
+    border: 1px solid var(--line);
     /* HAFİF SOLA YATIK. 3 derece: eğim fark edilecek kadar var, okumayı zorlaştıracak
        kadar değil. Gölge de eğimle birlikte dönüyor, telefon zeminden kopuk durmuyor. */
     transform: rotate(-3deg);
-    box-shadow: 0 48.4px 99px -37.4px rgba(15, 23, 42, .4), 0 8.8px 24.2px -11px rgba(15, 23, 42, .14);
+    box-shadow: 0 44px 90px -34px rgba(15, 23, 42, .4), 0 8px 22px -10px rgba(15, 23, 42, .14);
     overflow: hidden;
   }
   @media (max-width: 899px) {
@@ -360,7 +364,7 @@
        kenar boşluklarını gözle görülür biçimde eşitsizleştiriyor. */
     /* Tek sütunda ölçü yeniden GENİŞLİKTEN: burada telefon sayfanın tek sütununu
        paylaşıyor ve kısıt yükseklik değil, kenar boşlukları. */
-    .phone { transform: rotate(-1.5deg); height: auto; width: clamp(250px, 62vw, 360px); }
+    .phone { transform: rotate(-1.5deg); height: auto; width: clamp(210px, 52vw, 300px); }
   }
 
   /*
@@ -400,10 +404,10 @@
     kesintisiz akıyor, şerit yalnızca metinden ibaret.
   */
   footer {
-    padding: clamp(9.9px, 1.76vh, 16.5px) clamp(19.8px, 5.5vw, 57.2px);
+    padding: clamp(9px, 1.6vh, 15px) clamp(18px, 5vw, 52px);
     display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
-    gap: 6.6px 19.8px;
-    font-size: clamp(.814rem, 1.54vh, .924rem); color: var(--muted);
+    gap: 6px 18px;
+    font-size: clamp(.74rem, 1.4vh, .84rem); color: var(--muted);
     background: transparent;
   }
   footer a { color: var(--muted); text-decoration: none; }
@@ -467,17 +471,15 @@
   /*
     ─── DAR EKRAN: TEK SATIR ZORLAMASI KALKIYOR ───────────────────
 
-    Sayfanın üst kısmındaki `white-space: nowrap` kararları GENİŞ ekran içindi: iki dilin
-    aynı yerleşimi tutması için satırların sarmaması gerekiyordu. Telefonda bu kural ters
-    çalışıyor — metin sarmak yerine ekrandan taşıyor ve `overflow-x: hidden` taşan kısmı
-    kırpıyor, yani yazının sonu görünmüyor. Slogan, maddeler ve marka yazısı 390 px
-    genişlikte kesiliyordu.
+    Yukarıdaki `white-space: nowrap` kararları GENİŞ ekran içindi: iki dilin aynı yerleşimi
+    tutması için satırların sarmaması gerekiyordu. Telefonda bu kural ters çalışıyor —
+    metin sarmak yerine yazı boyutu tabana dayanıyor ve satırlar okunmaz derecede küçülüyor.
 
     Bu ekranlarda dil parite kaygısı da anlamsız: tek sütun var, sarma iki dilde de aynı
     biçimde oluyor ve altındaki her şey zaten dikey diziliyor.
 
     Marka ölçüsü de burada YÜKSEKLİĞE değil GENİŞLİĞE bağlanıyor. Telefon uzun ve dar;
-    `vh` üzerinden ölçmek simgeyi ve yazıyı ekran genişliğinin ötesine taşıyordu.
+    `vh` üzerinden ölçmek simgeyi ve yazıyı gereğinden büyük gösteriyordu.
   */
   @media (max-width: 700px) {
     .tagline { white-space: normal; }
