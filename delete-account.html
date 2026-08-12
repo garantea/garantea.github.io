@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GaranTea — Hesabımı Sil / Delete My Account</title>
+<meta name="theme-color" content="#2563eb">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<style>
+  /*
+    STİL privacy.html İLE BİREBİR AYNI — kopyalanmadı, aynı kalıp.
+
+    İki sayfa da mağaza listelemesinden doğrudan açılabiliyor ve kullanıcı ikisi
+    arasında gidip geliyor. Farklı görünmeleri, ikisini iki ayrı yer gibi gösterirdi;
+    hesap silme sayfasının "resmî" durması ise özellikle önemli, çünkü kullanıcı oraya
+    bir şeyi kalıcı olarak yok etmek için geliyor.
+
+    YALNIZCA AÇIK TEMA: privacy.html ile aynı gerekçe — bu içeriğin bir kopyası açılış
+    sayfasında beyaz zeminli bir modalın içinde de gösteriliyor.
+  */
+  :root {
+    color-scheme: light;
+    --primary: #2563eb; --fg: #0f172a; --muted-fg: #64748b;
+    --bg: #ffffff; --border: #e6eaf2;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0 auto; padding: clamp(20px, 5vw, 40px) clamp(20px, 5vw, 24px) 64px;
+    max-width: 760px;
+    font: 16px/1.65 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    color: var(--fg); background: var(--bg);
+    -webkit-font-smoothing: antialiased;
+  }
+  /* Geri bağlantısı ÜSTTE: sayfaya doğrudan bir bağlantıyla gelen kullanıcı (mağaza
+     listelemesinden) siteye dönmenin bir yolu olduğunu görmeli. */
+  .back {
+    display: inline-flex; align-items: center; gap: 7px;
+    font-size: .9rem; color: var(--muted-fg); text-decoration: none;
+    margin-bottom: 28px;
+  }
+  .back:hover { color: var(--primary); }
+  h1 { font-size: clamp(1.5rem, 4vw, 1.9rem); margin: 0 0 4px; letter-spacing: -.025em; }
+  h2 { font-size: 1.08rem; margin-top: 34px; letter-spacing: -.01em; }
+  .meta { color: var(--muted-fg); font-size: .9rem; margin-top: 0; }
+  hr { border: 0; border-top: 1px solid var(--border); margin: 56px 0; }
+  ul, ol { padding-left: 20px; }
+  li { margin-bottom: 6px; }
+  a { color: var(--primary); }
+  p { text-wrap: pretty; }
+  /* İletişim kutusu: sayfadaki tek EYLEM alanı, metinden ayrışması gerekiyor. */
+  .contact {
+    border: 1px solid var(--border); border-radius: 12px;
+    padding: 14px 18px; margin: 18px 0; background: #f8fafc;
+  }
+  .contact p { margin: 0; }
+  .contact p + p { margin-top: 6px; }
+</style>
+</head>
+<body>
+<a class="back" href="index.html">← GaranTea</a>
+
+<!--
+  BU SAYFA NEDEN VAR: Google Play, hesap silme talebinin UYGULAMA DIŞINDAN da
+  iletilebilmesini zorunlu tutuyor. Uygulama içindeki silme (Profil → Hesabımı Sil) tek
+  başına yetmiyor; telefonunu kaybetmiş ya da uygulamayı kaldırmış kullanıcının da bir
+  yolu olmalı. Eksikliği mağaza incelemesinde ret sebebi.
+
+  Sayfa uygulamanın hiçbir yerinden çağrılmıyor, yani silinse ya da bağlantısı koparılsa
+  hiçbir yerde hata çıkmaz — bu yüzden varlığı ve içeriği testle korunuyor
+  (bkz. __tests__/privacyPolicy.test.ts).
+-->
+
+<!--
+  HER DİL KENDİ SARMALAYICISINDA — privacy.html ile aynı düzen. Bu sayfa ikisini birden
+  gösteriyor, çünkü mağazaya verilen adres tek ve her iki dilde okunabilir olmalı.
+-->
+<div id="delete-tr" lang="tr">
+<h1>GaranTea — Hesabımı Sil</h1>
+<p class="meta">İletişim: <a href="mailto:appgarantea@gmail.com?subject=Hesap%20silme%20talebi">appgarantea@gmail.com</a></p>
+
+<section>
+<h2>Uygulamadan silme</h2>
+<p>En hızlı yol bu ve hiçbir onay beklemenizi gerektirmez:</p>
+<ol>
+  <li>GaranTea'yi açın ve hesabınıza giriş yapın.</li>
+  <li><strong>Profil &gt; Ayarlar &gt; Hesabımı Sil</strong> adımlarını izleyin.</li>
+  <li>Onay kutusuna <strong>ONAY</strong> yazın ve işlemi onaylayın.</li>
+</ol>
+<p>Silme anında tamamlanır ve geri alınamaz.</p>
+</section>
+
+<section>
+<h2>Uygulamaya erişemiyorsanız</h2>
+<p>Telefonunuzu kaybettiyseniz veya uygulamayı kaldırdıysanız, hesabınıza kayıtlı e-posta adresinden bize yazın. Talebi aldığımızda kimliğinizi doğrulayıp hesabınızı sileriz.</p>
+<div class="contact">
+  <p><strong>E-posta:</strong> <a href="mailto:appgarantea@gmail.com?subject=Hesap%20silme%20talebi">appgarantea@gmail.com</a></p>
+  <p><strong>WhatsApp:</strong> <a href="https://wa.me/905525670435">+90 552 567 04 35</a></p>
+</div>
+<p>Talepler en geç <strong>30 gün</strong> içinde sonuçlandırılır.</p>
+</section>
+
+<section>
+<h2>Silinen veriler</h2>
+<ul>
+  <li>Hesabınız ve giriş bilgileriniz</li>
+  <li>Kaydettiğiniz tüm cihazlar ve garanti bilgileri</li>
+  <li>Yüklediğiniz fatura görselleri, cihaz fotoğrafları ve profil fotoğrafınız</li>
+  <li>Kredi bakiyeniz ve uygulama tercihleriniz</li>
+  <li>Gönderdiğiniz destek talepleri ve geri bildirimler</li>
+</ul>
+<p>Silme işleminden sonra bu verilerin hiçbiri geri getirilemez. Satın alınmış ve kullanılmamış krediler iade edilmez.</p>
+</section>
+
+<section>
+<h2>Saklanabilecek veriler</h2>
+<p>Daha önce anonim hâle getirilmiş veriler silme kapsamı dışındadır. Anonimleştirme geri döndürülemez olduğu için bu veriler sizinle ilişkilendirilemez ve teknik olarak "sizin verinizi silmek" diye bir işlem tanımlanamaz. Ayrıntısı <a href="privacy.html">Gizlilik Politikasında</a>.</p>
+<p>Ayrıca satın alma ve fatura kayıtları, ilgili mevzuatın öngördüğü süre boyunca saklanabilir. Bu kayıtlar mali denetim amacıyla tutulur.</p>
+</section>
+
+<section>
+<h2>Uygulamayı kaldırmak hesabı silmez</h2>
+<p>GaranTea'yi telefonunuzdan kaldırmak yalnızca uygulamayı kaldırır; bulut kaydınız durmaya devam eder ve tekrar giriş yaptığınızda verileriniz geri gelir. Hesabınızın silinmesi için yukarıdaki adımlardan birini izlemeniz gerekir.</p>
+</section>
+
+<p><a href="privacy.html">← Gizlilik Politikası</a></p>
+</div>
+
+<hr>
+
+<div id="delete-en" lang="en">
+<h1>GaranTea — Delete My Account</h1>
+<p class="meta">Contact: <a href="mailto:appgarantea@gmail.com?subject=Account%20deletion%20request">appgarantea@gmail.com</a></p>
+
+<section>
+<h2>Deleting from the app</h2>
+<p>This is the fastest route and does not require waiting for any approval:</p>
+<ol>
+  <li>Open GaranTea and sign in to your account.</li>
+  <li>Go to <strong>Profile &gt; Settings &gt; Delete My Account</strong>.</li>
+  <li>Type <strong>CONFIRM</strong> in the confirmation box and confirm.</li>
+</ol>
+<p>Deletion happens immediately and cannot be undone.</p>
+</section>
+
+<section>
+<h2>If you cannot access the app</h2>
+<p>If you lost your phone or uninstalled the app, write to us from the email address registered to your account. Once we receive your request, we will verify your identity and delete your account.</p>
+<div class="contact">
+  <p><strong>Email:</strong> <a href="mailto:appgarantea@gmail.com?subject=Account%20deletion%20request">appgarantea@gmail.com</a></p>
+  <p><strong>WhatsApp:</strong> <a href="https://wa.me/905525670435">+90 552 567 04 35</a></p>
+</div>
+<p>Requests are completed within <strong>30 days</strong> at the latest.</p>
+</section>
+
+<section>
+<h2>What gets deleted</h2>
+<ul>
+  <li>Your account and sign-in credentials</li>
+  <li>All devices and warranty records you saved</li>
+  <li>Receipt images, device photos and your profile picture</li>
+  <li>Your credit balance and app preferences</li>
+  <li>Support requests and feedback you sent</li>
+</ul>
+<p>None of this can be recovered after deletion. Purchased but unused credits are not refunded.</p>
+</section>
+
+<section>
+<h2>What may be retained</h2>
+<p>Data that was previously anonymised falls outside the scope of deletion. Because anonymisation is irreversible, such data cannot be linked back to you and there is technically no such operation as "deleting your data" for it. Details are in the <a href="privacy.html">Privacy Policy</a>.</p>
+<p>Purchase and invoice records may also be retained for the period required by applicable law. These records are kept for financial auditing.</p>
+</section>
+
+<section>
+<h2>Uninstalling does not delete your account</h2>
+<p>Removing GaranTea from your phone only removes the app; your cloud record remains and your data returns when you sign in again. To delete your account, follow one of the routes above.</p>
+</section>
+
+<p><a href="privacy.html">← Privacy Policy</a></p>
+</div>
+
+</body>
+</html>

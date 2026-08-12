@@ -710,7 +710,16 @@
       tutuyor; bu satır o adresin siteden bulunabilmesini sağlıyor.
     -->
     <p class="legal-note">
-      <a id="delete-open" href="#delete" data-tr="Hesabımı sil" data-en="Delete my account">Delete my account</a>
+      <!--
+        `href` GERÇEK SAYFAYA GİDİYOR, `#delete` ÇAPASINA DEĞİL.
+
+        Gizlilik bağlantısındaki gerekçenin aynısı: JS modalı açıp adresi değiştiriyor,
+        ama betik yüklenmeden tıklanırsa ya da hiç çalışmazsa bağlantı normal davranıp
+        gerçek sayfayı açmalı. `#delete` ile kalsaydı JS'siz bir tarayıcıda bağlantı
+        HİÇBİR YERE gitmezdi — ve Play Console'un aradığı şey tam olarak çalışan,
+        uygulama dışından erişilebilen bir adres.
+      -->
+      <a id="delete-open" href="delete-account.html" data-tr="Hesabımı sil" data-en="Delete my account">Delete my account</a>
     </p>
   </div>
 
