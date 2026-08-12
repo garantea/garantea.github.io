@@ -283,6 +283,17 @@
     Renkler ZEMİNDEKİYLE aynı sırada okunuyor: beyaz → mavi → kırmızı. Yazı koyu kalıyor,
     çünkü açık tonlarda beyaz yazı hareket sırasında bazı karelerde okunmaz oluyordu.
   */
+  /* Hesap silme bagi: buton DEGIL, dipnot. Butonlastirilsaydi mağaza butonlariyla ayni
+     agirlikta gorunur ve kullaniciyi hesabini silmeye davet ediyormus gibi okunurdu. */
+  .legal-note {
+    margin: clamp(6px, 1vh, 12px) 0 0;
+    font-size: clamp(.6rem, .8vw + .15rem, .8rem);
+    color: var(--muted);
+    text-align: center;
+  }
+  .legal-note a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
+  .legal-note a:hover { color: var(--blue); }
+
   .ghost {
     display: inline-flex; align-items: center; justify-content: center;
     /* Genişlik satırdan geliyor (`.actions > *`), etiketten değil — mağaza butonlarıyla
@@ -686,6 +697,21 @@
       -->
       <a class="ghost" id="privacy-open" href="privacy.html" data-tr="Gizlilik Politikası" data-en="Privacy Policy">Privacy Policy</a>
     </div>
+
+    <!--
+      HESAP SİLME BAĞLANTISI — buton satırının İÇİNDE DEĞİL, altında.
+
+      Üç buton (Play, App Store, Gizlilik) yan yana duracak biçimde ayarlandı; dördüncüyü
+      aralarına koymak hepsini okunamayacak kadar daraltırdı. Ayrıca bu bir EYLEM ÇAĞRISI
+      değil: kullanıcıyı hesabını silmeye davet etmiyoruz, yalnızca yolun bulunabilir
+      olmasını sağlıyoruz.
+
+      Play Console, uygulama dışından erişilebilen bir hesap silme adresini ZORUNLU
+      tutuyor; bu satır o adresin siteden bulunabilmesini sağlıyor.
+    -->
+    <p class="legal-note">
+      <a href="delete-account.html" data-tr="Hesabımı sil" data-en="Delete my account">Delete my account</a>
+    </p>
   </div>
 
   <!--

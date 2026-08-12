@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GaranTea — Hesap Silme / Delete Account</title>
+<meta name="description" content="GaranTea hesabınızı ve verilerinizi nasıl sileceğiniz. How to delete your GaranTea account and data.">
+<meta name="theme-color" content="#2563eb">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+
+<!--
+  ─── BU SAYFA NEDEN VAR ──────────────────────────────────────────
+
+  Google Play, kullanıcı verisi toplayan her uygulamadan UYGULAMA DIŞINDAN erişilebilen
+  bir hesap silme talebi adresi istiyor. Uygulama içi silme (Profil > Hesabımı Sil) VAR ve
+  çalışıyor, ama tek başına yetmiyor: telefonunu kaybetmiş ya da uygulamayı silmiş bir
+  kullanıcının da verisini sildirebilmesi gerekiyor. Bu adres olmadan uygulama Play
+  incelemesinden geçmiyor.
+
+  GİRİŞ İSTEMİYOR — bilerek. Google, adresin herkese açık olmasını şart koşuyor; arkasına
+  giriş konsaydı, hesabına erişemeyen kullanıcı (yani bu sayfaya en çok ihtiyaç duyan kişi)
+  talebini hiç iletemezdi.
+
+  ─── FORM YOK, E-POSTA VAR ───────────────────────────────────────
+
+  Bir form, arkasında talebi işleyecek bir sunucu olmadan ÇALIŞIYOR GİBİ görünen bir kutu
+  olurdu: kullanıcı gönderir, hiçbir yere gitmez, sildiğini sanır. Uygulamada tam olarak bu
+  hatayı bir kez yaptık ve düzelttik (bkz. ProfileHelpScreen.tsx — `mailto:` ile sessizce
+  kaybolan destek mesajları).
+
+  Supabase'e geçilip Edge Function yazıldığında burası gerçek bir forma dönüşebilir.
+  O zamana kadar e-posta, ULAŞTIĞI DOĞRULANABİLEN tek yol.
+
+  ─── METİN GİZLİLİK POLİTİKASIYLA UYUMLU OLMAK ZORUNDA ───────────
+
+  Saklama süreleri ve anonim veri istisnası, privacy.html ve uygulamadaki Kullanıcı
+  Sözleşmesi md.6 ile AYNI şeyi söylüyor. Üçünden biri değişirse diğer ikisi de
+  güncellenmeli; çelişen beyanlar mağaza incelemesinde tek başına ret sebebi.
+-->
+<style>
+  /* Renkler açılış sayfası ve gizlilik politikasıyla ORTAK — üçü aynı siteye ait. */
+  :root {
+    color-scheme: light;
+    --primary: #2563eb; --fg: #0f172a; --muted-fg: #64748b;
+    --bg: #ffffff; --border: #e6eaf2; --soft: #f8fafc;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0 auto; padding: clamp(20px, 5vw, 40px) clamp(20px, 5vw, 24px) 64px;
+    max-width: 760px;
+    font: 16px/1.65 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    color: var(--fg); background: var(--bg);
+    -webkit-font-smoothing: antialiased;
+  }
+  .back {
+    display: inline-flex; align-items: center; gap: 7px;
+    font-size: .9rem; color: var(--muted-fg); text-decoration: none;
+    margin-bottom: 28px;
+  }
+  .back:hover { color: var(--primary); }
+  h1 { font-size: clamp(1.5rem, 4vw, 1.9rem); margin: 0 0 4px; letter-spacing: -.025em; }
+  h2 { font-size: 1.08rem; margin-top: 34px; letter-spacing: -.01em; }
+  .meta { color: var(--muted-fg); font-size: .9rem; margin-top: 0; }
+  hr { border: 0; border-top: 1px solid var(--border); margin: 56px 0; }
+  ul, ol { padding-left: 20px; }
+  li { margin-bottom: 6px; }
+  a { color: var(--primary); }
+  p { text-wrap: pretty; }
+
+  /* Uygulama içi yol ÖNE ÇIKARILIYOR: anında ve kendi kendine yapılabilen tek yöntem o.
+     E-posta yolu bekleme gerektiriyor, bu yüzden ikinci sırada ve vurgusuz. */
+  .card {
+    background: var(--soft); border: 1px solid var(--border);
+    border-radius: 14px; padding: 18px 20px; margin: 18px 0;
+  }
+  .card h3 { margin: 0 0 8px; font-size: 1rem; }
+  .warn { color: #b42318; }
+</style>
+</head>
+<body>
+<a class="back" href="index.html">← GaranTea</a>
+
+<div lang="tr">
+<h1>GaranTea — Hesap ve Veri Silme</h1>
+<p class="meta">Son güncelleme: 2026-08-10 · İletişim: <a href="mailto:appgarantea@gmail.com">appgarantea@gmail.com</a></p>
+
+<p>
+  GaranTea hesabınızı ve hesabınıza bağlı tüm verileri dilediğiniz zaman
+  silebilirsiniz. İki yol var.
+</p>
+
+<div class="card">
+  <h3>1. Uygulama içinden (önerilen — anında)</h3>
+  <ol>
+    <li>GaranTea uygulamasını açın ve hesabınıza giriş yapın.</li>
+    <li><strong>Profil</strong> sekmesine gidin.</li>
+    <li><strong>Hesabımı Sil</strong> seçeneğine dokunun.</li>
+    <li>Onay adımını tamamlayın.</li>
+  </ol>
+  <p>Silme işlemi anında gerçekleşir. <span class="warn">Bu işlem geri alınamaz.</span></p>
+</div>
+
+<div class="card">
+  <h3>2. E-posta ile (uygulamaya erişiminiz yoksa)</h3>
+  <p>
+    Telefonunuzu kaybettiyseniz ya da uygulamayı kaldırdıysanız,
+    <a href="mailto:appgarantea@gmail.com?subject=Hesap%20Silme%20Talebi">appgarantea@gmail.com</a>
+    adresine <strong>“Hesap Silme Talebi”</strong> konusuyla yazın ve hesabınıza kayıtlı
+    <strong>telefon numaranızı</strong> belirtin.
+  </p>
+  <p>
+    Kimliğinizi doğrulayabilmemiz için talebi hesabınıza kayıtlı numaradan teyit etmenizi
+    isteyebiliriz. Başkasının hesabının silinmesini önlemenin başka bir yolu yok.
+  </p>
+  <p>Talepler en geç <strong>30 gün</strong> içinde sonuçlandırılır.</p>
+</div>
+
+<h2>Silinen veriler</h2>
+<p>Hesabınız silindiğinde aşağıdakiler hem cihazınızdan hem de bulut tarafından kaldırılır:</p>
+<ul>
+  <li>Hesap bilgileriniz: telefon numarası, ad ve varsa profil fotoğrafı</li>
+  <li>Kaydettiğiniz tüm cihazlar: ad, marka, seri numarası, satın alma tarihi, garanti süresi, fiyat ve satıcı bilgileri</li>
+  <li>Yüklediğiniz tüm fatura ve garanti belgesi görselleri ile PDF dosyaları</li>
+  <li>Uygulama tercihleriniz: dil, tema ve bildirim ayarları</li>
+  <li>Kredi bakiyeniz ve kredi işlem geçmişiniz</li>
+  <li>Gönderdiğiniz destek talepleri ve geri bildirimler</li>
+</ul>
+
+<h2>Silinmeyen veriler</h2>
+<ul>
+  <li>
+    <strong>Anonim hâle getirilmiş veriler.</strong> Sizi tanımlamayı imkânsız kılacak
+    biçimde anonimleştirilmiş kayıtlar artık kişisel veri sayılmadığı ve sizinle
+    ilişkilendirilemediği için silme kapsamı dışındadır. Ayrıntı için
+    <a href="privacy.html">Gizlilik Politikası</a>.
+  </li>
+  <li>
+    <strong>Mevzuatın saklamayı zorunlu tuttuğu kayıtlar.</strong> Örneğin satın alma
+    işlemlerine ilişkin mali kayıtlar, kanuni saklama süresi boyunca yalnızca bu yükümlülük
+    gereği tutulur ve başka hiçbir amaçla kullanılmaz.
+  </li>
+</ul>
+
+<h2>Bilmeniz gerekenler</h2>
+<ul>
+  <li>
+    Uygulamayı yalnızca telefonunuzdan kaldırmak <strong>hesabınızı silmez</strong>.
+    Bulut kaydınız durur ve tekrar giriş yaptığınızda geri gelir.
+  </li>
+  <li>
+    Satın aldığınız krediler ve abonelikler <strong>iade edilmez</strong>. Aboneliğinizi
+    ayrıca Google Play veya App Store üzerinden iptal etmeniz gerekir; hesabın silinmesi
+    mağaza aboneliğini kendiliğinden sonlandırmaz.
+  </li>
+  <li>Silme işlemi geri alınamaz; aynı numarayla yeniden kayıt olsanız da eski verileriniz geri gelmez.</li>
+</ul>
+</div>
+
+<hr>
+
+<div lang="en">
+<h1 id="en">GaranTea — Account and Data Deletion</h1>
+<p class="meta">Last updated: 2026-08-10 · Contact: <a href="mailto:appgarantea@gmail.com">appgarantea@gmail.com</a></p>
+
+<p>You can delete your GaranTea account and all associated data at any time. There are two ways.</p>
+
+<div class="card">
+  <h3>1. From inside the app (recommended — immediate)</h3>
+  <ol>
+    <li>Open GaranTea and sign in to your account.</li>
+    <li>Go to the <strong>Profile</strong> tab.</li>
+    <li>Tap <strong>Delete My Account</strong>.</li>
+    <li>Complete the confirmation step.</li>
+  </ol>
+  <p>Deletion happens immediately. <span class="warn">This cannot be undone.</span></p>
+</div>
+
+<div class="card">
+  <h3>2. By email (if you cannot access the app)</h3>
+  <p>
+    If you have lost your phone or uninstalled the app, write to
+    <a href="mailto:appgarantea@gmail.com?subject=Account%20Deletion%20Request">appgarantea@gmail.com</a>
+    with the subject <strong>“Account Deletion Request”</strong> and include the
+    <strong>phone number</strong> registered to your account.
+  </p>
+  <p>
+    We may ask you to confirm the request from the registered number so that we can verify
+    your identity. There is no other way to prevent someone else’s account from being deleted.
+  </p>
+  <p>Requests are completed within <strong>30 days</strong> at the latest.</p>
+</div>
+
+<h2>Data that is deleted</h2>
+<p>When your account is deleted, the following are removed from both your device and the cloud:</p>
+<ul>
+  <li>Your account details: phone number, name and profile photo if set</li>
+  <li>All device records you created: name, brand, serial number, purchase date, warranty period, price and seller details</li>
+  <li>All receipt and warranty document images and PDF files you uploaded</li>
+  <li>Your app preferences: language, theme and notification settings</li>
+  <li>Your credit balance and credit transaction history</li>
+  <li>Support requests and feedback you submitted</li>
+</ul>
+
+<h2>Data that is not deleted</h2>
+<ul>
+  <li>
+    <strong>Anonymised data.</strong> Records that have been anonymised so that you can no
+    longer be identified are no longer personal data and cannot be linked to you, so they
+    fall outside the scope of deletion. See the <a href="privacy.html#en">Privacy Policy</a>
+    for details.
+  </li>
+  <li>
+    <strong>Records we are legally required to retain.</strong> For example, financial
+    records relating to purchases are kept for the statutory retention period solely to
+    comply with that obligation and are not used for any other purpose.
+  </li>
+</ul>
+
+<h2>What you should know</h2>
+<ul>
+  <li>
+    Removing the app from your phone <strong>does not delete your account</strong>. Your
+    cloud record remains and returns when you sign in again.
+  </li>
+  <li>
+    Purchased credits and subscriptions are <strong>not refunded</strong>. You must cancel
+    your subscription separately through Google Play or the App Store; deleting your account
+    does not automatically end a store subscription.
+  </li>
+  <li>Deletion is irreversible; registering again with the same number will not restore your previous data.</li>
+</ul>
+</div>
+
+</body>
+</html>
