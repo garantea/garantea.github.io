@@ -710,7 +710,7 @@
       tutuyor; bu satır o adresin siteden bulunabilmesini sağlıyor.
     -->
     <p class="legal-note">
-      <a id="delete-open" href="delete-account.html" data-tr="Hesabımı sil" data-en="Delete my account">Delete my account</a>
+      <a id="delete-open" href="#delete" data-tr="Hesabımı sil" data-en="Delete my account">Delete my account</a>
     </p>
   </div>
 
@@ -755,7 +755,106 @@
       <button class="modal-close" id="delete-close" type="button" aria-label="Close">&times;</button>
     </div>
     <div class="modal-body" id="delete-body">
-      <p class="meta" data-tr="Yükleniyor…" data-en="Loading…">Loading…</p>
+      <!-- Embedded Delete Account Content -->
+      <div id="delete-tr" lang="tr">
+        <h1>Hesap ve Veri Silme</h1>
+        <p class="meta">Son güncelleme: 2026-08-12 · İletişim: <a href="mailto:appgarantea@gmail.com">appgarantea@gmail.com</a></p>
+        
+        <p>GaranTea hesabınızı ve hesabınıza bağlı tüm verileri dilediğiniz zaman silebilirsiniz. İki yol var.</p>
+        
+        <div style="background: var(--soft, #f8fafc); border: 1px solid var(--line, #e6eaf2); border-radius: 14px; padding: 18px 20px; margin: 18px 0;">
+          <h3 style="margin: 0 0 8px; font-size: 1rem;">1. Uygulama içinden (önerilen — anında)</h3>
+          <ol style="padding-left: 20px; margin-bottom: 0;">
+            <li style="margin-bottom: 6px;">GaranTea uygulamasını açın ve hesabınıza giriş yapın.</li>
+            <li style="margin-bottom: 6px;"><strong>Profil</strong> sekmesine gidin.</li>
+            <li style="margin-bottom: 6px;"><strong>Hesabımı Sil</strong> seçeneğine dokunun.</li>
+            <li style="margin-bottom: 6px;">Onay adımını tamamlayın.</li>
+          </ol>
+          <p style="margin-bottom: 0;">Silme işlemi anında gerçekleşir. <span style="color: #b42318;">Bu işlem geri alınamaz.</span></p>
+        </div>
+        
+        <div style="background: var(--soft, #f8fafc); border: 1px solid var(--line, #e6eaf2); border-radius: 14px; padding: 18px 20px; margin: 18px 0;">
+          <h3 style="margin: 0 0 8px; font-size: 1rem;">2. E-posta ile (uygulamaya erişiminiz yoksa)</h3>
+          <p>Telefonunuzu kaybettiyseniz ya da uygulamayı kaldırdıysanız, <a href="mailto:appgarantea@gmail.com?subject=Hesap%20Silme%20Talebi">appgarantea@gmail.com</a> adresine <strong>“Hesap Silme Talebi”</strong> konusuyla yazın ve hesabınıza kayıtlı <strong>telefon numaranızı</strong> belirtin.</p>
+          <p>Kimliğinizi doğrulayabilmemiz için talebi hesabınıza kayıtlı numaradan teyit etmenizi isteyebiliriz. Başkasının hesabının silinmesini önlemenin başka bir yolu yok.</p>
+          <p style="margin-bottom: 0;">Talepler en geç <strong>30 gün</strong> içinde sonuçlandırılır.</p>
+        </div>
+        
+        <h2>Silinen veriler</h2>
+        <p>Hesabınız silindiğinde aşağıdakiler hem cihazınızdan hem de bulut tarafından kaldırılır:</p>
+        <ul>
+          <li>Hesap bilgileriniz: telefon numarası, ad ve varsa profil fotoğrafı</li>
+          <li>Kaydettiğiniz tüm cihazlar: ad, marka, seri numarası, satın alma tarihi, garanti süresi, fiyat ve satıcı bilgileri</li>
+          <li>Yüklediğiniz tüm fatura ve garanti belgesi görselleri ile PDF dosyaları</li>
+          <li>Uygulama tercihleriniz: dil, tema ve bildirim ayarları</li>
+          <li>Kredi bakiyeniz ve kredi işlem geçmişiniz</li>
+          <li>Gönderdiğiniz destek talepleri ve geri bildirimler</li>
+        </ul>
+        
+        <h2>Silinmeyen veriler</h2>
+        <ul>
+          <li><strong>Anonim hâle getirilmiş veriler.</strong> Sizi tanımlamayı imkânsız kılacak biçimde anonimleştirilmiş kayıtlar artık kişisel veri sayılmadığı ve sizinle ilişkilendirilemediği için silme kapsamı dışındadır. Ayrıntı için <a href="#privacy">Gizlilik Politikası</a>.</li>
+          <li><strong>Mevzuatın saklamayı zorunlu tuttuğu kayıtlar.</strong> Örneğin satın alma işlemlerine ilişkin mali kayıtlar, kanuni saklama süresi boyunca yalnızca bu yükümlülük gereği tutulur ve başka hiçbir amaçla kullanılmaz.</li>
+        </ul>
+        
+        <h2>Bilmeniz gerekenler</h2>
+        <ul>
+          <li>Uygulamayı yalnızca telefonunuzdan kaldırmak <strong>hesabınızı silmez</strong>. Bulut kaydınız durur ve tekrar giriş yaptığınızda geri gelir.</li>
+          <li>Satın aldığınız krediler ve abonelikler <strong>iade edilmez</strong>. Aboneliğinizi ayrıca Google Play veya App Store üzerinden iptal etmeniz gerekir; hesabın silinmesi mağaza aboneliğini kendiliğinden sonlandırmaz.</li>
+          <li>Silme işlemi geri alınamaz; aynı numarayla yeniden kayıt olsanız da eski verileriniz geri gelmez.</li>
+        </ul>
+      </div>
+
+      <hr>
+
+      <div id="delete-en" lang="en">
+        <h1 id="en">Account and Data Deletion</h1>
+        <p class="meta">Last updated: 2026-08-12 · Contact: <a href="mailto:appgarantea@gmail.com">appgarantea@gmail.com</a></p>
+        
+        <p>You can delete your GaranTea account and all associated data at any time. There are two ways.</p>
+        
+        <div style="background: var(--soft, #f8fafc); border: 1px solid var(--line, #e6eaf2); border-radius: 14px; padding: 18px 20px; margin: 18px 0;">
+          <h3 style="margin: 0 0 8px; font-size: 1rem;">1. From inside the app (recommended — immediate)</h3>
+          <ol style="padding-left: 20px; margin-bottom: 0;">
+            <li style="margin-bottom: 6px;">Open GaranTea and sign in to your account.</li>
+            <li style="margin-bottom: 6px;">Go to the <strong>Profile</strong> tab.</li>
+            <li style="margin-bottom: 6px;">Tap <strong>Delete My Account</strong>.</li>
+            <li style="margin-bottom: 6px;">Complete the confirmation step.</li>
+          </ol>
+          <p style="margin-bottom: 0;">Deletion happens immediately. <span style="color: #b42318;">This cannot be undone.</span></p>
+        </div>
+        
+        <div style="background: var(--soft, #f8fafc); border: 1px solid var(--line, #e6eaf2); border-radius: 14px; padding: 18px 20px; margin: 18px 0;">
+          <h3 style="margin: 0 0 8px; font-size: 1rem;">2. By email (if you cannot access the app)</h3>
+          <p>If you have lost your phone or uninstalled the app, write to <a href="mailto:appgarantea@gmail.com?subject=Account%20Deletion%20Request">appgarantea@gmail.com</a> with the subject <strong>“Account Deletion Request”</strong> and include the <strong>phone number</strong> registered to your account.</p>
+          <p>We may ask you to confirm the request from the registered number so that we can verify your identity. There is no other way to prevent someone else’s account from being deleted.</p>
+          <p style="margin-bottom: 0;">Requests are completed within <strong>30 days</strong> at the latest.</p>
+        </div>
+        
+        <h2>Data that is deleted</h2>
+        <p>When your account is deleted, the following are removed from both your device and the cloud:</p>
+        <ul>
+          <li>Your account details: phone number, name and profile photo if set</li>
+          <li>All device records you created: name, brand, serial number, purchase date, warranty period, price and seller details</li>
+          <li>All receipt and warranty document images and PDF files you uploaded</li>
+          <li>Your app preferences: language, theme and notification settings</li>
+          <li>Your credit balance and credit transaction history</li>
+          <li>Support requests and feedback you submitted</li>
+        </ul>
+        
+        <h2>Data that is not deleted</h2>
+        <ul>
+          <li><strong>Anonymised data.</strong> Records that have been anonymised so that you can no longer be identified are no longer personal data and cannot be linked to you, so they fall outside the scope of deletion. See the <a href="#privacy">Privacy Policy</a> for details.</li>
+          <li><strong>Records we are legally required to retain.</strong> For example, financial records relating to purchases are kept for the statutory retention period solely to comply with that obligation and are not used for any other purpose.</li>
+        </ul>
+        
+        <h2>What you should know</h2>
+        <ul>
+          <li>Removing the app from your phone <strong>does not delete your account</strong>. Your cloud record remains and returns when you sign in again.</li>
+          <li>Purchased credits and subscriptions are <strong>not refunded</strong>. You must cancel your subscription separately through Google Play or the App Store; deleting your account does not automatically end a store subscription.</li>
+          <li>Deletion is irreversible; registering again with the same number will not restore your previous data.</li>
+        </ul>
+      </div>
     </div>
   </div>
 </div>
@@ -787,7 +886,7 @@
     /* Modal AÇIKKEN dil değişirse metin de değişmeli; yoksa kullanıcı Türkçeye geçtiği
        hâlde İngilizce politikayı okumaya devam ederdi. */
     if (modal && modal.hasAttribute('open')) load(lang);
-    if (typeof deleteModal !== 'undefined' && deleteModal && deleteModal.hasAttribute('open')) loadDelete(lang);
+    if (typeof deleteModal !== 'undefined' && deleteModal && deleteModal.hasAttribute('open')) updateDeleteLang(lang);
 
     try { localStorage.setItem(KEY, lang); } catch (e) { /* gizli sekme: sorun değil */ }
   }
@@ -869,28 +968,18 @@
   /* ──────────────────── HESAP SİLME MODALI ──────────────────── */
   var deleteModal = document.getElementById('delete-modal');
   var deleteBody  = document.getElementById('delete-body');
-  var deleteCache = {};
-
-  function loadDelete(lang) {
-    if (deleteCache[lang]) { deleteBody.innerHTML = deleteCache[lang]; return; }
-    fetch('delete-account.html')
-      .then(function (r) { if (!r.ok) throw new Error(r.status); return r.text(); })
-      .then(function (html) {
-        var doc = new DOMParser().parseFromString(html, 'text/html');
-        var content = doc.getElementById('delete-' + lang);
-        if (!content) throw new Error('delete content bulunamadi');
-        deleteCache[lang] = content.innerHTML;
-        deleteBody.innerHTML = deleteCache[lang];
-      })
-      .catch(function () {
-        deleteBody.innerHTML = '<p><a href="delete-account.html">' +
-          (lang === 'tr' ? 'Hesap silme sayfasını açmak için tıklayın.' : 'Open the account deletion page.') +
-          '</a></p>';
-      });
+  
+  function updateDeleteLang(lang) {
+    var tr = document.getElementById('delete-tr');
+    var en = document.getElementById('delete-en');
+    if (tr && en) {
+      if (lang === 'tr') { tr.style.display = 'block'; en.style.display = 'none'; }
+      else { tr.style.display = 'none'; en.style.display = 'block'; }
+    }
   }
 
   function openDelete(push) {
-    loadDelete(document.documentElement.lang === 'tr' ? 'tr' : 'en');
+    updateDeleteLang(document.documentElement.lang === 'tr' ? 'tr' : 'en');
     deleteModal.setAttribute('open', '');
     document.body.style.overflow = 'hidden';
     if (push && location.hash !== '#delete') history.pushState(null, '', '#delete');
