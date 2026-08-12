@@ -1,0 +1,13 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.garanteaapp",
+      "sha256_cert_fingerprints": [
+        "B8:9A:08:4F:06:BC:DA:69:57:60:E7:E1:B2:2A:ED:40:E5:2C:8C:31:52:55:1D:1A:B0:3F:D8:21:14:18:1D:C5",
+        "24:12:5F:DC:C3:DD:08:C1:41:D9:99:D7:01:70:86:FC:76:E2:61:D1:07:63:E5:C0:7F:31:9A:4C:BF:96:B3:F7"
+      ]
+    }
+  }
+]

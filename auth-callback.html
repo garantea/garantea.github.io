@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GaranTea — Girişi tamamla / Complete sign-in</title>
+<meta name="theme-color" content="#2563eb">
+<meta name="robots" content="noindex">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<!--
+  ═══ GİRİŞ BAĞLANTISININ KÖPRÜSÜ ═══════════════════════════════════
+
+  NE İŞE YARIYOR: kullanıcı e-postasındaki bağlantıya tıklıyor, Supabase doğrulamayı
+  yapıp buraya yönlendiriyor, bu sayfa da onu uygulamaya devrediyor.
+
+  ─── NEDEN DOĞRUDAN `garantea://` KULLANILMIYOR ────────────────────
+
+  Kullanılıyordu ve ÇALIŞMIYORDU. Supabase doğrudan `garantea://auth-callback` adresine
+  yönlendirebiliyor (sunucu tarafı doğru çalışıyor, Chrome'da devir de oluyor), ama
+  Gmail bağlantıyı çoğu zaman KENDİ İÇİNDEKİ bir WebView'de açıyor ve bir WebView,
+  uygulamaya özel şemaları hiç devretmiyor. Kullanıcı açısından belirtisi: bağlantıya
+  basıyor, hiçbir şey olmuyor, hata da görünmüyor.
+
+  Bu sayfa `https` olduğu için o duvarı aşıyor:
+
+    1. `assetlinks.json` (bkz. .well-known/) sayesinde Android bu adresi UYGULAMAYA ait
+       kabul ediyor ve bağlantıyı tarayıcıya hiç uğratmadan doğrudan uygulamaya veriyor.
+       Bu yolda kullanıcı bu sayfayı GÖRMÜYOR bile.
+    2. Doğrulama yapılmamışsa ya da bağlantı yine bir WebView'de açıldıysa sayfa
+       görünüyor ve devir denemesi burada yapılıyor.
+    3. O da olmazsa BUTON var. Butona basmak bir KULLANICI DOKUNUŞU sayılıyor ve
+       tarayıcılar uygulamaya özel şemaya geçişi kullanıcı dokunuşuyla her yerde
+       kabul ediyor — sessizce hiçbir şey yapmayan bir bağlantı yerine, en kötü ihtimalle
+       tek dokunuş.
+
+  ─── JETON BU SAYFADAN GEÇİYOR, BU BİR SORUN DEĞİL ────────────────
+
+  Adres satırında bir `code` taşınıyor ama o kod tek başına oturum AÇMIYOR: PKCE gereği
+  yalnızca bağlantıyı isteyen cihazda saklanan `code_verifier` ile takas edilebiliyor.
+  Sayfa hiçbir şey saklamıyor, hiçbir yere göndermiyor, hiçbir dış kaynak yüklemiyor —
+  yalnızca adres satırındaki parçaları olduğu gibi uygulamaya aktarıyor.
+
+  `noindex` bilinçli: bu sayfanın arama sonuçlarında işi yok.
+-->
+<style>
+  /* Stil sitenin geri kalanıyla aynı kalıp (bkz. privacy.html, delete-account.html):
+     kullanıcı burada bir an duruyor ve tanıdık bir yerde olduğunu görmeli. */
+  :root {
+    color-scheme: light;
+    --primary: #2563eb; --fg: #0f172a; --muted-fg: #64748b;
+    --bg: #ffffff; --border: #e6eaf2;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0 auto; padding: clamp(20px, 5vw, 40px) clamp(20px, 5vw, 24px) 64px;
+    max-width: 520px; min-height: 100vh;
+    display: flex; flex-direction: column; justify-content: center;
+    font: 16px/1.65 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    color: var(--fg); background: var(--bg); text-align: center;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1 { font-size: clamp(1.35rem, 4vw, 1.6rem); margin: 0 0 8px; letter-spacing: -.025em; }
+  p { color: var(--muted-fg); margin: 0 0 8px; text-wrap: pretty; }
+  .en { font-size: .92rem; }
+  .btn {
+    display: inline-block; margin: 28px 0 20px;
+    background: var(--primary); color: #fff; text-decoration: none;
+    padding: 14px 28px; border-radius: 999px; font-weight: 500;
+  }
+  .hint { font-size: .85rem; border-top: 1px solid var(--border); padding-top: 20px; margin-top: 12px; }
+  .err { color: #b91c1c; }
+</style>
+</head>
+<body>
+
+<h1 id="baslik">Girişin tamamlanıyor…</h1>
+<p id="aciklama">Seni GaranTea uygulamasına yönlendiriyoruz.</p>
+<p class="en" id="aciklama-en">Taking you back to the GaranTea app.</p>
+
+<!--
+  Buton HEMEN görünüyor, otomatik devir başarısız olana kadar beklenmiyor. Beklemenin
+  ölçülebilir bir yolu yok: tarayıcı devri sessizce reddettiğinde hiçbir olay üretmiyor,
+  yani "başarısız oldu" anını öğrenmenin yolu yok. Görünür bir buton, olmayan bir
+  geri bildirimi beklemekten iyi.
+-->
+<a class="btn" id="ac" href="#">Uygulamada aç / Open in the app</a>
+
+<p class="hint" id="ipucu">
+  Sayfa açık kalırsa uygulamayı kendin açabilirsin; giriş orada tamamlanır.<br>
+  <span class="en">If this page stays open, open the app yourself; sign-in completes there.</span>
+</p>
+
+<script>
+(function () {
+  /*
+    ADRESTEKİ HER ŞEY OLDUĞU GİBİ AKTARILIYOR — ayrıştırılmıyor.
+
+    Supabase duruma göre farklı parçalar gönderiyor: PKCE akışında `?code=`, hata
+    durumunda `?error=`, eski akışlarda ise jetonlar `#` işaretinden SONRA geliyor.
+    Burada hangisinin ne olduğuna karar vermeye çalışmak, uygulamada zaten yapılan işi
+    ikinci kez ve eksik yapmak olurdu (bkz. services/authService.handleAuthDeepLink).
+    Sayfanın tek işi taşımak.
+  */
+  var hedef = 'garantea://auth-callback' + window.location.search + window.location.hash;
+
+  document.getElementById('ac').setAttribute('href', hedef);
+
+  /*
+    HATA VARSA KULLANICIYA BURADA SÖYLENİYOR. Süresi dolmuş bir bağlantıda uygulamayı
+    açmanın bir anlamı yok — uygulama da aynı hatayı gösterecek, ama kullanıcı bunu
+    ancak uygulamaya geçtikten sonra öğrenecekti.
+  */
+  if (window.location.search.indexOf('error') !== -1 || window.location.hash.indexOf('error') !== -1) {
+    document.getElementById('baslik').textContent = 'Bağlantının süresi dolmuş';
+    document.getElementById('baslik').className = 'err';
+    document.getElementById('aciklama').textContent =
+      'Bu giriş bağlantısı artık geçerli değil. Uygulamadan yeni bir bağlantı iste.';
+    document.getElementById('aciklama-en').textContent =
+      'This sign-in link is no longer valid. Request a new one from the app.';
+    return;
+  }
+
+  /*
+    `replace`, `assign` DEĞİL: kullanıcı uygulamadan tarayıcıya geri döndüğünde bu sayfa
+    geçmişte durmamalı. Dursaydı "geri" tuşu onu tekrar buraya getirir ve tek kullanımlık
+    bağlantı ikinci kez denenirdi — bu sefer "süresi dolmuş" hatasıyla.
+  */
+  window.location.replace(hedef);
+})();
+</script>
+
+</body>
+</html>
