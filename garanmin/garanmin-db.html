@@ -106,9 +106,9 @@
                RLS ile kendi satirlariyla sinirli. Ikisi ayri seyler, sutunda ayriliyor. */
             const panel = x.tablo.indexOf('garanmin_') === 0;
             return '<tr>'
-              + '<td><strong>' + gEsc(x.tablo) + '</strong>'
+              + '<td>' + gEsc(x.tablo)
               + '<div style="font-size:11px;color:#9aa1b2">' + gEsc(ACIKLAMA[x.tablo] || '') + '</div></td>'
-              + '<td><strong>' + gNum(x.satir) + '</strong></td>'
+              + '<td>' + gNum(x.satir) + '</td>'
               + '<td>' + gEsc(x.boyut) + '</td>'
               + '<td>' + (x.rls
                   ? '<span class="g-rozet yesil">acik</span>'

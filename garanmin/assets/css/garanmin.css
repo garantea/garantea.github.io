@@ -2,41 +2,53 @@
    GARANMIN — panel teması ve düzeni
    ==========================================================================
 
+   ─── RENKLER UYGULAMADAN GELİYOR ─────────────────────────────────────────
+
+   Buradaki değişkenler `GaranTea-App/src/theme/theme.ts` içindeki `lightColors`
+   ile birebir aynı. Panel uygulamanın parçası; kendi paletini uydurursa aynı
+   markanın iki farklı yüzü olur ve "mavi" dediğimiz şey iki üründe iki ayrı
+   renk olur.
+
+   KOYU TEMA YOK. Panel yalnızca aydınlık paletle çalışıyor — bilinçli bir
+   sadeleştirme: iki palet, her yeni bileşende iki kez denenmesi gereken bir
+   yüzey demek ve denenmeyen tarafta okunmayan metinler sessizce birikir.
+
    ─── NEDEN SNEAT'IN KENDİ DÜZENİ KULLANILMIYOR ───────────────────────────
 
    Sneat'in `layout-menu` yapısı sayfanın uzamasına göre kaydırılmak üzere
-   tasarlanmış. Buradaki gereksinim tam tersi: her sayfa TEK EKRANA sığmalı,
-   sayfa kaydırması olmamalı. İkisi aynı anda olamıyor, çünkü Sneat gövdeyi
-   `overflow: visible` bırakıp yüksekliği içeriğe bağlıyor.
-
-   Bu yüzden düzen burada sıfırdan kuruldu: `100dvh` yüksekliğinde bir ızgara,
-   içeride kendi kaydırma alanları olan kartlar. Bootstrap'in bileşenleri
-   (kart, rozet, tablo, buton) olduğu gibi kullanılıyor — değişen yalnızca
-   iskelet.
+   tasarlanmış. Buradaki gereksinim tam tersi: her sayfa TEK EKRANA sığmalı.
+   İkisi aynı anda olamıyor, çünkü Sneat gövdeyi `overflow: visible` bırakıp
+   yüksekliği içeriğe bağlıyor. Bu yüzden iskelet sıfırdan kuruldu; Bootstrap'in
+   bileşenleri (buton, rozet, uyarı) olduğu gibi kullanılmaya devam ediyor.
 
    `dvh` BİLİNÇLİ (`vh` değil): mobil tarayıcılarda adres çubuğu kayarken `vh`
-   sabit kalıyor ve sayfanın altı ekranın dışında kalıyor. `dvh` görünen alanı
-   ölçüyor.
+   sabit kalıyor ve sayfanın altı ekranın dışında kalıyor.
    ========================================================================== */
 
 :root {
-  --g-mavi:      #2563eb;
-  --g-mavi-koyu: #1d4ed8;
-  --g-kirmizi:   #dc2626;
-  --g-yesil:     #16a34a;
-  --g-turuncu:   #f59e0b;
+  /* Uygulamanın paleti (theme.ts → lightColors) */
+  --g-primary:     #2563eb;
+  --g-primary-koyu:#1d4ed8;
+  --g-primary-acik:#eff4ff;
+  --g-kirmizi:     #ef4444;
+  --g-yesil:       #16a34a;
+  --g-turuncu:     #f59e0b;
+  --g-mor:         #7c3aed;
 
-  --g-zemin:     #f4f6fb;
-  --g-kart:      #ffffff;
-  --g-cizgi:     #e6e9f2;
-  --g-metin:     #1f2438;
-  --g-soluk:     #6b7280;
+  --g-zemin:       #f6f8fc;   /* sayfa arka planı */
+  --g-kart:        #ffffff;
+  --g-cizgi:       #e2e8f0;   /* theme.border */
+  --g-cizgi-acik:  #f1f5f9;
+  --g-metin:       #0f172a;   /* theme.foreground */
+  --g-soluk:       #64748b;   /* theme.mutedForeground */
 
-  --g-kenar:     264px;   /* kenar menü açık genişliği */
-  --g-kenar-dar: 76px;    /* simge durumundaki genişliği */
-  --g-ust:       60px;    /* üst çubuk yüksekliği */
+  --g-kenar:       248px;
+  --g-kenar-dar:   72px;
+  --g-ust:         58px;
 
-  --g-golge:     0 1px 2px rgba(16,24,40,.04), 0 4px 16px rgba(16,24,40,.06);
+  --g-golge:       0 1px 2px rgba(15,23,42,.04), 0 2px 10px rgba(15,23,42,.05);
+  --g-golge-buyuk: 0 12px 48px rgba(15,23,42,.16);
+  --g-yuvarlak:    12px;
 }
 
 * { box-sizing: border-box; }
@@ -44,13 +56,14 @@
 html, body {
   height: 100%;
   margin: 0;
-  /* SAYFA KAYDIRMASI KAPALI — gereksinimin kendisi bu. Kaydırma, ihtiyaç duyan
-     panelin İÇİNDE oluyor (bkz. .g-scroll). */
+  /* SAYFA KAYDIRMASI KAPALI. Kaydırma, ihtiyaç duyan panelin İÇİNDE oluyor. */
   overflow: hidden;
   font-family: 'Public Sans', -apple-system, 'Segoe UI', Roboto, sans-serif;
   background: var(--g-zemin);
   color: var(--g-metin);
-  font-size: 14px;
+  font-size: 13.5px;
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
 }
 
 /* ── IZGARA ─────────────────────────────────────────────────────────────── */
@@ -61,80 +74,72 @@ html, body {
   grid-template-rows: var(--g-ust) 1fr;
   grid-template-areas: "yan ust" "yan icerik";
   height: 100dvh;
-  transition: grid-template-columns .22s ease;
+  transition: grid-template-columns .2s ease;
 }
 .g-app.dar { grid-template-columns: var(--g-kenar-dar) 1fr; }
 
-/* ── KENAR MENÜ ─────────────────────────────────────────────────────────── */
+/* ── KENAR MENÜ (aydınlık) ──────────────────────────────────────────────── */
 
 .g-yan {
   grid-area: yan;
-  background: #101528;
-  color: #c9cfe4;
-  display: flex;
-  flex-direction: column;
+  background: var(--g-kart);
+  border-right: 1px solid var(--g-cizgi);
+  display: flex; flex-direction: column;
   overflow: hidden;
 }
 
 .g-marka {
   height: var(--g-ust);
-  display: flex;
-  align-items: center;
-  gap: 10px;
+  display: flex; align-items: center; gap: 10px;
   padding: 0 16px;
-  border-bottom: 1px solid rgba(255,255,255,.07);
+  border-bottom: 1px solid var(--g-cizgi);
   flex: 0 0 auto;
 }
-.g-marka-yazi { font-weight: 800; font-size: 18px; letter-spacing: -.4px; white-space: nowrap; }
-.g-marka-yazi .a { color: #60a5fa; }
-.g-marka-yazi .b { color: #f87171; }
+.g-app.dar .g-marka { padding: 0; justify-content: center; }
+.g-marka-yazi { font-weight: 800; font-size: 17px; letter-spacing: -.4px; white-space: nowrap; }
+.g-marka-yazi .a { color: var(--g-primary); }
+.g-marka-yazi .b { color: var(--g-kirmizi); }
 
-/* Simge durumunda yalnızca logo kalıyor, yazılar kayboluyor. `display:none`
-   yerine genişlik/opaklık kullanılıyor ki geçiş ani olmasın. */
+/* Simge durumunda yazılar kayboluyor. `display:none` yerine genişlik/opaklık
+   kullanılıyor ki geçiş ani olmasın. */
 .g-app.dar .g-marka-yazi,
 .g-app.dar .g-metin-gizle { opacity: 0; width: 0; overflow: hidden; }
 
-.g-menu { flex: 1 1 auto; overflow-y: auto; padding: 10px 0 16px; }
+.g-menu { flex: 1 1 auto; overflow-y: auto; padding: 8px 10px 14px; }
 .g-menu::-webkit-scrollbar { width: 6px; }
-.g-menu::-webkit-scrollbar-thumb { background: rgba(255,255,255,.12); border-radius: 3px; }
+.g-menu::-webkit-scrollbar-thumb { background: #dbe1ea; border-radius: 3px; }
 
 .g-grup { margin-bottom: 2px; }
 
 .g-grup-bas {
-  display: flex; align-items: center; gap: 12px;
-  padding: 10px 18px; cursor: pointer;
-  color: #aab3cc; font-weight: 600; font-size: 13.5px;
+  display: flex; align-items: center; gap: 11px;
+  padding: 9px 12px; border-radius: 9px; cursor: pointer;
+  color: #475569; font-weight: 500; font-size: 13px;
   white-space: nowrap; user-select: none;
 }
-.g-grup-bas:hover { color: #fff; background: rgba(255,255,255,.04); }
-.g-grup-bas i.ok { margin-left: auto; font-size: 16px; transition: transform .2s ease; }
-.g-grup.acik .g-grup-bas i.ok { transform: rotate(90deg); }
-.g-grup.acik .g-grup-bas { color: #fff; }
+.g-grup-bas:hover { background: var(--g-cizgi-acik); color: var(--g-metin); }
 .g-grup-bas i:first-child { font-size: 19px; min-width: 20px; text-align: center; }
+.g-grup-bas i.ok { margin-left: auto; font-size: 15px; transition: transform .2s ease; opacity: .5; }
+.g-grup.acik .g-grup-bas i.ok { transform: rotate(90deg); }
+.g-grup.aktif-grup > .g-grup-bas { color: var(--g-primary); background: var(--g-primary-acik); }
 
-.g-alt { max-height: 0; overflow: hidden; transition: max-height .22s ease; }
-.g-grup.acik .g-alt { max-height: 320px; }
+.g-alt { max-height: 0; overflow: hidden; transition: max-height .2s ease; }
+.g-grup.acik .g-alt { max-height: 300px; }
 
 .g-alt a {
-  display: block;
-  padding: 8px 18px 8px 50px;
-  color: #939fbd; text-decoration: none; font-size: 13px;
-  border-left: 3px solid transparent;
+  display: block; margin: 2px 0 2px 22px;
+  padding: 7px 12px; border-radius: 8px;
+  color: #64748b; text-decoration: none; font-size: 12.5px;
   white-space: nowrap;
 }
-.g-alt a:hover { color: #fff; background: rgba(255,255,255,.05); }
-.g-alt a.aktif {
-  color: #fff; background: rgba(37,99,235,.22);
-  border-left-color: var(--g-mavi);
-  font-weight: 600;
-}
+.g-alt a:hover { background: var(--g-cizgi-acik); color: var(--g-metin); }
+.g-alt a.aktif { background: var(--g-primary); color: #fff; font-weight: 500; }
 
-/* Simge durumunda alt başlıklar tamamen gizleniyor: 76 piksele sığmazlar ve
-   yarısı kesilmiş bir metin, kapalı olduğunu anlatmaktan daha kötüdür. */
+/* Simge durumunda alt başlıklar tamamen gizleniyor: 72 piksele sığmazlar ve
+   yarısı kesilmiş bir metin, hiç göstermemekten kötüdür. */
 .g-app.dar .g-alt { display: none; }
-.g-app.dar .g-grup-bas { justify-content: center; padding: 12px 0; }
+.g-app.dar .g-grup-bas { justify-content: center; padding: 11px 0; }
 .g-app.dar .g-grup-bas i.ok { display: none; }
-.g-app.dar .g-grup.aktif-grup .g-grup-bas { background: rgba(37,99,235,.25); color: #fff; }
 
 /* ── ÜST ÇUBUK ──────────────────────────────────────────────────────────── */
 
@@ -142,162 +147,293 @@ html, body {
   grid-area: ust;
   background: var(--g-kart);
   border-bottom: 1px solid var(--g-cizgi);
-  display: flex; align-items: center; gap: 14px;
-  padding: 0 18px;
+  display: flex; align-items: center; gap: 12px;
+  padding: 0 16px;
 }
 
 .g-katla {
   border: 1px solid var(--g-cizgi); background: #fff;
-  width: 34px; height: 34px; border-radius: 9px;
+  width: 32px; height: 32px; border-radius: 8px;
   display: grid; place-items: center; cursor: pointer; color: var(--g-metin);
-  flex: 0 0 auto;
+  flex: 0 0 auto; font-size: 18px;
 }
-.g-katla:hover { background: var(--g-zemin); }
+.g-katla:hover { background: var(--g-cizgi-acik); }
 
-.g-baslik { font-weight: 700; font-size: 16px; margin: 0; }
-.g-sag { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+.g-baslik { font-weight: 500; font-size: 15px; margin: 0; white-space: nowrap; }
+.g-sag { margin-left: auto; display: flex; align-items: center; gap: 10px; }
 
 /* Canlı göstergesi: nokta yanıp sönüyor. Yanıp sönmenin kendisi bilgi taşıyor —
    donmuş bir sayfada nokta da donar. */
 .g-canli {
   display: flex; align-items: center; gap: 7px;
-  font-size: 12.5px; font-weight: 600;
-  padding: 6px 11px; border-radius: 999px;
-  border: 1px solid var(--g-cizgi); background: #fff;
+  font-size: 12px; font-weight: 500;
+  padding: 5px 10px; border-radius: 999px;
+  border: 1px solid var(--g-cizgi); background: #fff; white-space: nowrap;
 }
-.g-nokta { width: 8px; height: 8px; border-radius: 50%; background: var(--g-soluk); }
-.g-canli.ok   .g-nokta { background: var(--g-yesil); animation: nabiz 1.6s infinite; }
-.g-canli.ok   { color: var(--g-yesil); border-color: rgba(22,163,74,.3); background: rgba(22,163,74,.06); }
+.g-nokta { width: 7px; height: 7px; border-radius: 50%; background: var(--g-soluk); }
+.g-canli.ok   { color: var(--g-yesil); border-color: rgba(22,163,74,.28); background: rgba(22,163,74,.06); }
+.g-canli.ok   .g-nokta { background: var(--g-yesil); animation: nabiz 1.8s infinite; }
+.g-canli.hata { color: var(--g-kirmizi); border-color: rgba(239,68,68,.28); background: rgba(239,68,68,.06); }
 .g-canli.hata .g-nokta { background: var(--g-kirmizi); }
-.g-canli.hata { color: var(--g-kirmizi); border-color: rgba(220,38,38,.3); background: rgba(220,38,38,.06); }
 @keyframes nabiz {
-  0%   { box-shadow: 0 0 0 0 rgba(22,163,74,.5); }
-  70%  { box-shadow: 0 0 0 7px rgba(22,163,74,0); }
+  0%   { box-shadow: 0 0 0 0 rgba(22,163,74,.45); }
+  70%  { box-shadow: 0 0 0 6px rgba(22,163,74,0); }
   100% { box-shadow: 0 0 0 0 rgba(22,163,74,0); }
 }
 
 .g-saat { text-align: right; line-height: 1.15; }
-.g-saat .s { font-weight: 700; font-size: 15px; font-variant-numeric: tabular-nums; }
-.g-saat .t { font-size: 11.5px; color: var(--g-soluk); }
+.g-saat .s { font-weight: 500; font-size: 14px; font-variant-numeric: tabular-nums; }
+.g-saat .t { font-size: 11px; color: var(--g-soluk); }
 
 .g-kullanici {
-  display: flex; align-items: center; gap: 9px;
-  padding: 5px 10px 5px 5px; border-radius: 999px;
+  display: flex; align-items: center; gap: 8px;
+  padding: 4px 10px 4px 4px; border-radius: 999px;
   border: 1px solid var(--g-cizgi); background: #fff;
 }
 .g-avatar {
-  width: 28px; height: 28px; border-radius: 50%;
-  background: linear-gradient(135deg, var(--g-mavi), var(--g-kirmizi));
+  width: 27px; height: 27px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--g-primary), var(--g-kirmizi));
   color: #fff; display: grid; place-items: center;
-  font-weight: 700; font-size: 12px;
+  font-weight: 500; font-size: 11px; flex: 0 0 auto;
 }
-.g-kullanici .ad { font-weight: 600; font-size: 13px; line-height: 1.1; }
-.g-kullanici .rol { font-size: 11px; color: var(--g-soluk); }
+.g-kullanici .ad  { font-weight: 500; font-size: 12.5px; line-height: 1.15; }
+.g-kullanici .rol { font-size: 10.5px; color: var(--g-soluk); }
 
 /* ── İÇERİK ─────────────────────────────────────────────────────────────── */
 
 .g-icerik {
   grid-area: icerik;
-  padding: 14px 18px 18px;
-  overflow: hidden;              /* sayfa kaymıyor; kaydırma kartların içinde */
-  display: flex; flex-direction: column; gap: 12px;
-  min-height: 0;                 /* ızgara çocuğunun taşmasını engelliyor */
+  padding: 12px 14px 14px;
+  overflow: hidden;
+  display: flex; flex-direction: column; gap: 10px;
+  min-height: 0;
 }
 
-.g-satir { display: grid; gap: 12px; min-height: 0; }
-.g-satir.esit-4 { grid-template-columns: repeat(4, 1fr); }
-.g-satir.esit-3 { grid-template-columns: repeat(3, 1fr); }
-.g-satir.esit-2 { grid-template-columns: repeat(2, 1fr); }
+/*
+  SATIRLAR İÇERİĞE GÖRE BOYUTLANIYOR.
+
+  `.buyuk` kalan bütün alanı alıyor; diğerleri içeriklerinin gerektirdiği kadar
+  yer kaplıyor. Sabit piksel yükseklikler kaldırıldı: 210px'e sabitlenmiş bir kart,
+  içindeki tablo 4 satır olduğunda boş, 40 satır olduğunda okunmaz oluyordu.
+*/
+.g-satir { display: grid; gap: 10px; min-height: 0; }
+.g-satir.esit-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.g-satir.esit-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.g-satir.esit-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .g-satir.buyuk  { flex: 1 1 auto; }
+/* Grafik satırları için makul bir alt sınır: bunun altında eksen etiketleri
+   üst üste biniyor ve grafik okunmuyor. */
+.g-satir.grafik { flex: 1 1 auto; min-height: 240px; }
 
 .g-kart {
   background: var(--g-kart);
   border: 1px solid var(--g-cizgi);
-  border-radius: 14px;
+  border-radius: var(--g-yuvarlak);
   box-shadow: var(--g-golge);
-  padding: 14px 16px;
+  padding: 12px 14px;
   display: flex; flex-direction: column;
   min-height: 0; min-width: 0;
 }
 .g-kart-bas {
-  font-size: 12px; font-weight: 700; letter-spacing: .4px;
+  font-size: 11.5px; font-weight: 500; letter-spacing: .3px;
   text-transform: uppercase; color: var(--g-soluk);
-  margin-bottom: 10px; flex: 0 0 auto;
-  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 8px; flex: 0 0 auto;
+  display: flex; align-items: center; gap: 7px; min-height: 24px;
 }
-.g-kart-govde { flex: 1 1 auto; min-height: 0; }
+.g-kart-bas i { font-size: 15px; }
+.g-kart-govde { flex: 1 1 auto; min-height: 0; position: relative; }
 
-/* Uzun listeler yalnızca KENDİ kutusunda kayıyor. Böylece sayfa sabit kalırken
-   tablo yine de tamamen okunabiliyor. */
-.g-scroll { overflow-y: auto; height: 100%; }
-.g-scroll::-webkit-scrollbar { width: 7px; }
-.g-scroll::-webkit-scrollbar-thumb { background: #d3d8e6; border-radius: 4px; }
+/* Uzun listeler yalnızca KENDİ kutusunda kayıyor: sayfa sabit kalırken tablo
+   yine de tamamen okunabiliyor. */
+.g-scroll { overflow-y: auto; overflow-x: auto; height: 100%; }
+.g-scroll::-webkit-scrollbar { width: 7px; height: 7px; }
+.g-scroll::-webkit-scrollbar-thumb { background: #d7dee8; border-radius: 4px; }
+.g-scroll::-webkit-scrollbar-thumb:hover { background: #c2cbd9; }
 
-/* Özet kutusu */
-.g-ozet { display: flex; align-items: center; gap: 12px; }
+/* Özet kutusu — şerit kartları */
+.g-ozet { display: flex; align-items: center; gap: 11px; }
 .g-ozet-ikon {
-  width: 40px; height: 40px; border-radius: 11px;
-  display: grid; place-items: center; font-size: 21px; flex: 0 0 auto;
+  width: 38px; height: 38px; border-radius: 10px;
+  display: grid; place-items: center; font-size: 20px; flex: 0 0 auto;
 }
-.g-ozet-sayi { font-size: 22px; font-weight: 800; line-height: 1.1; font-variant-numeric: tabular-nums; }
-.g-ozet-etiket { font-size: 12px; color: var(--g-soluk); }
+.g-ozet-sayi {
+  font-size: 21px; font-weight: 500; line-height: 1.15;
+  font-variant-numeric: tabular-nums; white-space: nowrap;
+  overflow: hidden; text-overflow: ellipsis;
+}
+.g-ozet-etiket { font-size: 11.5px; color: var(--g-soluk); white-space: nowrap;
+                 overflow: hidden; text-overflow: ellipsis; }
 
-.mavi    { background: rgba(37,99,235,.1);  color: var(--g-mavi); }
-.yesil   { background: rgba(22,163,74,.1);  color: var(--g-yesil); }
-.turuncu { background: rgba(245,158,11,.12);color: var(--g-turuncu); }
-.kirmizi { background: rgba(220,38,38,.1);  color: var(--g-kirmizi); }
-.mor     { background: rgba(124,58,237,.1); color: #7c3aed; }
+.mavi    { background: rgba(37,99,235,.10); color: var(--g-primary); }
+.yesil   { background: rgba(22,163,74,.10); color: var(--g-yesil); }
+.turuncu { background: rgba(245,158,11,.13);color: #b45309; }
+.kirmizi { background: rgba(239,68,68,.10); color: var(--g-kirmizi); }
+.mor     { background: rgba(124,58,237,.10);color: var(--g-mor); }
+.gri     { background: #f1f5f9;             color: var(--g-soluk); }
 
-table.g-tablo { width: 100%; border-collapse: collapse; font-size: 13px; }
+/* ── TABLO ──────────────────────────────────────────────────────────────── */
+
+table.g-tablo { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 12.5px; }
 table.g-tablo th {
-  text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: .4px;
-  color: var(--g-soluk); font-weight: 700;
-  padding: 7px 8px; border-bottom: 1px solid var(--g-cizgi);
-  position: sticky; top: 0; background: var(--g-kart); z-index: 1;
+  text-align: left; font-size: 10.5px; text-transform: uppercase; letter-spacing: .4px;
+  color: var(--g-soluk); font-weight: 500;
+  padding: 8px; background: var(--g-kart);
+  /*
+    BASLIK YAPISKAN. Uzun bir listede aşağı inildiğinde hangi sütunun ne olduğu
+    kayboluyordu. `border-bottom` yerine `box-shadow` kullanılıyor: yapışkan
+    hücrelerde kenarlık kaydırma sırasında birlikte kaymıyor ve çizgi kayboluyor.
+  */
+  position: sticky; top: 0; z-index: 2;
+  box-shadow: inset 0 -1px 0 var(--g-cizgi);
+  white-space: nowrap;
 }
-table.g-tablo td { padding: 8px; border-bottom: 1px solid #f1f3f9; white-space: nowrap; }
-table.g-tablo tbody tr:hover { background: #f8f9fd; }
+table.g-tablo td {
+  padding: 8px; border-bottom: 1px solid var(--g-cizgi-acik);
+  white-space: nowrap; vertical-align: middle;
+}
+table.g-tablo tbody tr:last-child td { border-bottom: 0; }
+table.g-tablo tbody tr:hover { background: #f8fafc; }
 table.g-tablo tr.tiklanir { cursor: pointer; }
+table.g-tablo tr.tiklanir:hover { background: var(--g-primary-acik); }
+/* Sayı sütunları hizalı okunsun. */
+table.g-tablo td.sayi, table.g-tablo th.sayi { text-align: right; font-variant-numeric: tabular-nums; }
+/* Uzun serbest metin (destek mesajı) sarabilsin. */
+table.g-tablo td.metin { white-space: normal; min-width: 240px; max-width: 480px; }
 
 .g-rozet {
   display: inline-block; padding: 2px 9px; border-radius: 999px;
-  font-size: 11.5px; font-weight: 700;
+  font-size: 11px; font-weight: 500; white-space: nowrap;
 }
 
-.g-bos { display: grid; place-items: center; height: 100%; color: var(--g-soluk); font-size: 13px; }
+.g-bos {
+  display: grid; place-items: center; height: 100%; min-height: 90px;
+  color: var(--g-soluk); font-size: 12.5px; text-align: center;
+}
+
+/* Anahtar/değer listesi (profil, sistem bilgileri) */
+.g-kv { padding: 6px 0; border-bottom: 1px solid var(--g-cizgi-acik); }
+.g-kv:last-child { border-bottom: 0; }
+.g-kv-satir { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; }
+.g-kv-etiket { color: var(--g-soluk); font-size: 12px; }
+.g-kv-deger  { font-weight: 500; font-size: 12.5px; text-align: right; }
+.g-kv-not    { font-size: 10.5px; color: #94a3b8; margin-top: 2px; }
 
 /* ══════════════════════════════════════════════════════════════════════════
-   GARANTEA ANİMASYONU — logodaki fincan ve yükselen buhar
+   MODAL — kullanıcı detayı
    ══════════════════════════════════════════════════════════════════════════
 
-   Uygulamanın açılış ekranındaki hareketin aynısı. Panelde de bulunmasının
-   sebebi süs değil: panel uygulamanın parçası ve aynı markayı taşımalı.
+   Detay ayrı bir sayfa yerine modal: listedeki yer kaybolmuyor. Ayrı sayfada
+   geri dönüldüğünde arama kutusu boşalıyor, sayfa numarası sıfırlanıyor ve
+   kullanıcı aradığı satırı yeniden bulmak zorunda kalıyordu.
+   ══════════════════════════════════════════════════════════════════════════ */
 
-   `prefers-reduced-motion` UYULUYOR: hareket hassasiyeti olan kullanıcılarda
-   buhar duruyor, logo sabit kalıyor. Bir gösterge panelinde sürekli hareket
-   eden bir öğe, o kullanıcılar için rahatsız edici olabiliyor.
-   ========================================================================= */
+.g-modal-perde {
+  position: fixed; inset: 0; z-index: 50;
+  background: rgba(15,23,42,.45);
+  backdrop-filter: blur(2px);
+  display: none; place-items: center; padding: 20px;
+}
+.g-modal-perde.acik { display: grid; }
 
-.g-logo { width: 34px; height: 34px; flex: 0 0 auto; }
-.g-logo .buhar { opacity: 0; transform-origin: center bottom; }
-.g-logo .b1 { animation: buhar 2.6s ease-in-out infinite; }
-.g-logo .b2 { animation: buhar 2.6s ease-in-out .5s infinite; }
-.g-logo .b3 { animation: buhar 2.6s ease-in-out 1s infinite; }
-
-@keyframes buhar {
-  0%   { opacity: 0;   transform: translateY(2px)  scaleY(.6); }
-  30%  { opacity: .85; }
-  70%  { opacity: .35; }
-  100% { opacity: 0;   transform: translateY(-9px) scaleY(1.25); }
+.g-modal {
+  background: var(--g-kart);
+  width: min(1080px, 96vw);
+  max-height: 90dvh;
+  border-radius: 16px;
+  box-shadow: var(--g-golge-buyuk);
+  display: flex; flex-direction: column;
+  overflow: hidden;
+  animation: modalGir .16s ease-out;
+}
+@keyframes modalGir {
+  from { opacity: 0; transform: translateY(8px) scale(.99); }
+  to   { opacity: 1; transform: none; }
 }
 
-/* Giriş ekranındaki büyük logo */
-.g-giris-logo { width: 96px; height: 96px; }
+.g-modal-bas {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 18px; border-bottom: 1px solid var(--g-cizgi);
+  flex: 0 0 auto;
+}
+.g-modal-govde {
+  padding: 14px 18px; overflow-y: auto; min-height: 0;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.g-modal-kapat {
+  margin-left: auto; border: 1px solid var(--g-cizgi); background: #fff;
+  width: 30px; height: 30px; border-radius: 8px; cursor: pointer;
+  display: grid; place-items: center; color: var(--g-soluk); font-size: 18px;
+}
+.g-modal-kapat:hover { background: var(--g-cizgi-acik); color: var(--g-metin); }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   GARANTEA ANİMASYONU
+   ══════════════════════════════════════════════════════════════════════════
+
+   Uygulamadaki simgenin (src/components/GaranTeaLogo.tsx) birebir karşılığı:
+   aynı 200x200 geometri, aynı degradeler, aynı zamanlama
+   (src/lib/logoTimeline.ts → LOGO_CYCLE_MS = 4000ms).
+
+   BELGE FİNCANIN ARKASINA GİRİYOR. Uygulamada bunu iki şey birlikte yapıyor:
+   fincanın ön gövdesi belgeden SONRA çiziliyor (dolayısıyla üstünü örtüyor) ve
+   grubun saydamlığı geri kalanını siliyor. SVG'de boyama sırası aynı olduğu için
+   burada da maskeye gerek kalmıyor — zaten uygulamada maske Android'de sessizce
+   çalışmadığı için kaldırılmıştı.
+
+   `prefers-reduced-motion` UYULUYOR: hareket hassasiyeti olan kullanıcılarda
+   animasyon duruyor. Sürekli hareket eden bir öğe, günün çoğunu bu panelde
+   geçirecek biri için yorucu olabilir.
+   ========================================================================= */
+
+.g-logo { width: 32px; height: 32px; flex: 0 0 auto; overflow: visible; }
+.g-giris-logo { width: 104px; height: 104px; }
+
+.g-logo .g-belge { animation: gBelge 4s linear infinite; }
+@keyframes gBelge {
+  0%   { transform: translateY(5px);   opacity: 0; }
+  5%   { transform: translateY(5px);   opacity: 1; }
+  45%  { transform: translateY(110px); opacity: 1; }
+  100% { transform: translateY(110px); opacity: 0; }
+}
+
+/* Beş buhar çubuğu; logoTimeline.ts'teki STEAM dizisiyle aynı değerler. */
+.g-logo .b1 { animation: gBuhar1 4s linear infinite; }
+.g-logo .b2 { animation: gBuhar2 4s linear infinite; }
+.g-logo .b3 { animation: gBuhar3 4s linear infinite; }
+.g-logo .b4 { animation: gBuhar4 4s linear infinite; }
+.g-logo .b5 { animation: gBuhar5 4s linear infinite; }
+
+@keyframes gBuhar1 {
+  0%,45%  { transform: translateY(15px);  opacity: 0; }
+  75%     { transform: translateY(-15px); opacity: .70; }
+  100%    { transform: translateY(-15px); opacity: 0; }
+}
+@keyframes gBuhar2 {
+  0%,40%  { transform: translateY(15px);  opacity: 0; }
+  80%     { transform: translateY(-25px); opacity: .85; }
+  100%    { transform: translateY(-25px); opacity: 0; }
+}
+@keyframes gBuhar3 {
+  0%,45%  { transform: translateY(15px);  opacity: 0; }
+  85%     { transform: translateY(-35px); opacity: .95; }
+  100%    { transform: translateY(-35px); opacity: 0; }
+}
+@keyframes gBuhar4 {
+  0%,50%  { transform: translateY(15px);  opacity: 0; }
+  90%     { transform: translateY(-25px); opacity: .85; }
+  100%    { transform: translateY(-25px); opacity: 0; }
+}
+@keyframes gBuhar5 {
+  0%,42%  { transform: translateY(15px);  opacity: 0; }
+  72%     { transform: translateY(-15px); opacity: .70; }
+  100%    { transform: translateY(-15px); opacity: 0; }
+}
 
 @media (prefers-reduced-motion: reduce) {
-  .g-logo .buhar { animation: none; opacity: .5; }
+  .g-logo .g-belge, .g-logo [class^="b"] { animation: none; }
+  .g-logo .g-belge { opacity: 0; }
   .g-canli.ok .g-nokta { animation: none; }
-  .g-app, .g-alt, .g-grup-bas i.ok { transition: none; }
+  .g-app, .g-alt, .g-grup-bas i.ok, .g-modal { transition: none; animation: none; }
 }
 
 /* ── GİRİŞ EKRANI ───────────────────────────────────────────────────────── */
@@ -305,28 +441,37 @@ table.g-tablo tr.tiklanir { cursor: pointer; }
 .g-giris {
   height: 100dvh; display: grid; place-items: center;
   background:
-    radial-gradient(1000px 500px at 15% -10%, rgba(37,99,235,.14), transparent 60%),
-    radial-gradient(900px 500px at 90% 110%, rgba(220,38,38,.12), transparent 60%),
+    radial-gradient(900px 460px at 12% -12%, rgba(37,99,235,.13), transparent 62%),
+    radial-gradient(820px 460px at 92% 112%, rgba(239,68,68,.10), transparent 62%),
     var(--g-zemin);
 }
 .g-giris-kutu {
   width: 380px; max-width: 92vw;
   background: #fff; border: 1px solid var(--g-cizgi);
-  border-radius: 18px; box-shadow: 0 10px 40px rgba(16,24,40,.10);
-  padding: 30px 28px 26px; text-align: center;
+  border-radius: 18px; box-shadow: 0 10px 40px rgba(15,23,42,.09);
+  padding: 30px 28px 24px; text-align: center;
 }
 
+/* ── BOOTSTRAP DOKUNUŞLARI ──────────────────────────────────────────────── */
+/* Sneat'in `core.css`i kendi mavisini kullanıyor; marka rengiyle hizalanıyor. */
+.btn-primary { background-color: var(--g-primary) !important; border-color: var(--g-primary) !important; }
+.btn-primary:hover { background-color: var(--g-primary-koyu) !important; border-color: var(--g-primary-koyu) !important; }
+.form-control:focus { border-color: var(--g-primary); box-shadow: 0 0 0 .18rem rgba(37,99,235,.15); }
+.btn { font-size: 12.5px; }
+.alert { border-radius: 10px; font-size: 12.5px; }
+
 /* ── DAR EKRAN ──────────────────────────────────────────────────────────── */
-/* Panel masaüstü için tasarlandı. Dar ekranda menü simge durumuna geçiyor ve
-   çok sütunlu ızgaralar tek sütuna iniyor; bu durumda tek ekran kuralı
-   korunamıyor, içerik kaydırılabilir oluyor — okunmaz bir sıkıştırma yerine
-   bilinçli bir taviz. */
-@media (max-width: 1100px) {
-  .g-satir.esit-4 { grid-template-columns: repeat(2, 1fr); }
-  .g-satir.esit-3 { grid-template-columns: repeat(2, 1fr); }
+/* Panel masaüstü için tasarlandı. Dar ekranda tek ekran kuralı korunamıyor;
+   okunmaz bir sıkıştırma yerine bilinçli olarak kaydırmaya izin veriliyor. */
+@media (max-width: 1200px) {
+  .g-satir.esit-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
-@media (max-width: 820px) {
+@media (max-width: 992px) {
   .g-app { grid-template-columns: var(--g-kenar-dar) 1fr; }
+  .g-satir.esit-3 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 760px) {
   .g-satir.esit-4, .g-satir.esit-3, .g-satir.esit-2 { grid-template-columns: 1fr; }
   .g-icerik { overflow-y: auto; }
+  .g-saat, .g-kullanici .rol { display: none; }
 }

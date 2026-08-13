@@ -43,7 +43,7 @@
 
         <div class="alert alert-warning py-2 mb-0 small" style="flex:0 0 auto">
           <i class="bx bx-info-circle me-1"></i>
-          <strong>Bu sayfa ciro degil, kredi hareketi gosteriyor.</strong>
+          Bu sayfa ciro degil, kredi hareketi gosteriyor.
           Odemeler RevenueCat tarafinda tutuluyor ve veritabanina akmiyor.
         </div>
 
@@ -65,7 +65,7 @@
           </div>
         </div>
 
-        <div class="g-satir esit-3" style="height:170px">
+        <div class="g-satir esit-3">
           <div class="g-kart">
             <div class="g-kart-bas"><i class="bx bx-wallet"></i> Kredi akisi</div>
             <div class="g-kart-govde g-scroll" id="akis"></div>
@@ -98,7 +98,7 @@
         return '<div style="padding:7px 0;border-bottom:1px solid #f1f3f9">'
           + '<div style="display:flex;justify-content:space-between;gap:10px">'
           + '<span style="color:#6b7280;font-size:12.5px">' + etiket + '</span>'
-          + '<span style="font-weight:700;font-size:13px">' + deger + '</span></div>'
+          + '<span style="font-weight:500;font-size:13px">' + deger + '</span></div>'
           + (not ? '<div style="font-size:10.5px;color:#9aa1b2">' + not + '</div>' : '') + '</div>';
       }
 
@@ -130,7 +130,7 @@
 
           document.getElementById('top').innerHTML = (top && top.length)
             ? top.map(function (u) {
-                return '<tr><td><strong>' + gEsc(u.email) + '</strong></td>'
+                return '<tr><td>' + gEsc(u.email) + '</td>'
                   + '<td>' + gNum(u.credits) + '</td>'
                   + '<td>' + gNum(u.ads) + '</td></tr>';
               }).join('')

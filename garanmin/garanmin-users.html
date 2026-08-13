@@ -11,14 +11,17 @@
   Sebep: dosyanin ilk satiri `yukle()` cagiriyordu, `const SAYFA = 25` ise iki satir
   SONRA geliyordu. `const` bildirimi yukari tasinir ama BASLATILANA KADAR erisilemez
   (temporal dead zone), dolayisiyla `yukle()` icindeki `SAYFA` referansi hemen hata
-  firlatiyor ve sayfa bos kaliyordu.
+  firlatiyor ve sayfa bos kaliyordu. Artik butun tanimlar once, ILK CAGRI en sonda.
 
-  Cozum: butun sabitler ve fonksiyonlar once tanimlaniyor, ILK CAGRI en sonda. Bu
-  dosyada bu kural her yerde gecerli.
+  ─── DETAY MODAL OLARAK ACILIYOR ──────────────────────────────────────────
 
-  Liste SAYFALANIYOR ve arama SUNUCUDA yapiliyor: butun kullanicilari cekip tarayicida
-  suzmek, kullanici sayisi buyudukce hem yavaslar hem de gereksiz yere butun e-posta
-  adreslerini agdan gecirir.
+  Ayri bir sayfa degil: geri donuldugunde arama kutusu bosalir, sayfa numarasi
+  sifirlanir ve kullanici aradigi satiri yeniden bulmak zorunda kalirdi. Modal
+  kapandiginda liste oldugu gibi duruyor.
+
+  Liste SAYFALANIYOR ve arama SUNUCUDA yapiliyor: butun kullanicilari cekip
+  tarayicida suzmek, kullanici sayisi buyudukce hem yavaslar hem de gereksiz yere
+  butun e-posta adreslerini agdan gecirir.
 -->
 <html lang="tr">
   <head>
@@ -47,11 +50,11 @@
         <div class="g-kart" style="flex:1 1 auto;min-height:0">
           <div class="g-kart-bas" style="justify-content:space-between">
             <span><i class="bx bx-group"></i> Kullanici listesi</span>
-            <span style="display:flex;gap:8px;align-items:center;text-transform:none;letter-spacing:0">
+            <span style="display:flex;gap:6px;align-items:center;text-transform:none;letter-spacing:0">
               <input id="arama" class="form-control form-control-sm" style="width:230px"
                      placeholder="E-posta ara..." />
-              <button class="btn btn-sm btn-primary" id="ara-btn"><i class="bx bx-search"></i></button>
-              <button class="btn btn-sm btn-outline-secondary" id="temizle-btn"><i class="bx bx-x"></i></button>
+              <button class="btn btn-sm btn-primary" id="ara-btn" title="Ara"><i class="bx bx-search"></i></button>
+              <button class="btn btn-sm btn-outline-secondary" id="temizle-btn" title="Temizle"><i class="bx bx-x"></i></button>
             </span>
           </div>
 
@@ -60,7 +63,8 @@
               <thead>
                 <tr>
                   <th>E-posta</th><th>Kayit</th><th>Son giris</th>
-                  <th>Cihaz</th><th>Kredi</th><th>Reklam</th><th>Talep</th><th></th>
+                  <th class="sayi">Cihaz</th><th class="sayi">Kredi</th>
+                  <th class="sayi">Reklam</th><th class="sayi">Talep</th><th></th>
                 </tr>
               </thead>
               <tbody id="tbody">
@@ -69,8 +73,8 @@
             </table>
           </div>
 
-          <div style="display:flex;align-items:center;gap:10px;padding-top:10px;flex:0 0 auto">
-            <span class="text-muted small" id="sayfa-bilgi"></span>
+          <div style="display:flex;align-items:center;gap:10px;padding-top:9px;flex:0 0 auto">
+            <span class="text-muted" style="font-size:12px" id="sayfa-bilgi"></span>
             <span style="margin-left:auto;display:flex;gap:6px">
               <button class="btn btn-sm btn-outline-secondary" id="onceki"><i class="bx bx-chevron-left"></i></button>
               <button class="btn btn-sm btn-outline-secondary" id="sonraki"><i class="bx bx-chevron-right"></i></button>
@@ -91,19 +95,143 @@
         document.getElementById('serit').innerHTML = liste.map(function (k) {
           return '<div class="g-kart"><div class="g-ozet">'
             + '<div class="g-ozet-ikon ' + k.renk + '"><i class="bx ' + k.ikon + '"></i></div>'
-            + '<div><div class="g-ozet-sayi">' + k.deger + '</div>'
+            + '<div style="min-width:0"><div class="g-ozet-sayi">' + k.deger + '</div>'
             + '<div class="g-ozet-etiket">' + k.etiket + '</div></div></div></div>';
         }).join('');
       }
 
+      function kv(etiket, deger, not) {
+        return '<div class="g-kv"><div class="g-kv-satir">'
+          + '<span class="g-kv-etiket">' + etiket + '</span>'
+          + '<span class="g-kv-deger">' + deger + '</span></div>'
+          + (not ? '<div class="g-kv-not">' + not + '</div>' : '') + '</div>';
+      }
+
       /**
-       * Satira tiklayinca kullanici detayina gidiliyor.
+       * Bir cihazin garanti durumu — uygulamanin kuralinin AYNISI.
        *
-       * KIMLIK ADRESTE TASINIYOR (`?id=`): detay sayfasi dogrudan da acilabilsin,
-       * yer imine eklenebilsin ve yenilendiginde bos kalmasin. `sessionStorage`'a
-       * yazilsaydi adresi paylasan kisi bos bir sayfa gorurdu.
+       * Esik "%90 tuketildi", "30 gun kaldi" DEGIL. Iki taraf farkli sayarsa panel,
+       * kullanicinin telefonunda gordugunden baska bir tablo gosterir.
        */
-      function git(id) { location.href = 'garanmin-user.html?id=' + encodeURIComponent(id); }
+      function durum(d) {
+        if (!d.bitis) return 'active';
+        const bitis = new Date(d.bitis), bugun = new Date();
+        if (bitis < bugun) return 'expired';
+        if (!d.alim) return 'active';
+        const bas = new Date(d.alim), toplam = bitis - bas;
+        if (toplam <= 0) return 'active';
+        return ((bugun - bas) / toplam) > 0.9 ? 'expiring_soon' : 'active';
+      }
+
+      /**
+       * Kullanici detayini modal olarak acar.
+       *
+       * TEK CAGRI: profil, cihazlar, garanti dagilimi ve talepler
+       * `garanmin_user_detail` icinden birlikte geliyor. Dort ayri cagri olsaydi
+       * aralarinda gecen surede kullanici cihaz ekledi diye "toplam 13 ama listede
+       * 12 satir" gibi bir ekran cikabilir ve bu fark hicbir yerde hata olarak
+       * gorunmezdi.
+       */
+      async function detay(id, email) {
+        garanminModalAc(
+          '<span class="g-avatar">' + gEsc((email || '?').slice(0, 2).toUpperCase()) + '</span>'
+          + '<div><div style="font-size:14px">' + gEsc(email) + '</div>'
+          + '<div style="font-size:11.5px;color:var(--g-soluk)">Kullanici detayi</div></div>',
+          '<div class="g-bos"><i class="bx bx-loader-alt bx-spin" style="font-size:22px"></i></div>'
+        );
+
+        try {
+          const v = await garanminData('garanmin_user_detail', { p_user_id: id });
+          const p = v.profil, g = v.garanti || {}, c = v.cihazlar || [], t = v.talepler || [];
+
+          const seritHtml = [
+            { etiket: 'Cihaz',          deger: gNum(c.length),   ikon: 'bx-devices', renk: 'mavi' },
+            { etiket: 'Kredi',          deger: gNum(p.credits),  ikon: 'bx-star',    renk: 'turuncu' },
+            { etiket: 'Izlenen reklam', deger: gNum(p.ads),      ikon: 'bx-tv',      renk: 'yesil' },
+            { etiket: 'Destek talebi',  deger: gNum(t.length),   ikon: 'bx-support', renk: 'kirmizi' },
+          ].map(function (k) {
+            return '<div class="g-kart"><div class="g-ozet">'
+              + '<div class="g-ozet-ikon ' + k.renk + '"><i class="bx ' + k.ikon + '"></i></div>'
+              + '<div><div class="g-ozet-sayi">' + k.deger + '</div>'
+              + '<div class="g-ozet-etiket">' + k.etiket + '</div></div></div></div>';
+          }).join('');
+
+          const cihazHtml = c.length
+            ? c.map(function (d) {
+                const s = gDurum(durum(d));
+                return '<tr>'
+                  + '<td>' + gEsc(d.ad) + '</td>'
+                  + '<td>' + gEsc(d.marka) + '</td>'
+                  + '<td>' + gEsc(gKategori(d.kategori)) + '</td>'
+                  + '<td>' + gEsc(d.oda) + '</td>'
+                  + '<td>' + gDate(d.alim) + '</td>'
+                  + '<td>' + gDate(d.bitis) + '</td>'
+                  + '<td><span class="g-rozet ' + s.sinif + '">' + s.ad + '</span></td>'
+                  + '<td>' + (d.fatura_var
+                      ? '<i class="bx bx-check" style="color:var(--g-yesil)"></i>'
+                      : '<span class="text-muted">-</span>') + '</td>'
+                  + '</tr>';
+              }).join('')
+            : '<tr><td colspan="8" class="text-muted">Bu kullanicinin cihazi yok</td></tr>';
+
+          const talepHtml = t.length
+            ? t.map(function (x) {
+                return '<tr><td>' + gDateTime(x.created_at) + '</td>'
+                  + '<td>' + gEsc(x.kind) + '</td>'
+                  + '<td>' + gEsc(x.status) + '</td>'
+                  + '<td class="metin">' + gEsc(x.message) + '</td></tr>';
+              }).join('')
+            : '<tr><td colspan="4" class="text-muted">Talep yok</td></tr>';
+
+          document.getElementById('g-modal-govde').innerHTML =
+            '<div class="g-satir esit-4">' + seritHtml + '</div>'
+
+            + '<div class="g-satir esit-3">'
+            +   '<div class="g-kart">'
+            +     '<div class="g-kart-bas"><i class="bx bx-id-card"></i> Profil</div>'
+            +     '<div class="g-kart-govde">'
+            +       kv('Kayit tarihi', gDate(p.created_at))
+            +       kv('Son giris', gGoreli(p.last_sign_in_at))
+            +       kv('Giris yontemi', gEsc(p.saglayici))
+            +       kv('Aktif garanti', gNum(g.active || 0))
+            +       kv('Yakinda bitiyor', gNum(g.expiring_soon || 0))
+            +       kv('Suresi dolmus', gNum(g.expired || 0))
+            +     '</div>'
+            +   '</div>'
+
+            +   '<div class="g-kart" style="grid-column: span 2">'
+            +     '<div class="g-kart-bas" style="justify-content:space-between">'
+            +       '<span><i class="bx bx-devices"></i> Cihazlar</span>'
+            +       '<span style="text-transform:none;letter-spacing:0">'
+            +         '<span class="g-rozet mavi">' + gNum(g.active || 0) + ' aktif</span> '
+            +         '<span class="g-rozet turuncu">' + gNum(g.expiring_soon || 0) + ' yakin</span> '
+            +         '<span class="g-rozet kirmizi">' + gNum(g.expired || 0) + ' dolmus</span>'
+            +       '</span>'
+            +     '</div>'
+            /* Cihaz listesi kendi kutusunda kayiyor: 40 cihazi olan bir kullanicida
+               modal ekrandan tasmasin, 2 cihazi olanda da bos yer kalmasin. */
+            +     '<div class="g-kart-govde g-scroll" style="max-height:260px">'
+            +       '<table class="g-tablo"><thead><tr>'
+            +         '<th>Cihaz</th><th>Marka</th><th>Kategori</th><th>Oda</th>'
+            +         '<th>Alim</th><th>Bitis</th><th>Durum</th><th>Fatura</th>'
+            +       '</tr></thead><tbody>' + cihazHtml + '</tbody></table>'
+            +     '</div>'
+            +   '</div>'
+            + '</div>'
+
+            + '<div class="g-kart">'
+            +   '<div class="g-kart-bas"><i class="bx bx-support"></i> Destek talepleri</div>'
+            +   '<div class="g-kart-govde g-scroll" style="max-height:180px">'
+            +     '<table class="g-tablo"><thead><tr>'
+            +       '<th>Tarih</th><th>Tur</th><th>Durum</th><th>Mesaj</th>'
+            +     '</tr></thead><tbody>' + talepHtml + '</tbody></table>'
+            +   '</div>'
+            + '</div>';
+        } catch (e) {
+          document.getElementById('g-modal-govde').innerHTML =
+            '<div class="alert alert-danger mb-0">' + gEsc(e.message) + '</div>';
+        }
+      }
 
       async function yukle() {
         try {
@@ -116,14 +244,15 @@
             tb.innerHTML = '<tr><td colspan="8" class="text-muted">Kayit yok</td></tr>';
           } else {
             tb.innerHTML = v.map(function (u) {
-              return '<tr class="tiklanir" onclick="git(\'' + gEsc(u.id) + '\')">'
-                + '<td><strong>' + gEsc(u.email || '-') + '</strong></td>'
+              const eposta = gEsc(u.email || '-');
+              return '<tr class="tiklanir" onclick="detay(\'' + gEsc(u.id) + '\',\'' + eposta + '\')">'
+                + '<td>' + eposta + '</td>'
                 + '<td>' + gDate(u.created_at) + '</td>'
                 + '<td>' + gGoreli(u.last_sign_in_at) + '</td>'
-                + '<td><span class="g-rozet mavi">' + gNum(u.device_count) + '</span></td>'
-                + '<td>' + gNum(u.credits) + '</td>'
-                + '<td>' + gNum(u.ad_watch_count) + '</td>'
-                + '<td>' + gNum(u.ticket_count) + '</td>'
+                + '<td class="sayi"><span class="g-rozet mavi">' + gNum(u.device_count) + '</span></td>'
+                + '<td class="sayi">' + gNum(u.credits) + '</td>'
+                + '<td class="sayi">' + gNum(u.ad_watch_count) + '</td>'
+                + '<td class="sayi">' + gNum(u.ticket_count) + '</td>'
                 + '<td class="text-muted"><i class="bx bx-chevron-right"></i></td>'
                 + '</tr>';
             }).join('');

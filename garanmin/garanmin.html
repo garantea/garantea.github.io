@@ -27,8 +27,10 @@
       <div class="g-giris-kutu">
         <div id="logo-yuva"></div>
 
-        <div style="font-size:26px;font-weight:800;letter-spacing:-.6px;margin-top:6px">
-          <span style="color:#2563eb">Garan</span><span style="color:#dc2626">min</span>
+        <!-- MARKA YAZISI, panelde kalin olan TEK metin. Geri kalan her yerde
+             agirlik 500'u gecmiyor; vurgu renk ve boslukla veriliyor. -->
+        <div class="g-marka-yazi" style="font-size:26px;margin-top:6px">
+          <span class="a">Garan</span><span class="b">min</span>
         </div>
         <div style="color:#6b7280;font-size:13px;margin-bottom:22px">GaranTea yonetim paneli</div>
 
@@ -36,11 +38,11 @@
 
         <form id="form" autocomplete="off">
           <div class="mb-3 text-start">
-            <label class="form-label small fw-semibold">Kullanici adi</label>
+            <label class="form-label small ">Kullanici adi</label>
             <input class="form-control" id="kullanici" autocomplete="username" required autofocus />
           </div>
           <div class="mb-3 text-start">
-            <label class="form-label small fw-semibold">Parola</label>
+            <label class="form-label small ">Parola</label>
             <input class="form-control" id="parola" type="password" autocomplete="current-password" required />
           </div>
           <button class="btn btn-primary w-100" id="btn" type="submit">

@@ -51,7 +51,7 @@
           </div>
         </div>
 
-        <div class="g-satir esit-3" style="height:210px">
+        <div class="g-satir esit-3 grafik">
           <div class="g-kart">
             <div class="g-kart-bas"><i class="bx bx-category"></i> Kategoriler</div>
             <div class="g-kart-govde" id="c-kategori"></div>
@@ -197,7 +197,7 @@
         }
         // Kullanici verisi `gEsc` ile kaciriliyor (gerekce: garanmin-api.js).
         tb.innerHTML = v.map(function (d) {
-          return '<tr><td><strong>' + gEsc(d.name) + '</strong></td>'
+          return '<tr><td>' + gEsc(d.name) + '</td>'
             + '<td>' + gEsc(d.brand) + '</td>'
             + '<td class="text-muted">' + gEsc(d.email || '-') + '</td></tr>';
         }).join('');

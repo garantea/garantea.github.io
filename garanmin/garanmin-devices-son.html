@@ -111,7 +111,7 @@
           tb.innerHTML = v.map(function (d) {
             const s = gDurum(durum(d.purchase_date, d.warranty_end));
             return '<tr>'
-              + '<td><strong>' + gEsc(d.name) + '</strong></td>'
+              + '<td>' + gEsc(d.name) + '</td>'
               + '<td>' + gEsc(d.brand) + '</td>'
               + '<td>' + gEsc(gKategori(d.category)) + '</td>'
               + '<td>' + gDate(d.purchase_date) + '</td>'

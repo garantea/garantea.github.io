@@ -159,9 +159,12 @@ const GARANMIN_MENU = [
     { href: 'garanmin-db.html',   ad: 'Tablolar' },
     { href: 'garanmin-akis.html', ad: 'Zaman Akisi' },
   ]},
+  /* Kullanici detayi MENUDE YOK: listeden bir satira tiklaninca MODAL olarak
+     aciliyor. Ayri bir sayfa olsaydi geri donuldugunde arama kutusu bosalir,
+     sayfa numarasi sifirlanir ve kullanici aradigi satiri yeniden bulmak
+     zorunda kalirdi. */
   { ad: 'Kullanicilar', ikon: 'bx-group', alt: [
     { href: 'garanmin-users.html', ad: 'Liste' },
-    { href: 'garanmin-user.html',  ad: 'Kullanici Detayi' },
   ]},
   { ad: 'Cihazlar', ikon: 'bx-devices', alt: [
     { href: 'garanmin-devices.html',     ad: 'Kirilimlar' },
@@ -175,21 +178,84 @@ const GARANMIN_MENU = [
   ]},
 ];
 
-/* GaranTea logosu — fincan ve yükselen buhar. Animasyon CSS'te (`.g-logo`). */
-const GARANMIN_LOGO = `
-<svg class="g-logo" viewBox="0 0 64 64" aria-hidden="true">
-  <g class="buhar b1"><rect x="24" y="8"  width="3" height="10" rx="1.5" fill="#93c5fd"/></g>
-  <g class="buhar b2"><rect x="31" y="5"  width="3" height="13" rx="1.5" fill="#60a5fa"/></g>
-  <g class="buhar b3"><rect x="38" y="9"  width="3" height="9"  rx="1.5" fill="#93c5fd"/></g>
-  <ellipse cx="32" cy="52" rx="21" ry="5" fill="#1e40af" opacity=".35"/>
-  <path d="M14 26h33v12a16 16 0 0 1-16 16h-1a16 16 0 0 1-16-16z" fill="#2563eb"/>
-  <path d="M14 26h33v5H14z" fill="#1d4ed8"/>
-  <path d="M47 30h4a7 7 0 0 1 0 14h-4" fill="none" stroke="#2563eb" stroke-width="4"/>
-  <rect x="27" y="18" width="10" height="14" rx="2" fill="#dc2626"/>
-  <rect x="29" y="21" width="6" height="1.6" rx=".8" fill="#fecaca"/>
-  <rect x="29" y="24" width="6" height="1.6" rx=".8" fill="#fecaca"/>
-  <rect x="29" y="27" width="4" height="1.6" rx=".8" fill="#fecaca"/>
+/**
+ * GaranTea simgesi — UYGULAMANIN SVG'SİNİN BİREBİR KOPYASI.
+ *
+ * Kaynak: `GaranTea-App/src/components/GaranTeaLogo.tsx`. Aynı 200x200 viewBox,
+ * aynı degradeler, aynı geometri. Yeniden çizilmedi çünkü "benzer" bir logo,
+ * yan yana konduğunda gözle ayırt edilen bir logodur ve panel uygulamanın parçası.
+ *
+ * Animasyon CSS'te (`.g-logo`), zamanlaması `src/lib/logoTimeline.ts` ile aynı:
+ * belge yukarıdan gelip fincanın içine iniyor (4 saniyelik tur), ardından beş
+ * buhar çubuğu kademeli olarak yükseliyor.
+ *
+ * MASKE YOK — uygulamada da yok. Belgeyi gizleyen şey boyama sırası: fincanın ön
+ * gövdesi belgeden SONRA çiziliyor, dolayısıyla üstünü örtüyor. (Uygulamada maske
+ * bir dönem vardı ama react-native-svg'nin `Mask` desteği Android'de sessizce
+ * çalışmadığı için kaldırılmıştı; tarayıcıda da gerek yok.)
+ *
+ * `gradyanEk` — aynı sayfada iki logo olduğunda degrade kimlikleri çakışmasın diye
+ * son ek alıyor. SVG'de `id`ler belge genelinde benzersiz olmak zorunda; iki kopya
+ * aynı kimliği kullansaydı ikincisi birincinin degradesini devralır ve renkler
+ * beklenmedik şekilde değişirdi.
+ */
+function garanminLogo(gradyanEk) {
+  const e = gradyanEk || 'a';
+  return `
+<svg class="g-logo" viewBox="0 0 200 200" aria-hidden="true">
+  <defs>
+    <linearGradient id="cup-${e}" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#053582"/><stop offset="20%" stop-color="#0B57D0"/>
+      <stop offset="80%" stop-color="#4285F4"/><stop offset="100%" stop-color="#8ab4f8"/>
+    </linearGradient>
+    <linearGradient id="ins-${e}" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#03204e"/><stop offset="20%" stop-color="#053582"/>
+      <stop offset="80%" stop-color="#0B57D0"/><stop offset="100%" stop-color="#1a73e8"/>
+    </linearGradient>
+    <linearGradient id="sau-${e}" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#1a73e8"/><stop offset="100%" stop-color="#0f4185"/>
+    </linearGradient>
+    <linearGradient id="doc-${e}" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#EA4335"/><stop offset="100%" stop-color="#B31412"/>
+    </linearGradient>
+  </defs>
+
+  <ellipse cx="100" cy="176" rx="65" ry="8" fill="#e2e8f0"/>
+  <ellipse cx="100" cy="165" rx="80" ry="16" fill="url(#sau-${e})"/>
+  <ellipse cx="100" cy="165" rx="50" ry="10" fill="#1558b0" opacity="0.6"/>
+  <ellipse cx="100" cy="165" rx="49" ry="9" fill="none" stroke="#8ab4f8" stroke-width="1.5"/>
+  <ellipse cx="100" cy="165" rx="40" ry="8" fill="#0f4185" opacity="0.5"/>
+
+  <path d="M 155 105 C 190 105, 185 145, 140 148" fill="none" stroke="#1a73e8"
+        stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <ellipse cx="100" cy="95" rx="55" ry="13.5" fill="url(#ins-${e})"/>
+  <ellipse cx="100" cy="95" rx="59" ry="15" fill="none" stroke="url(#cup-${e})" stroke-width="2.5"/>
+
+  <g class="g-belge">
+    <g transform="translate(75, 10)">
+      <rect x="0" y="0" width="50" height="70" rx="6" fill="url(#doc-${e})"/>
+      <rect x="0" y="0" width="50" height="2" rx="1" fill="#ffffff" opacity="0.4"/>
+      <rect x="12" y="14" width="26" height="4" rx="2" fill="#ffffff"/>
+      <rect x="12" y="24" width="16" height="4" rx="2" fill="#ffffff"/>
+      <rect x="12" y="34" width="22" height="4" rx="2" fill="#ffffff"/>
+      <rect x="12" y="44" width="12" height="4" rx="2" fill="#ffffff"/>
+    </g>
+  </g>
+
+  <path d="M 41 95 A 59 15 0 0 0 159 95 C 159 150, 135 165, 100 165 C 65 165, 41 150, 41 95 Z"
+        fill="url(#cup-${e})" stroke="url(#cup-${e})" stroke-width="2.5" stroke-linejoin="round"/>
+
+  <rect class="b1" x="70"  y="65" width="6" height="14" rx="3" fill="#8ab4f8"/>
+  <rect class="b2" x="84"  y="60" width="6" height="20" rx="3" fill="#669df6"/>
+  <rect class="b3" x="97"  y="55" width="6" height="26" rx="3" fill="#4285f4"/>
+  <rect class="b4" x="110" y="60" width="6" height="20" rx="3" fill="#669df6"/>
+  <rect class="b5" x="124" y="65" width="6" height="14" rx="3" fill="#8ab4f8"/>
 </svg>`;
+}
+
+/* Eski adıyla da kullanılabilsin (giriş sayfası bunu okuyor). */
+const GARANMIN_LOGO = garanminLogo('menu');
 
 /* ══════════════════════════════════════════════════════════════════════════
    İSKELET
@@ -352,6 +418,48 @@ function garanminCanli(ok, not) {
   el.classList.toggle('hata', !ok);
   yazi.textContent = ok ? (not || 'canli') : 'baglanti yok';
   if (not) el.title = not;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   MODAL
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/**
+ * Modalı açar.
+ *
+ * ESC VE PERDEYE TIKLAMA İLE DE KAPANIYOR. Yalnızca çarpı düğmesi bırakılsaydı,
+ * kapatmanın tek yolu ekranın sağ üst köşesindeki 30 piksellik bir hedefe nişan
+ * almak olurdu; ikisi de kullanıcının refleksle denediği yollar.
+ */
+function garanminModalAc(baslikHtml, govdeHtml) {
+  let p = document.getElementById('g-modal-perde');
+  if (!p) {
+    p = document.createElement('div');
+    p.id = 'g-modal-perde';
+    p.className = 'g-modal-perde';
+    p.innerHTML = `
+      <div class="g-modal" id="g-modal">
+        <div class="g-modal-bas" id="g-modal-bas"></div>
+        <div class="g-modal-govde" id="g-modal-govde"></div>
+      </div>`;
+    document.body.appendChild(p);
+
+    // Perdeye tıklamak kapatıyor; modalın İÇİNE tıklamak kapatmıyor.
+    p.addEventListener('click', function (e) { if (e.target === p) garanminModalKapat(); });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') garanminModalKapat();
+    });
+  }
+  document.getElementById('g-modal-bas').innerHTML = baslikHtml
+    + '<button class="g-modal-kapat" onclick="garanminModalKapat()" aria-label="Kapat">'
+    + '<i class="bx bx-x"></i></button>';
+  document.getElementById('g-modal-govde').innerHTML = govdeHtml;
+  p.classList.add('acik');
+}
+
+function garanminModalKapat() {
+  const p = document.getElementById('g-modal-perde');
+  if (p) p.classList.remove('acik');
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
