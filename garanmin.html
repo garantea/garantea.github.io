@@ -51,6 +51,60 @@
     </div>
   </div>
 
+  <!-- MODAL DİALOG (Kullanıcı Detayları İçin) -->
+  <div class="gt-modal-overlay" id="user-modal-overlay">
+    <div class="gt-modal">
+      <div class="gt-modal-header">
+        <h5 class="gt-modal-title" id="modal-title">Kullanıcı Detayı</h5>
+        <button class="icon-btn" id="modal-close">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="gt-modal-body">
+        <div id="modal-loader" class="loading-box">
+          <div class="spinner"></div> Yükleniyor...
+        </div>
+        <div id="modal-content" style="display:none;">
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <h6 class="fw-semibold mb-2">Cihazlar (<span id="m-dev-count">0</span>)</h6>
+              <div class="table-responsive" style="max-height: 200px;">
+                <table class="table table-sm">
+                  <thead><tr><th>Cihaz</th><th>Garanti</th></tr></thead>
+                  <tbody id="m-dev-list"></tbody>
+                </table>
+              </div>
+            </div>
+            <div class="col-md-6 mb-3">
+              <h6 class="fw-semibold mb-2">Ödemeler (<span id="m-pay-count">0</span>)</h6>
+              <div class="table-responsive" style="max-height: 200px;">
+                <table class="table table-sm">
+                  <thead><tr><th>Tutar</th><th>Tarih</th></tr></thead>
+                  <tbody id="m-pay-list"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-12">
+              <h6 class="fw-semibold mb-2">Destek Talepleri (<span id="m-tic-count">0</span>)</h6>
+              <div class="table-responsive" style="max-height: 150px;">
+                <table class="table table-sm">
+                  <thead><tr><th>Konu</th><th>Durum</th><th>Tarih</th></tr></thead>
+                  <tbody id="m-tic-list"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="gt-modal-footer">
+        <button class="btn btn-secondary btn-sm" id="modal-btn-close">Kapat</button>
+        <button class="btn btn-outline-primary btn-sm text-danger border-danger" id="modal-btn-delete">Kullanıcıyı Sil</button>
+      </div>
+    </div>
+  </div>
+
   <!-- SNEAT APP SHELL -->
   <div id="app" style="display:none;">
     <div class="layout-wrapper">
@@ -170,17 +224,20 @@
 
           <!-- CONTENT WRAPPER -->
           <div class="content-wrapper">
-            <div class="container-xxl flex-grow-1">
+            <div class="container-xxl flex-grow-1 h-100 p-3">
               
               <!-- PANEL: OVERVIEW -->
-              <div id="panel-overview" class="panel on">
-                <div class="row" id="ov-grid"></div>
+              <!-- Tek sayfa (non-scrollable) kontrol merkezi mantığı eklendi -->
+              <div id="panel-overview" class="panel on h-100">
+                <div class="row h-100" id="ov-grid">
+                  <!-- JS tarafından doldurulacak. -->
+                </div>
               </div>
 
               <!-- PANEL: FINANCE -->
               <div id="panel-finance" class="panel">
                 <h4 class="page-title">Finansal Raporlar</h4>
-                <div class="card"><div class="card-body"><div class="loading-box">Yakında Eklenecek.</div></div></div>
+                <div class="row" id="fin-grid"></div>
               </div>
 
               <!-- PANEL: USERS -->
@@ -200,8 +257,8 @@
                           <th>Kullanıcı</th>
                           <th>Kayıt Tarihi</th>
                           <th>Kredi Bakiye</th>
+                          <th>Ödenen</th>
                           <th>Cihaz</th>
-                          <th>Talep</th>
                         </tr>
                       </thead>
                       <tbody id="utbody"></tbody>
@@ -238,7 +295,7 @@
               <!-- PANEL: SECURITY -->
               <div id="panel-security" class="panel">
                 <h4 class="page-title">Güvenlik ve Loglar</h4>
-                <div class="card"><div class="card-body"><div class="loading-box">Yakında Eklenecek.</div></div></div>
+                <div class="row" id="sec-grid"></div>
               </div>
 
               <!-- PANEL: API -->
