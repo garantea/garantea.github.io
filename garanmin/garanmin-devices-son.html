@@ -44,6 +44,12 @@
           </div>
           <div class="g-kart-govde g-scroll">
             <table class="g-tablo">
+              <!-- Sütun genişlikleri SABİT (gerekçe: garanmin.css). Toplam %100. -->
+              <colgroup>
+                <col style="width:18%"><col style="width:12%"><col style="width:12%">
+                <col style="width:10%"><col style="width:11%"><col style="width:13%">
+                <col style="width:16%"><col style="width:8%">
+              </colgroup>
               <thead>
                 <tr><th>Cihaz</th><th>Marka</th><th>Kategori</th>
                     <th>Alim</th><th>Garanti bitisi</th><th>Durum</th>
@@ -110,14 +116,16 @@
           // Kullanici verisi `gEsc` ile kaciriliyor (gerekce: garanmin-api.js).
           tb.innerHTML = v.map(function (d) {
             const s = gDurum(durum(d.purchase_date, d.warranty_end));
+            /* `title`: sutunlar sabit genislikte oldugu icin uzun cihaz adi ve
+               e-posta kesiliyor; tam degere ustune gelince ulasilabilsin. */
             return '<tr>'
-              + '<td>' + gEsc(d.name) + '</td>'
-              + '<td>' + gEsc(d.brand) + '</td>'
+              + '<td title="' + gEsc(d.name) + '">' + gEsc(d.name) + '</td>'
+              + '<td title="' + gEsc(d.brand) + '">' + gEsc(d.brand) + '</td>'
               + '<td>' + gEsc(gKategori(d.category)) + '</td>'
               + '<td>' + gDate(d.purchase_date) + '</td>'
               + '<td>' + gDate(d.warranty_end) + '</td>'
               + '<td><span class="g-rozet ' + s.sinif + '">' + s.ad + '</span></td>'
-              + '<td class="text-muted">' + gEsc(d.email || '-') + '</td>'
+              + '<td class="text-muted" title="' + gEsc(d.email || '-') + '">' + gEsc(d.email || '-') + '</td>'
               + '<td class="text-muted">' + gGoreli(d.updated_at) + '</td>'
               + '</tr>';
           }).join('');

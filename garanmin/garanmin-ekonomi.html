@@ -58,7 +58,9 @@
             <div class="g-kart-bas"><i class="bx bx-trophy"></i> En çok kredisi olan kullanıcılar</div>
             <div class="g-kart-govde g-scroll">
               <table class="g-tablo">
-                <thead><tr><th>E-posta</th><th>Kredi</th><th>Izlenen reklam</th></tr></thead>
+                <!-- Sütun genişlikleri SABİT (gerekçe: garanmin.css). Toplam %100. -->
+                <colgroup><col style="width:50%"><col style="width:22%"><col style="width:28%"></colgroup>
+                <thead><tr><th>E-posta</th><th class="sayi">Kredi</th><th class="sayi">Izlenen reklam</th></tr></thead>
                 <tbody id="top"><tr><td colspan="3" class="text-muted">Yukleniyor...</td></tr></tbody>
               </table>
             </div>
@@ -138,9 +140,9 @@
 
           document.getElementById('top').innerHTML = (top && top.length)
             ? top.map(function (u) {
-                return '<tr><td>' + gEsc(u.email) + '</td>'
-                  + '<td>' + gNum(u.credits) + '</td>'
-                  + '<td>' + gNum(u.ads) + '</td></tr>';
+                return '<tr><td title="' + gEsc(u.email) + '">' + gEsc(u.email) + '</td>'
+                  + '<td class="sayi">' + gNum(u.credits) + '</td>'
+                  + '<td class="sayi">' + gNum(u.ads) + '</td></tr>';
               }).join('')
             : '<tr><td colspan="3" class="text-muted">Kayit yok</td></tr>';
 

@@ -43,6 +43,12 @@
             <div class="g-kart-bas"><i class="bx bx-message-detail"></i> Talepler</div>
             <div class="g-kart-govde g-scroll">
               <table class="g-tablo">
+                <!-- Sütun genişlikleri SABİT (gerekçe: garanmin.css). Toplam %100.
+                     Mesaj sütunu en geniş: kesilmek yerine saran tek sütun o. -->
+                <colgroup>
+                  <col style="width:15%"><col style="width:18%"><col style="width:12%">
+                  <col style="width:11%"><col style="width:14%"><col style="width:30%">
+                </colgroup>
                 <thead>
                   <tr><th>Tarih</th><th>Kullanıcı</th><th>Tür</th><th>Durum</th><th>Cihaz</th><th>Mesaj</th></tr>
                 </thead>
@@ -101,12 +107,14 @@
             ? liste.map(function (t) {
                 return '<tr>'
                   + '<td>' + gDateTime(t.created_at) + '</td>'
-                  + '<td>' + gEsc(t.email || '-') + '</td>'
+                  + '<td title="' + gEsc(t.email || '-') + '">' + gEsc(t.email || '-') + '</td>'
                   + '<td>' + gEsc(TUR[t.kind] || t.kind) + '</td>'
                   + '<td><span class="g-rozet ' + (ROZET[t.status] || 'mavi') + '">'
                     + gEsc(t.status) + '</span></td>'
                   + '<td>' + gEsc(t.device_name || '-') + '</td>'
-                  + '<td style="white-space:normal;max-width:420px">' + gEsc(t.message) + '</td>'
+                  /* `metin` sinifi: genisligi colgroup veriyor, hucre sarmali.
+                     Inline `max-width` sabit duzende yok sayiliyor. */
+                  + '<td class="metin">' + gEsc(t.message) + '</td>'
                   + '</tr>';
               }).join('')
             : '<tr><td colspan="6" class="text-muted">Talep yok</td></tr>';

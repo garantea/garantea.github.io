@@ -331,7 +331,10 @@ html, body {
 
 /* Uzun listeler yalnızca KENDİ kutusunda kayıyor: sayfa sabit kalırken tablo
    yine de tamamen okunabiliyor. */
-.g-scroll { overflow-y: auto; overflow-x: auto; height: 100%; }
+/* YATAY KAYDIRMA KAPALI. Sütunlar artık `colgroup` ile yüzde olarak tanımlı,
+   yani tablo her genişlikte kartın içine tam oturuyor; yatay kaydırma çubuğu
+   yalnızca eski `auto` düzenin taşmasını gizlemek için vardı. */
+.g-scroll { overflow-y: auto; overflow-x: hidden; height: 100%; }
 .g-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
 .g-scroll::-webkit-scrollbar-thumb { background: #DFE5EF; border-radius: 4px; }
 .g-scroll::-webkit-scrollbar-thumb:hover { background: #C7D0E0; }
@@ -368,7 +371,30 @@ html, body {
 
 /* ── TABLO ──────────────────────────────────────────────────────────────── */
 
-table.g-tablo { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 13px; }
+/*
+  ─── SÜTUN GENİŞLİKLERİ SABİT ─────────────────────────────────────────────
+
+  `table-layout: fixed` ve her tablonun kendi `<colgroup>`'u var.
+
+  Varsayılan `auto` düzende tarayıcı sütun genişliğini O AN İÇERİDEKİ VERİYE
+  göre hesaplıyor. Sonucu iki ayrı arıza oluyordu:
+
+  1. Tablo "Yukleniyor..." ile açılıyor, veri gelince genişlikler yeniden
+     hesaplanıyor ve bütün sütunlar zıplıyordu. Sayfa numarası değiştiğinde de
+     aynı şey oluyordu: uzun bir e-posta içeren sayfada sütunlar bir yerde,
+     kısa olanlarda başka yerde duruyordu.
+  2. Hücreler `nowrap` olduğu için tablonun doğal genişliği kartı aşıyor ve
+     içerik beyaz alanın dışına taşıyordu.
+
+  `fixed` düzende genişlikler `colgroup`'tan geliyor; veri hiç etkilemiyor.
+  Sığmayan metin kesilip "..." ile bitiyor — tam değer `title` ile hâlâ
+  erişilebilir olduğu için bilgi kaybı yok.
+*/
+table.g-tablo {
+  width: 100%; table-layout: fixed;
+  border-collapse: separate; border-spacing: 0; font-size: 13px;
+}
+table.g-tablo th, table.g-tablo td { overflow: hidden; text-overflow: ellipsis; }
 table.g-tablo th {
   text-align: left; font-size: 12px; text-transform: none; letter-spacing: 0;
   color: var(--g-soluk); font-weight: 500;
@@ -392,8 +418,13 @@ table.g-tablo tr.tiklanir { cursor: pointer; }
 table.g-tablo tr.tiklanir:hover { background: var(--g-primary-acik); }
 /* Sayı sütunları hizalı okunsun. */
 table.g-tablo td.sayi, table.g-tablo th.sayi { text-align: right; font-variant-numeric: tabular-nums; }
-/* Uzun serbest metin (destek mesajı) sarabilsin. */
-table.g-tablo td.metin { white-space: normal; min-width: 240px; max-width: 480px; line-height: 1.45; }
+/* Uzun serbest metin (destek mesajı) kesilmek yerine SARSIN. Genişliği zaten
+   `colgroup` veriyor; `min-width`/`max-width` sabit düzende yok sayılıyor. */
+table.g-tablo td.metin {
+  white-space: normal; overflow: visible; text-overflow: clip;
+  line-height: 1.45; vertical-align: top; word-break: break-word;
+}
+table.g-tablo tr:has(td.metin) td { vertical-align: top; }
 table.g-tablo .text-muted { color: var(--g-soluk-2) !important; }
 
 .g-rozet {

@@ -64,6 +64,8 @@
             <div class="g-kart-bas"><i class="bx bx-time-five"></i> Son eklenen cihazlar</div>
             <div class="g-kart-govde g-scroll">
               <table class="g-tablo">
+                <!-- Sütun genişlikleri SABİT (gerekçe: garanmin.css). Toplam %100. -->
+                <colgroup><col style="width:40%"><col style="width:25%"><col style="width:35%"></colgroup>
                 <thead><tr><th>Cihaz</th><th>Marka</th><th>Kullanıcı</th></tr></thead>
                 <tbody id="son-cihaz"><tr><td colspan="3" class="text-muted">Yukleniyor...</td></tr></tbody>
               </table>
@@ -197,9 +199,11 @@
         }
         // Kullanici verisi `gEsc` ile kaciriliyor (gerekce: garanmin-api.js).
         tb.innerHTML = v.map(function (d) {
-          return '<tr><td>' + gEsc(d.name) + '</td>'
-            + '<td>' + gEsc(d.brand) + '</td>'
-            + '<td class="text-muted">' + gEsc(d.email || '-') + '</td></tr>';
+          /* `title`: sutunlar sabit genislikte, uzun deger kesiliyor. */
+          return '<tr><td title="' + gEsc(d.name) + '">' + gEsc(d.name) + '</td>'
+            + '<td title="' + gEsc(d.brand) + '">' + gEsc(d.brand) + '</td>'
+            + '<td class="text-muted" title="' + gEsc(d.email || '-') + '">'
+              + gEsc(d.email || '-') + '</td></tr>';
         }).join('');
       }
     </script>

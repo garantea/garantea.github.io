@@ -60,6 +60,12 @@
 
           <div class="g-kart-govde g-scroll">
             <table class="g-tablo">
+              <!-- Sütun genişlikleri SABİT (gerekçe: garanmin.css). Toplam %100. -->
+              <colgroup>
+                <col style="width:34%"><col style="width:12%"><col style="width:13%">
+                <col style="width:9%"><col style="width:9%">
+                <col style="width:10%"><col style="width:9%"><col style="width:4%">
+              </colgroup>
               <thead>
                 <tr>
                   <th>E-posta</th><th>Kayit</th><th>Son giris</th>
@@ -160,8 +166,8 @@
             ? c.map(function (d) {
                 const s = gDurum(durum(d));
                 return '<tr>'
-                  + '<td>' + gEsc(d.ad) + '</td>'
-                  + '<td>' + gEsc(d.marka) + '</td>'
+                  + '<td title="' + gEsc(d.ad) + '">' + gEsc(d.ad) + '</td>'
+                  + '<td title="' + gEsc(d.marka) + '">' + gEsc(d.marka) + '</td>'
                   + '<td>' + gEsc(gKategori(d.kategori)) + '</td>'
                   + '<td>' + gEsc(d.oda) + '</td>'
                   + '<td>' + gDate(d.alim) + '</td>'
@@ -211,7 +217,14 @@
             /* Cihaz listesi kendi kutusunda kayiyor: 40 cihazi olan bir kullanicida
                modal ekrandan tasmasin, 2 cihazi olanda da bos yer kalmasin. */
             +     '<div class="g-kart-govde g-scroll" style="max-height:260px">'
-            +       '<table class="g-tablo"><thead><tr>'
+            +       '<table class="g-tablo">'
+            /* Sutun genislikleri SABIT (gerekce: garanmin.css). Toplam %100. */
+            +       '<colgroup>'
+            +         '<col style="width:18%"><col style="width:12%"><col style="width:13%">'
+            +         '<col style="width:11%"><col style="width:11%"><col style="width:11%">'
+            +         '<col style="width:15%"><col style="width:9%">'
+            +       '</colgroup>'
+            +       '<thead><tr>'
             +         '<th>Cihaz</th><th>Marka</th><th>Kategori</th><th>Oda</th>'
             +         '<th>Alim</th><th>Bitis</th><th>Durum</th><th>Fatura</th>'
             +       '</tr></thead><tbody>' + cihazHtml + '</tbody></table>'
@@ -222,7 +235,13 @@
             + '<div class="g-kart">'
             +   '<div class="g-kart-bas"><i class="bx bx-support"></i> Destek talepleri</div>'
             +   '<div class="g-kart-govde g-scroll" style="max-height:180px">'
-            +     '<table class="g-tablo"><thead><tr>'
+            +     '<table class="g-tablo">'
+            /* Sutun genislikleri SABIT (gerekce: garanmin.css). Toplam %100. */
+            +     '<colgroup>'
+            +       '<col style="width:16%"><col style="width:14%">'
+            +       '<col style="width:12%"><col style="width:58%">'
+            +     '</colgroup>'
+            +     '<thead><tr>'
             +       '<th>Tarih</th><th>Tur</th><th>Durum</th><th>Mesaj</th>'
             +     '</tr></thead><tbody>' + talepHtml + '</tbody></table>'
             +   '</div>'
@@ -246,7 +265,9 @@
             tb.innerHTML = v.map(function (u) {
               const eposta = gEsc(u.email || '-');
               return '<tr class="tiklanir" onclick="detay(\'' + gEsc(u.id) + '\',\'' + eposta + '\')">'
-                + '<td>' + eposta + '</td>'
+                /* `title`: sutun sabit genislikte oldugu icin uzun e-posta
+                   kesiliyor; tam degere ustune gelince ulasilabilsin. */
+                + '<td title="' + eposta + '">' + eposta + '</td>'
                 + '<td>' + gDate(u.created_at) + '</td>'
                 + '<td>' + gGoreli(u.last_sign_in_at) + '</td>'
                 + '<td class="sayi"><span class="g-rozet mavi">' + gNum(u.device_count) + '</span></td>'
