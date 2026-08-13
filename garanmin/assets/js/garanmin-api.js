@@ -274,55 +274,110 @@ const GARANMIN_MENU = [
  */
 function garanminLogo() {
   return `
-<svg class="g-logo" viewBox="0 0 200 200" aria-hidden="true">
+<svg class="g-logo" viewBox="0 0 200 200" style="overflow:visible" aria-hidden="true">
   <defs>
-    <linearGradient id="cup-g" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#053582"/><stop offset="20%" stop-color="#0B57D0"/>
-      <stop offset="80%" stop-color="#4285F4"/><stop offset="100%" stop-color="#8ab4f8"/>
+    <linearGradient id="docFade" x1="0" y1="80" x2="0" y2="105" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="white" />
+      <stop offset="100%" stop-color="black" />
     </linearGradient>
-    <linearGradient id="ins-g" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#03204e"/><stop offset="20%" stop-color="#053582"/>
-      <stop offset="80%" stop-color="#0B57D0"/><stop offset="100%" stop-color="#1a73e8"/>
+    <linearGradient id="cupGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#053582" />
+      <stop offset="20%" stop-color="#0B57D0" />
+      <stop offset="80%" stop-color="#4285F4" />
+      <stop offset="100%" stop-color="#8ab4f8" />
     </linearGradient>
-    <linearGradient id="sau-g" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#1a73e8"/><stop offset="100%" stop-color="#0f4185"/>
+    <linearGradient id="insideCupGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#03204e" />
+      <stop offset="20%" stop-color="#053582" />
+      <stop offset="80%" stop-color="#0B57D0" />
+      <stop offset="100%" stop-color="#1a73e8" />
     </linearGradient>
-    <linearGradient id="doc-g" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#EA4335"/><stop offset="100%" stop-color="#B31412"/>
+    <linearGradient id="saucerGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#1a73e8" />
+      <stop offset="100%" stop-color="#0f4185" />
     </linearGradient>
+    <linearGradient id="docGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#EA4335" />
+      <stop offset="100%" stop-color="#B31412" />
+    </linearGradient>
+    <mask id="fadeMask" maskUnits="userSpaceOnUse" x="0" y="0" width="200" height="200">
+      <rect x="0" y="0" width="200" height="200" fill="url(#docFade)" />
+    </mask>
   </defs>
 
-  <ellipse cx="100" cy="176" rx="65" ry="8" fill="#e2e8f0"/>
-  <ellipse cx="100" cy="165" rx="80" ry="16" fill="url(#sau-g)"/>
-  <ellipse cx="100" cy="165" rx="50" ry="10" fill="#1558b0" opacity="0.6"/>
-  <ellipse cx="100" cy="165" rx="49" ry="9" fill="none" stroke="#8ab4f8" stroke-width="1.5"/>
-  <ellipse cx="100" cy="165" rx="40" ry="8" fill="#0f4185" opacity="0.5"/>
+  <style>
+    .g-anim-doc { animation: docAnim 4s linear infinite; }
+    .g-anim-st1 { animation: st1 4s infinite; }
+    .g-anim-st2 { animation: st2 4s infinite; }
+    .g-anim-st3 { animation: st3 4s infinite; }
+    .g-anim-st4 { animation: st4 4s infinite; }
+    .g-anim-st5 { animation: st5 4s infinite; }
 
-  <path d="M 155 105 C 190 105, 185 145, 140 148" fill="none" stroke="#1a73e8"
-        stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+    @keyframes docAnim {
+      0% { transform: translate(75px, 5px); opacity: 0; }
+      5% { transform: translate(75px, 5px); opacity: 1; }
+      45% { transform: translate(75px, 110px); opacity: 1; }
+      100% { transform: translate(75px, 110px); opacity: 0; }
+    }
+    @keyframes st1 {
+      0%, 45% { transform: translateY(15px); opacity: 0; height: 14px; }
+      75% { transform: translateY(-15px); opacity: 0.7; height: 22px; }
+      100% { transform: translateY(-15px); opacity: 0; height: 22px; }
+    }
+    @keyframes st2 {
+      0%, 40% { transform: translateY(15px); opacity: 0; height: 20px; }
+      80% { transform: translateY(-25px); opacity: 0.85; height: 32px; }
+      100% { transform: translateY(-25px); opacity: 0; height: 32px; }
+    }
+    @keyframes st3 {
+      0%, 45% { transform: translateY(15px); opacity: 0; height: 26px; }
+      85% { transform: translateY(-35px); opacity: 0.95; height: 42px; }
+      100% { transform: translateY(-35px); opacity: 0; height: 42px; }
+    }
+    @keyframes st4 {
+      0%, 50% { transform: translateY(15px); opacity: 0; height: 20px; }
+      90% { transform: translateY(-25px); opacity: 0.85; height: 32px; }
+      100% { transform: translateY(-25px); opacity: 0; height: 32px; }
+    }
+    @keyframes st5 {
+      0%, 42% { transform: translateY(15px); opacity: 0; height: 14px; }
+      72% { transform: translateY(-15px); opacity: 0.7; height: 22px; }
+      100% { transform: translateY(-15px); opacity: 0; height: 22px; }
+    }
+  </style>
 
-  <ellipse cx="100" cy="95" rx="55" ry="13.5" fill="url(#ins-g)"/>
-  <ellipse cx="100" cy="95" rx="59" ry="15" fill="none" stroke="url(#cup-g)" stroke-width="2.5"/>
+  <ellipse cx="100" cy="176" rx="65" ry="8" fill="rgba(255,255,255,0.2)" />
+  <ellipse cx="100" cy="165" rx="80" ry="16" fill="url(#saucerGradient)" />
+  <ellipse cx="100" cy="165" rx="50" ry="10" fill="#1558b0" opacity="0.6" />
+  <ellipse cx="100" cy="165" rx="49" ry="9" fill="none" stroke="#8ab4f8" stroke-width="1.5" />
+  <ellipse cx="100" cy="165" rx="40" ry="8" fill="#0f4185" opacity="0.5" />
 
-  <g class="g-belge">
-    <g transform="translate(75, 10)">
-      <rect x="0" y="0" width="50" height="70" rx="6" fill="url(#doc-g)"/>
-      <rect x="0" y="0" width="50" height="2" rx="1" fill="#ffffff" opacity="0.4"/>
-      <rect x="12" y="14" width="26" height="4" rx="2" fill="#ffffff"/>
-      <rect x="12" y="24" width="16" height="4" rx="2" fill="#ffffff"/>
-      <rect x="12" y="34" width="22" height="4" rx="2" fill="#ffffff"/>
-      <rect x="12" y="44" width="12" height="4" rx="2" fill="#ffffff"/>
+  <path d="M 156 106 C 188 106, 185 146, 145 148" fill="none" stroke="url(#cupGradient)" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" />
+
+  <ellipse cx="100" cy="95" rx="60" ry="16" fill="url(#insideCupGradient)" />
+  <ellipse cx="100" cy="95" rx="60" ry="16" fill="none" stroke="url(#cupGradient)" stroke-width="2.5" />
+
+  <g mask="url(#fadeMask)">
+    <g class="g-anim-doc">
+      <rect x="0" y="0" width="50" height="70" rx="6" fill="url(#docGradient)" />
+      <rect x="0" y="0" width="50" height="2" rx="1" fill="#ffffff" opacity="0.4" />
+      <rect x="10" y="16" width="30" height="4" rx="2" fill="#ffffff" />
+      <rect x="10" y="28" width="20" height="4" rx="2" fill="#ffffff" />
+      <rect x="10" y="40" width="25" height="4" rx="2" fill="#ffffff" />
+      <rect x="10" y="52" width="15" height="4" rx="2" fill="#ffffff" />
     </g>
   </g>
 
-  <path d="M 41 95 A 59 15 0 0 0 159 95 C 159 150, 135 165, 100 165 C 65 165, 41 150, 41 95 Z"
-        fill="url(#cup-g)" stroke="url(#cup-g)" stroke-width="2.5" stroke-linejoin="round"/>
+  <path d="M 40 95 A 60 16 0 0 0 160 95 C 160 150, 135 165, 100 165 C 65 165, 40 150, 40 95 Z" fill="url(#cupGradient)" stroke="url(#cupGradient)" stroke-width="2.5" stroke-linejoin="round" />
+  <path d="M 40 95 A 60 16 0 0 0 160 95" fill="none" stroke="url(#cupGradient)" stroke-width="2.5" />
 
-  <rect class="b1" x="70"  y="65" width="6" height="14" rx="3" fill="#8ab4f8"/>
-  <rect class="b2" x="84"  y="60" width="6" height="20" rx="3" fill="#669df6"/>
-  <rect class="b3" x="97"  y="55" width="6" height="26" rx="3" fill="#4285f4"/>
-  <rect class="b4" x="110" y="60" width="6" height="20" rx="3" fill="#669df6"/>
-  <rect class="b5" x="124" y="65" width="6" height="14" rx="3" fill="#8ab4f8"/>
+  <g>
+    <rect x="70" y="65" width="6" height="14" rx="3" fill="#8ab4f8" class="g-anim-st1" />
+    <rect x="84" y="60" width="6" height="20" rx="3" fill="#669df6" class="g-anim-st2" />
+    <rect x="97" y="55" width="6" height="26" rx="3" fill="#4285f4" class="g-anim-st3" />
+    <rect x="110" y="60" width="6" height="20" rx="3" fill="#669df6" class="g-anim-st4" />
+    <rect x="124" y="65" width="6" height="14" rx="3" fill="#8ab4f8" class="g-anim-st5" />
+  </g>
 </svg>`;
 }
 
