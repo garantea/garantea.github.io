@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="tr" data-theme="dark">
+<html lang="tr" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -12,8 +12,13 @@
   <link rel="manifest" href="manifest.json">
 </head>
 <body>
-  <!-- BACKGROUND BLOBS -->
-  <div class="bg"><span class="blob-1"></span><span class="blob-2"></span></div>
+  <!-- BACKGROUND BLOBS (Garantea Brand) -->
+  <div class="bg">
+    <span class="red"></span>
+    <span class="blue"></span>
+    <span class="deep"></span>
+    <div class="wash"></div>
+  </div>
 
   <!-- LOGIN SCREEN -->
   <div id="login-screen">
@@ -22,7 +27,7 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:32px;height:32px;color:var(--blue)">
           <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
         </svg>
-        <span class="lbrand-name">GaranTea</span>
+        <span class="lbrand-name"><span class="g">Garan</span><span class="t">Tea</span></span>
       </div>
       <div class="ltagline">Yönetim Kontrol Merkezi (v3)</div>
       
@@ -53,7 +58,7 @@
               <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
             </svg>
             <div class="sb-brand-text">
-              <div class="sb-name">GaranTea</div>
+              <div class="sb-name"><span class="g">Garan</span><span class="t">Tea</span></div>
               <div class="sb-tag">Admin Panel</div>
             </div>
           </div>
@@ -71,27 +76,45 @@
       </div>
       
       <nav class="sb-nav">
-        <div class="sb-sec">Analitik</div>
+        <!-- BÖLÜM 1: GENEL ANALİTİKLER -->
+        <div class="sb-sec">Genel Analitikler</div>
         <a class="nitem on" data-panel="overview">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/></svg>
           <span>Kontrol Merkezi</span>
         </a>
+        <a class="nitem" data-panel="finance">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          <span>Finansal Raporlar</span>
+        </a>
+
+        <!-- BÖLÜM 2: VERİTABANI YÖNETİMİ -->
+        <div class="sb-sec">Veritabanı Yönetimi</div>
         <a class="nitem" data-panel="users">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
           <span>Kullanıcı Veritabanı</span>
         </a>
-        <div class="sb-sec">Modüller</div>
         <a class="nitem" data-panel="devices">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
           <span>Cihaz Envanteri</span>
         </a>
+        <a class="nitem" data-panel="support">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>
+          <span>Destek Talepleri</span>
+        </a>
+
+        <!-- BÖLÜM 3: SİSTEM VE AYARLAR -->
+        <div class="sb-sec">Sistem ve Ayarlar</div>
         <a class="nitem" data-panel="credits">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v8"/><path d="M8 12h8"/></svg>
           <span>Kredi Ekonomisi</span>
         </a>
-        <a class="nitem" data-panel="support">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>
-          <span>Destek Talepleri</span>
+        <a class="nitem" data-panel="security">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          <span>Güvenlik ve Loglar</span>
+        </a>
+        <a class="nitem" data-panel="api">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+          <span>API Ayarları</span>
         </a>
       </nav>
 
@@ -124,9 +147,12 @@
         
         <!-- PANEL: OVERVIEW -->
         <div id="panel-overview" class="panel on">
-          <div class="bento bento-overview" id="ov-grid">
-            <!-- KPIs (Will be filled by JS) -->
-          </div>
+          <div class="bento bento-overview" id="ov-grid"></div>
+        </div>
+
+        <!-- PANEL: FINANCE (DUMMY) -->
+        <div id="panel-finance" class="panel">
+          <div class="card" style="flex:1"><div class="chead"><div class="clabel">Finansal Raporlar</div></div><div class="cbody" style="align-items:center;justify-content:center;color:var(--muted)">Yakında eklenecek.</div></div>
         </div>
 
         <!-- PANEL: USERS -->
@@ -170,23 +196,27 @@
 
         <!-- PANEL: DEVICES -->
         <div id="panel-devices" class="panel">
-          <div class="bento bento-2" id="dev-grid">
-            <!-- Filled by JS -->
-          </div>
+          <div class="bento bento-2" id="dev-grid"></div>
         </div>
 
         <!-- PANEL: CREDITS -->
         <div id="panel-credits" class="panel">
-          <div class="bento bento-3" id="cr-grid">
-            <!-- Filled by JS -->
-          </div>
+          <div class="bento bento-3" id="cr-grid"></div>
         </div>
 
         <!-- PANEL: SUPPORT -->
         <div id="panel-support" class="panel">
-          <div class="bento bento-2" id="sup-grid">
-            <!-- Filled by JS -->
-          </div>
+          <div class="bento bento-2" id="sup-grid"></div>
+        </div>
+
+        <!-- PANEL: SECURITY (DUMMY) -->
+        <div id="panel-security" class="panel">
+          <div class="card" style="flex:1"><div class="chead"><div class="clabel">Güvenlik ve Loglar</div></div><div class="cbody" style="align-items:center;justify-content:center;color:var(--muted)">Yakında eklenecek.</div></div>
+        </div>
+
+        <!-- PANEL: API (DUMMY) -->
+        <div id="panel-api" class="panel">
+          <div class="card" style="flex:1"><div class="chead"><div class="clabel">API Ayarları</div></div><div class="cbody" style="align-items:center;justify-content:center;color:var(--muted)">Yakında eklenecek.</div></div>
         </div>
 
       </div>

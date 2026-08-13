@@ -1,6 +1,6 @@
 /**
- * GaranTea — Admin Panel v3 (garanmin.js)
- * Advanced Analytics & Bento Grid
+ * GaranTea — Admin Panel v3.1 (garanmin.js)
+ * Brand Colors & Fixes
  */
 
 'use strict';
@@ -22,16 +22,27 @@ let clockTick = null;
 
 const PANEL_TITLES = {
   overview: 'Kontrol Merkezi',
+  finance:  'Finansal Raporlar',
   users:    'Kullanıcı Veritabanı',
   devices:  'Cihaz Envanteri',
-  credits:  'Kredi Ekonomisi',
   support:  'Destek Talepleri',
+  credits:  'Kredi Ekonomisi',
+  security: 'Güvenlik ve Loglar',
+  api:      'API Ayarları'
 };
 
-// Koyu/Endüstriyel renk paleti
+// Yalnızca GaranTea marka renkleri
 const PALETTE = [
-  '#3b82f6', '#8b5cf6', '#10b981', '#f59e0b', '#ef4444', 
-  '#06b6d4', '#ec4899', '#f97316', '#64748b', '#84cc16'
+  '#2563eb', // blue
+  '#EA4335', // red
+  '#0B57D0', // deep blue
+  '#f87171', // light red
+  '#60a5fa', // light blue
+  '#991b1b', // dark red
+  '#1e40af', // dark blue
+  '#fca5a5', // lighter red
+  '#93c5fd', // lighter blue
+  '#7f1d1d'  // darkest red
 ];
 
 Chart.defaults.font.family = "'Inter', sans-serif";
@@ -166,7 +177,14 @@ document.getElementById('theme-btn').addEventListener('click', () => {
   });
 });
 
-if (localStorage.getItem('gt_theme') === 'light') document.getElementById('theme-btn').click();
+// Sync Theme Button Icon on load
+if (htmlEl.getAttribute('data-theme') === 'light') {
+  document.getElementById('icon-moon').style.display = 'block';
+  document.getElementById('icon-sun').style.display = 'none';
+} else {
+  document.getElementById('icon-moon').style.display = 'none';
+  document.getElementById('icon-sun').style.display = 'block';
+}
 
 const sidebar = document.getElementById('sidebar');
 document.getElementById('sb-toggle').addEventListener('click', () => {
@@ -190,14 +208,20 @@ document.getElementById('refresh-btn').addEventListener('click', () => {
 });
 
 async function loadPanel(name) {
+  // Hide all panels
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('on'));
+  
+  // Show target panel
   const t = document.getElementById('panel-' + name);
   if (t) t.classList.add('on');
+  else return; // If panel DOM doesn't exist, exit
+
+  // Load data asynchronously (errors caught inside to prevent breaking nav)
   if (name === 'overview') await renderOverview();
-  if (name === 'users') await loadUsers(0);
-  if (name === 'devices') await renderDevices();
-  if (name === 'credits') await renderCredits();
-  if (name === 'support') await renderSupport();
+  else if (name === 'users') await loadUsers(0);
+  else if (name === 'devices') await renderDevices();
+  else if (name === 'credits') await renderCredits();
+  else if (name === 'support') await renderSupport();
 }
 
 // ─── ICONS ────────────────────────────────────────────────────────
@@ -242,8 +266,8 @@ async function renderOverview() {
 
     g.innerHTML = `
       ${buildKpi('Kullanıcı (DAU/MAU)', `${fmt(stats.dau)} <span style="font-size:1rem;color:var(--muted)">/ ${fmt(stats.mau)}</span>`, ic.users, 'blue', `Son 30 günde ${fmt(stats.new_users_30d)} yeni kayıt`, true)}
-      ${buildKpi('Eklenen Cihaz', fmt(stats.total_devices), ic.device, 'amber', `${fmt(stats.users_with_devices)} aktif cihaz sahibi`, null)}
-      ${buildKpi('Ekonomi Hacmi', fmt(Math.round(stats.total_credits_sum)), ic.credit, 'green', `${fmt(Math.round(stats.total_ads_watched))} reklam izlendi`, true)}
+      ${buildKpi('Eklenen Cihaz', fmt(stats.total_devices), ic.device, 'blue', `${fmt(stats.users_with_devices)} aktif cihaz sahibi`, null)}
+      ${buildKpi('Ekonomi Hacmi', fmt(Math.round(stats.total_credits_sum)), ic.credit, 'red', `${fmt(Math.round(stats.total_ads_watched))} reklam izlendi`, true)}
       ${buildKpi('Destek Talebi', fmt(stats.support_tickets_total), ic.activity, 'red', `Son 7 günde ${fmt(stats.support_tickets_7d)} talep`, false)}
       ${buildChartCard('chart-main', 'Büyüme Hızı', ic.activity, 'ch-act')}
       ${buildChartCard('chart-side', 'Top 10 Marka', ic.pie, 'ch-brands')}
@@ -256,7 +280,7 @@ async function renderOverview() {
       type: 'line',
       data: { labels: trend.map(r=>r.date), datasets: [{
         label: 'Yeni Kayıt', data: trend.map(r=>r.count),
-        borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,0.15)',
+        borderColor: '#2563eb', backgroundColor: 'rgba(37,99,235,0.15)',
         fill: true, tension: 0.4, borderWidth: 2, pointRadius: 0, pointHitRadius: 10
       }]},
       options: {
@@ -285,7 +309,7 @@ async function renderOverview() {
     // 3. Bar for Warranty
     destroyChart('chWarranty');
     const wLabels = {'active':'Devam Ediyor', 'expiring_soon':'30 Günden Az', 'expired':'Süresi Dolmuş'};
-    const wColors = {'active':'#10b981', 'expiring_soon':'#f59e0b', 'expired':'#ef4444'};
+    const wColors = {'active':'#2563eb', 'expiring_soon':'#0B57D0', 'expired':'#EA4335'};
     chartRefs.chWarranty = new Chart(document.getElementById('ch-warranty').getContext('2d'), {
       type: 'bar',
       data: {
@@ -332,7 +356,7 @@ async function loadUsers(offset=0) {
         <td>${fmtDate(u.created_at)}</td>
         <td>${fmtDatetime(u.last_sign_in_at)}</td>
         <td><span class="badge bd-b">${fmt(u.credits)}</span></td>
-        <td><span class="badge ${u.device_count>0?'bd-g':'bd-mu'}">${fmt(u.device_count)}</span></td>
+        <td><span class="badge ${u.device_count>0?'bd-b':'bd-mu'}">${fmt(u.device_count)}</span></td>
         <td><span class="badge ${u.ticket_count>0?'bd-r':'bd-mu'}">${fmt(u.ticket_count)}</span></td>
         <td><span class="peek">İncele →</span></td>
       </tr>
@@ -386,8 +410,7 @@ async function fetchUserDetail(uid) {
 function wBadge(endIso) {
   if (!endIso) return ''; const days = Math.round((new Date(endIso) - new Date()) / 86400000);
   if (days<0) return '<span class="badge bd-r">Bitti</span>';
-  if (days<30) return `<span class="badge bd-a">${days}g Kaldı</span>`;
-  return `<span class="badge bd-g">${days}g Kaldı</span>`;
+  return `<span class="badge bd-b">${days}g Kaldı</span>`;
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -414,7 +437,7 @@ async function renderDevices() {
     destroyChart('chDrooms');
     chartRefs.chDrooms = new Chart(document.getElementById('ch-drooms').getContext('2d'), {
       type: 'bar',
-      data: { labels: rooms.map(r=>r.room), datasets: [{ label:'Cihaz', data: rooms.map(r=>r.count), backgroundColor: '#8b5cf6', borderRadius:4 }] },
+      data: { labels: rooms.map(r=>r.room), datasets: [{ label:'Cihaz', data: rooms.map(r=>r.count), backgroundColor: '#2563eb', borderRadius:4 }] },
       options: { responsive:true, maintainAspectRatio:false, plugins: { legend: {display:false} }, scales: { x: {grid:{display:false}}, y: {grid:{color:getGridColor()}, beginAtZero:true} } }
     });
   } catch(e) { g.innerHTML = `<div class="ebox">Hata: ${e.message}</div>`; }
@@ -443,7 +466,7 @@ async function renderCredits() {
     destroyChart('chCr');
     chartRefs.chCr = new Chart(document.getElementById('ch-cr').getContext('2d'), {
       type: 'bar',
-      data: { labels: dist.map(d=>d.bucket + ' CR'), datasets: [{ data: dist.map(d=>d.count), backgroundColor: '#10b981', borderRadius:4 }] },
+      data: { labels: dist.map(d=>d.bucket + ' CR'), datasets: [{ data: dist.map(d=>d.count), backgroundColor: '#EA4335', borderRadius:4 }] },
       options: { responsive:true, maintainAspectRatio:false, plugins: { legend: {display:false} }, scales: { x: {grid:{display:false}}, y: {grid:{color:getGridColor()}, beginAtZero:true} } }
     });
   } catch(e) { g.innerHTML = `<div class="ebox">Hata: ${e.message}</div>`; }
