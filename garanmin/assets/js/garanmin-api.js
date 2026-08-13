@@ -274,7 +274,7 @@ const GARANMIN_MENU = [
  */
 function garanminLogo() {
   return `
-<svg class="g-logo" viewBox="0 0 200 200" width="100%" height="100%" style="overflow:visible" aria-hidden="true">
+<svg class="g-logo" viewBox="0 0 200 200" style="overflow:visible" aria-hidden="true">
   <defs>
     <linearGradient id="docFade" x1="0" y1="80" x2="0" y2="105" gradientUnits="userSpaceOnUse">
       <stop offset="0%" stop-color="white" />
