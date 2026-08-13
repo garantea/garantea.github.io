@@ -806,13 +806,58 @@ function gGrafikTemel(yukseklik) {
 */
 function garanminGrafikGozlemci() {
   const hedef = document.querySelector('.content');
-  if (!hedef || typeof ResizeObserver === 'undefined') return;
-  let zaman = null, sonGenislik = 0;
-  new ResizeObserver(function (kayitlar) {
-    const g = Math.round(kayitlar[0].contentRect.width);
-    if (g === sonGenislik) return;   // yalnızca GENİŞLİK önemli; yükseklik değişimi
-    sonGenislik = g;                 // grafiği ilgilendirmiyor ve döngü yaratırdı
+  if (!hedef) return;
+
+  let zaman = null;
+  function olc() {
     clearTimeout(zaman);
-    zaman = setTimeout(function () { window.dispatchEvent(new Event('resize')); }, 120);
-  }).observe(hedef);
+    zaman = setTimeout(function () { window.dispatchEvent(new Event('resize')); }, 60);
+  }
+
+  /*
+    ─── ÖLÇÜM 1: KAP GENİŞLİĞİ DEĞİŞTİĞİNDE ────────────────────────────────
+    Kenar çubuğu katlandığında ya da pencere değiştiğinde.
+  */
+  if (typeof ResizeObserver !== 'undefined') {
+    let sonGenislik = 0;
+    new ResizeObserver(function (kayitlar) {
+      const g = Math.round(kayitlar[0].contentRect.width);
+      if (g === sonGenislik) return;   // yalnızca GENİŞLİK önemli; yükseklik değişimi
+      sonGenislik = g;                 // grafiği ilgilendirmiyor ve döngü yaratırdı
+      olc();
+    }).observe(hedef);
+  }
+
+  /*
+    ─── ÖLÇÜM 2: GRAFİK SAYFAYA GİRDİĞİ ANDA ───────────────────────────────
+
+    ASIL DÜZELTME BURASI. Yukarıdaki gözlemci sayfa açılışında bir kez tetikleniyor
+    ama o an henüz hiçbir grafik çizilmemiş oluyor — veri ağdan geliyor, grafikler
+    yüzlerce milisaniye sonra doğuyor. Ondan sonra kabın genişliği bir daha
+    değişmediği için gözlemci bir daha hiç çalışmıyordu.
+
+    Sonuç: grafik kendi genişliğini ÇİZİM ANINDA bir kez ölçüp piksel olarak
+    sabitliyor ve o ölçüm yanlışsa (yazı tipi henüz inmemiş, kart animasyonu
+    sürüyor) öyle kalıyordu — kabından geniş çizilen grafik de kırpılıyordu.
+
+    `MutationObserver` her yeni `.apexcharts-canvas` düğümünü yakalayıp yeniden
+    ölçüm tetikliyor: artık ölçüm, düzen oturduktan SONRA da bir kez daha yapılıyor.
+  */
+  if (typeof MutationObserver !== 'undefined') {
+    new MutationObserver(function (kayitlar) {
+      for (const k of kayitlar) {
+        for (const d of k.addedNodes) {
+          if (d.nodeType === 1 &&
+              (d.classList.contains('apexcharts-canvas') || d.querySelector?.('.apexcharts-canvas'))) {
+            olc();
+            return;
+          }
+        }
+      }
+    }).observe(hedef, { childList: true, subtree: true });
+  }
+
+  /* Yazı tipleri geç indiğinde metin genişlikleri değişiyor ve eksen etiketleri
+     kayıyor; yüklenme sözü verildiğinde son bir ölçüm daha. */
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(olc);
 }

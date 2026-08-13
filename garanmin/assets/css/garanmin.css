@@ -344,11 +344,22 @@ html, body { margin: 0; min-height: 100%; }
 .apexcharts-canvas { max-width: 100% !important; }
 .apexcharts-canvas svg { max-width: 100%; }
 
-/* Grafik kabı — ApexCharts yüzde yükseklik için TANIMLI bir yükseklik istiyor;
-   kabın yüksekliği içeriğe bağlı kalsaydı grafik sıfır yükseklikte çizilirdi. */
-.g-grafik { height: 260px; min-height: 260px; width: 100%; overflow: hidden; position: relative; }
-.g-grafik.kisa { height: 200px; min-height: 200px; }
-.g-grafik.uzun { height: 320px; min-height: 320px; }
+/*
+  Grafik kabı — ApexCharts yüzde yükseklik için TANIMLI bir yükseklik istiyor;
+  kabın yüksekliği içeriğe bağlı kalsaydı grafik sıfır yükseklikte çizilirdi.
+
+  YÜKSEKLİKLER CÖMERT. Bir halka grafiğin altındaki gösterge, çubuk grafiğin
+  eksen etiketleri ve tarih dizisi hep aynı yüksekliği paylaşıyor; kap dar
+  olduğunda ApexCharts önce göstergeyi, sonra etiketleri kısaltıyor ve grafik
+  "sıkışmış" görünüyor. Kart zaten sayfayla birlikte uzuyor, bu yüzden burada
+  cimrilik etmenin bir kazancı yok.
+*/
+.g-grafik {
+  height: 290px; min-height: 290px; width: 100%;
+  overflow: hidden; position: relative;
+}
+.g-grafik.kisa { height: 215px; min-height: 215px; }
+.g-grafik.uzun { height: 345px; min-height: 345px; }
 
 /* Şablonun 12 sütunlu ızgarasında eksik olan genişlikler. */
 .col-3 { grid-column: span 3; }
