@@ -554,11 +554,11 @@ const GARANMIN_KATEGORI = {
 };
 function gKategori(k) { return GARANMIN_KATEGORI[k] || k || 'Diger'; }
 
-/** Garanti durumu → etiket + renk. Uygulamadaki rozetlerle aynı anlam. */
+/** Garanti durumu → etiket + renk. Rozet sınıflarıyla AYNI renk ailesi. */
 const GARANMIN_DURUM = {
-  active:        { ad: 'Aktif',            renk: '#2563eb', sinif: 'mavi' },
-  expiring_soon: { ad: 'Yakinda bitiyor',  renk: '#f59e0b', sinif: 'turuncu' },
-  expired:       { ad: 'Suresi dolmus',    renk: '#dc2626', sinif: 'kirmizi' },
+  active:        { ad: 'Aktif',            renk: '#5D87FF', sinif: 'mavi' },
+  expiring_soon: { ad: 'Yakinda bitiyor',  renk: '#FFAE1F', sinif: 'turuncu' },
+  expired:       { ad: 'Suresi dolmus',    renk: '#FA896B', sinif: 'kirmizi' },
 };
 function gDurum(k) { return GARANMIN_DURUM[k] || { ad: k, renk: '#6b7280', sinif: '' }; }
 
@@ -576,14 +576,55 @@ function gKap(id) {
   return d;
 }
 
-/** ApexCharts için ortak ayarlar — grafikler birbirine benzesin diye tek yerde. */
-const G_RENK = ['#2563eb', '#16a34a', '#f59e0b', '#dc2626', '#7c3aed', '#0891b2', '#64748b'];
+/**
+ * ApexCharts için ortak ayarlar — grafikler birbirine benzesin diye tek yerde.
+ *
+ * PALET CSS'TEKİYLE AYNI. Grafik renkleri ayrı seçilseydi, aynı "yakında bitiyor"
+ * kavramı rozette bir turuncu, halkada başka bir turuncu olurdu ve iki şeyden
+ * bahsedildiği izlenimi doğardı.
+ *
+ * Eksen ve ızgara SOLUK: veri çizgisinden daha görünür bir ızgara, okunması
+ * gereken şeyle yarışıyor.
+ */
+const G_RENK = ['#5D87FF', '#13DEB9', '#FFAE1F', '#FA896B', '#7C4DFF', '#49BEFF', '#7C8FAC'];
+
+/*
+  EKSEN/IZGARA BİÇİMİ `window.Apex` İLE VERİLİYOR — `gGrafikTemel` İÇİNDE DEĞİL.
+
+  Sayfalar seçenekleri `Object.assign(temel, ayar)` ile birleştiriyor ve bu SIĞ
+  bir birleştirme: bir sayfa kendi `xaxis: { categories: [...] }` nesnesini
+  verdiğinde temeldeki `xaxis` tamamen SİLİNİYOR — etiket rengi, kaldırılmış
+  eksen çizgisi, hepsi. Yani biçimi temele koymak, biçimi kullanan sayfalarda
+  sessizce kaybetmek demekti.
+
+  ApexCharts `window.Apex`'i her grafiğe DERİN birleştiriyor: sayfa yalnızca
+  `categories`'i verse bile geri kalan biçim yerinde kalıyor. On sayfayı tek tek
+  düzenlemeye de gerek kalmıyor.
+*/
+window.Apex = {
+  chart: { fontFamily: 'inherit', toolbar: { show: false },
+           animations: { easing: 'easeout', speed: 500 } },
+  dataLabels: { enabled: false },
+  stroke: { lineCap: 'round' },
+  /* Izgara veri çizgisinden daha soluk: okunması gereken şeyle yarışmasın. */
+  grid: { borderColor: '#EDF2F7', strokeDashArray: 4, padding: { left: 6, right: 6 } },
+  xaxis: {
+    axisBorder: { show: false }, axisTicks: { show: false },
+    labels: { style: { colors: '#7C8FAC', fontSize: '11.5px' } },
+  },
+  yaxis: { labels: { style: { colors: '#7C8FAC', fontSize: '11.5px' } } },
+  legend: {
+    fontSize: '12.5px', fontWeight: 500, labels: { colors: '#5A6A85' },
+    markers: { radius: 12, width: 10, height: 10 }, itemMargin: { horizontal: 7, vertical: 2 },
+  },
+  tooltip: { theme: 'light', style: { fontSize: '12.5px' } },
+  plotOptions: { pie: { donut: { labels: { value: { color: '#2A3547' },
+                                           total: { color: '#5A6A85' } } } } },
+};
+
 function gGrafikTemel(yukseklik) {
   return {
-    chart: { height: yukseklik || '100%', toolbar: { show: false }, fontFamily: 'inherit',
-             animations: { easing: 'easeout', speed: 500 } },
-    dataLabels: { enabled: false },
-    grid: { borderColor: '#eef0f6', strokeDashArray: 4 },
-    tooltip: { theme: 'light' },
+    chart: { height: yukseklik || '100%' },
+    colors: G_RENK,
   };
 }

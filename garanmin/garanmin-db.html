@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <!--
   GARANMIN — Veri Tabani / Tablolar.
 
@@ -24,7 +24,7 @@
     <title>Garanmin — Veri Tabani</title>
     <link rel="icon" type="image/x-icon" href="assets/img/favicon/favicon.ico" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="assets/vendor/fonts/iconify-icons.css" />
     <link rel="stylesheet" href="assets/vendor/css/core.css" />
     <link rel="stylesheet" href="assets/css/garanmin.css" />
@@ -107,7 +107,7 @@
             const panel = x.tablo.indexOf('garanmin_') === 0;
             return '<tr>'
               + '<td>' + gEsc(x.tablo)
-              + '<div style="font-size:11px;color:#9aa1b2">' + gEsc(ACIKLAMA[x.tablo] || '') + '</div></td>'
+              + '<div style="font-size:11.5px;color:var(--g-soluk-2)">' + gEsc(ACIKLAMA[x.tablo] || '') + '</div></td>'
               + '<td>' + gNum(x.satir) + '</td>'
               + '<td>' + gEsc(x.boyut) + '</td>'
               + '<td>' + (x.rls

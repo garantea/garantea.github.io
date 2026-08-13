@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <!--
   GARANMIN — Kullanicilar.
 
@@ -31,7 +31,7 @@
     <title>Garanmin — Kullanicilar</title>
     <link rel="icon" type="image/x-icon" href="assets/img/favicon/favicon.ico" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="assets/vendor/fonts/iconify-icons.css" />
     <link rel="stylesheet" href="assets/vendor/css/core.css" />
     <link rel="stylesheet" href="assets/css/garanmin.css" />
@@ -49,7 +49,7 @@
 
         <div class="g-kart" style="flex:1 1 auto;min-height:0">
           <div class="g-kart-bas" style="justify-content:space-between">
-            <span><i class="bx bx-group"></i> Kullanici listesi</span>
+            <span><i class="bx bx-group"></i> Kullanıcı listesi</span>
             <span style="display:flex;gap:6px;align-items:center;text-transform:none;letter-spacing:0">
               <input id="arama" class="form-control form-control-sm" style="width:230px"
                      placeholder="E-posta ara..." />
@@ -275,7 +275,7 @@
         try {
           const s = await garanminData('garanmin_stats');
           kutu([
-            { etiket: 'Toplam kullanici', deger: gNum(s.total_users),        ikon: 'bx-group',      renk: 'mavi' },
+            { etiket: 'Toplam kullanıcı', deger: gNum(s.total_users),        ikon: 'bx-group',      renk: 'mavi' },
             { etiket: 'Gunluk aktif',     deger: gNum(s.dau),                ikon: 'bx-run',        renk: 'yesil' },
             { etiket: 'Cihaz ekleyen',    deger: gNum(s.users_with_devices), ikon: 'bx-user-check', renk: 'turuncu' },
             { etiket: 'Yeni (7 gun)',     deger: gNum(s.new_users_7d),       ikon: 'bx-user-plus',  renk: 'mor' },

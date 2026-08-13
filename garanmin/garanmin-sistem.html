@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <!--
   GARANMIN — Sistem Durumu.
 
@@ -20,7 +20,7 @@
     <title>Garanmin — Sistem Durumu</title>
     <link rel="icon" type="image/x-icon" href="assets/img/favicon/favicon.ico" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="assets/vendor/fonts/iconify-icons.css" />
     <link rel="stylesheet" href="assets/vendor/css/core.css" />
     <link rel="stylesheet" href="assets/css/garanmin.css" />
@@ -60,13 +60,14 @@
         }).join('');
       }
 
+      /* Renkler ELLE YAZILMIYOR: `.g-kv` sinifi temadan geliyor. Onceki surumde
+         gri tonlari inline yazilmisti ve tema degistiginde bu liste eski paletle
+         kalip geri kalan her seyden ayri dusuyordu. */
       function satir(etiket, deger, not) {
-        return '<div style="padding:9px 0;border-bottom:1px solid #f1f3f9">'
-          + '<div style="display:flex;justify-content:space-between;gap:12px">'
-          + '<span style="color:#6b7280;font-size:12.5px">' + etiket + '</span>'
-          + '<span style="font-weight:500;font-size:13px;text-align:right">' + deger + '</span></div>'
-          + (not ? '<div style="font-size:11px;color:#9aa1b2;margin-top:2px">' + not + '</div>' : '')
-          + '</div>';
+        return '<div class="g-kv"><div class="g-kv-satir">'
+          + '<span class="g-kv-etiket">' + etiket + '</span>'
+          + '<span class="g-kv-deger">' + deger + '</span></div>'
+          + (not ? '<div class="g-kv-not">' + not + '</div>' : '') + '</div>';
       }
 
       function sure(ms) {

@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <!--
   GARANMIN — Genel Bakis (Ozet).
 
@@ -20,7 +20,7 @@
     <title>Garanmin — Genel Bakis</title>
     <link rel="icon" type="image/x-icon" href="assets/img/favicon/favicon.ico" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="assets/vendor/fonts/iconify-icons.css" />
     <link rel="stylesheet" href="assets/vendor/css/core.css" />
     <link rel="stylesheet" href="assets/css/garanmin.css" />
@@ -42,7 +42,7 @@
 
         <div class="g-satir esit-3 buyuk">
           <div class="g-kart" style="grid-column: span 2">
-            <div class="g-kart-bas"><i class="bx bx-line-chart"></i> Son 30 gun — kullanici, cihaz, destek</div>
+            <div class="g-kart-bas"><i class="bx bx-line-chart"></i> Son 30 gün — kullanıcı, cihaz, destek</div>
             <div class="g-kart-govde" id="c-akis"></div>
           </div>
           <div class="g-kart">
@@ -64,7 +64,7 @@
             <div class="g-kart-bas"><i class="bx bx-time-five"></i> Son eklenen cihazlar</div>
             <div class="g-kart-govde g-scroll">
               <table class="g-tablo">
-                <thead><tr><th>Cihaz</th><th>Marka</th><th>Kullanici</th></tr></thead>
+                <thead><tr><th>Cihaz</th><th>Marka</th><th>Kullanıcı</th></tr></thead>
                 <tbody id="son-cihaz"><tr><td colspan="3" class="text-muted">Yukleniyor...</td></tr></tbody>
               </table>
             </div>
@@ -118,7 +118,7 @@
           ]);
 
           kutu('is-serit', [
-            { etiket: 'Kullanici',        deger: gNum(stats.total_users),          ikon: 'bx-group',      renk: 'mavi' },
+            { etiket: 'Kullanıcı',        deger: gNum(stats.total_users),          ikon: 'bx-group',      renk: 'mavi' },
             { etiket: 'Aylik aktif',      deger: gNum(stats.mau),                  ikon: 'bx-pulse',      renk: 'yesil' },
             { etiket: 'Toplam kredi',     deger: gNum(stats.total_credits_sum),    ikon: 'bx-star',       renk: 'turuncu' },
             { etiket: 'Destek talebi',    deger: gNum(stats.support_tickets_total),ikon: 'bx-support',    renk: 'kirmizi' },
@@ -138,7 +138,7 @@
         t.chart.type = 'area';
         new ApexCharts(document.getElementById('c-akis'), Object.assign(t, {
           series: [
-            { name: 'Kullanici', data: v.map(function (d) { return Number(d.kullanici); }) },
+            { name: 'Kullanıcı', data: v.map(function (d) { return Number(d.kullanici); }) },
             { name: 'Cihaz',     data: v.map(function (d) { return Number(d.cihaz); }) },
             { name: 'Destek',    data: v.map(function (d) { return Number(d.talep); }) },
           ],

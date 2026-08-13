@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <!--
   GARANMIN — Gelir Gider / Kredi Ekonomisi.
 
@@ -27,7 +27,7 @@
     <title>Garanmin — Kredi Ekonomisi</title>
     <link rel="icon" type="image/x-icon" href="assets/img/favicon/favicon.ico" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="assets/vendor/fonts/iconify-icons.css" />
     <link rel="stylesheet" href="assets/vendor/css/core.css" />
     <link rel="stylesheet" href="assets/css/garanmin.css" />
@@ -51,11 +51,11 @@
 
         <div class="g-satir esit-2 buyuk">
           <div class="g-kart">
-            <div class="g-kart-bas"><i class="bx bx-bar-chart-alt-2"></i> Kredi dagilimi (kullanici basina)</div>
+            <div class="g-kart-bas"><i class="bx bx-bar-chart-alt-2"></i> Kredi dağılımı (kullanıcı başına)</div>
             <div class="g-kart-govde" id="c-dagilim"></div>
           </div>
           <div class="g-kart">
-            <div class="g-kart-bas"><i class="bx bx-trophy"></i> En cok kredisi olan kullanicilar</div>
+            <div class="g-kart-bas"><i class="bx bx-trophy"></i> En çok kredisi olan kullanıcılar</div>
             <div class="g-kart-govde g-scroll">
               <table class="g-tablo">
                 <thead><tr><th>E-posta</th><th>Kredi</th><th>Izlenen reklam</th></tr></thead>
@@ -77,7 +77,7 @@
             <div class="g-kart-govde g-scroll" id="akis"></div>
           </div>
           <div class="g-kart">
-            <div class="g-kart-bas"><i class="bx bx-user-check"></i> Kullanici dagilimi</div>
+            <div class="g-kart-bas"><i class="bx bx-user-check"></i> Kullanıcı dağılımı</div>
             <div class="g-kart-govde" id="c-kullanici"></div>
           </div>
           <div class="g-kart">
@@ -100,12 +100,14 @@
         }).join('');
       }
 
+      /* Renkler ELLE YAZILMIYOR: `.g-kv` sinifi temadan geliyor. Onceki surumde
+         gri tonlari inline yazilmisti ve tema degistiginde bu iki liste eski
+         paletle kalip geri kalan her seyden ayri dusuyordu. */
       function satir(etiket, deger, not) {
-        return '<div style="padding:7px 0;border-bottom:1px solid #f1f3f9">'
-          + '<div style="display:flex;justify-content:space-between;gap:10px">'
-          + '<span style="color:#6b7280;font-size:12.5px">' + etiket + '</span>'
-          + '<span style="font-weight:500;font-size:13px">' + deger + '</span></div>'
-          + (not ? '<div style="font-size:10.5px;color:#9aa1b2">' + not + '</div>' : '') + '</div>';
+        return '<div class="g-kv"><div class="g-kv-satir">'
+          + '<span class="g-kv-etiket">' + etiket + '</span>'
+          + '<span class="g-kv-deger">' + deger + '</span></div>'
+          + (not ? '<div class="g-kv-not">' + not + '</div>' : '') + '</div>';
       }
 
       async function yukle() {
@@ -121,13 +123,13 @@
             { etiket: 'Dolasimda kredi', deger: gNum(e.mevcut_kredi),    ikon: 'bx-star',    renk: 'turuncu' },
             { etiket: 'Harcanan kredi',  deger: gNum(e.harcanan_kredi),  ikon: 'bx-minus-circle', renk: 'kirmizi' },
             { etiket: 'Reklamla kazanilan', deger: gNum(e.reklam_kredi), ikon: 'bx-tv',      renk: 'yesil' },
-            { etiket: 'Kullanici basina ort.', deger: gNum(e.ortalama_kredi), ikon: 'bx-calculator', renk: 'mavi' },
+            { etiket: 'Kullanıcı başına ort.', deger: gNum(e.ortalama_kredi), ikon: 'bx-calculator', renk: 'mavi' },
           ]);
 
           if (!gBos('c-dagilim', e.dagilim)) {
             const t = gGrafikTemel(); t.chart.type = 'bar';
             new ApexCharts(document.getElementById('c-dagilim'), Object.assign(t, {
-              series: [{ name: 'Kullanici', data: e.dagilim.map(function (d) { return Number(d.count); }) }],
+              series: [{ name: 'Kullanıcı', data: e.dagilim.map(function (d) { return Number(d.count); }) }],
               xaxis: { categories: e.dagilim.map(function (d) { return d.bucket; }) },
               plotOptions: { bar: { borderRadius: 5, distributed: true, columnWidth: '55%' } },
               legend: { show: false }, colors: G_RENK,
@@ -152,7 +154,7 @@
           document.getElementById('reklam').innerHTML =
             satir('Toplam izlenme', gNum(e.reklam_izlenme))
             + satir('Kazandirdigi kredi', gNum(e.reklam_kredi), '5 reklam = 1 kredi')
-            + satir('Izlenme / kullanici',
+            + satir('İzlenme / kullanıcı',
                 gNum((Number(e.reklam_izlenme) / Math.max(1, Number(e.kredili_kullanici) + Number(e.kredisiz_kullanici))).toFixed(1)));
 
           /* Hic kullanici yoksa halka CIZILMIYOR: iki dilimi de sifir olan bir

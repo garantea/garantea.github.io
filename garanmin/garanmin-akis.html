@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <!--
   GARANMIN — Veri Tabani / Zaman Akisi.
 
@@ -19,7 +19,7 @@
     <title>Garanmin — Zaman Akisi</title>
     <link rel="icon" type="image/x-icon" href="assets/img/favicon/favicon.ico" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="assets/vendor/fonts/iconify-icons.css" />
     <link rel="stylesheet" href="assets/vendor/css/core.css" />
     <link rel="stylesheet" href="assets/css/garanmin.css" />
@@ -49,7 +49,7 @@
 
         <div class="g-satir esit-3 grafik">
           <div class="g-kart">
-            <div class="g-kart-bas"><i class="bx bx-user-plus"></i> Kullanici</div>
+            <div class="g-kart-bas"><i class="bx bx-user-plus"></i> Kullanıcı</div>
             <div class="g-kart-govde" id="c-k"></div>
           </div>
           <div class="g-kart">
@@ -122,7 +122,7 @@
           const top = function (a) { return a.reduce(function (x, y) { return x + y; }, 0); };
 
           kutu([
-            { etiket: 'Yeni kullanici (' + gun + ' gun)', deger: gNum(top(k)), ikon: 'bx-user-plus', renk: 'mavi' },
+            { etiket: 'Yeni kullanıcı (' + gun + ' gün)', deger: gNum(top(k)), ikon: 'bx-user-plus', renk: 'mavi' },
             { etiket: 'Eklenen cihaz',   deger: gNum(top(c)), ikon: 'bx-devices', renk: 'yesil' },
             { etiket: 'Destek talebi',   deger: gNum(top(t)), ikon: 'bx-support', renk: 'kirmizi' },
             { etiket: 'Gunluk ortalama cihaz',
@@ -134,7 +134,7 @@
             base.chart.type = 'line';
             const g = new ApexCharts(gKap('c-akis'), Object.assign(base, {
               series: [
-                { name: 'Kullanici', data: k },
+                { name: 'Kullanıcı', data: k },
                 { name: 'Cihaz',     data: c },
                 { name: 'Destek',    data: t },
               ],

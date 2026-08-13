@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <!--
   GARANMIN — giris.
 
@@ -16,7 +16,7 @@
     <link rel="icon" type="image/x-icon" href="assets/img/favicon/favicon.ico" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="assets/vendor/fonts/iconify-icons.css" />
     <link rel="stylesheet" href="assets/vendor/css/core.css" />
     <link rel="stylesheet" href="assets/css/garanmin.css" />
@@ -32,13 +32,13 @@
         <div class="g-marka-yazi" style="font-size:26px;margin-top:6px">
           <span class="a">Garan</span><span class="b">min</span>
         </div>
-        <div style="color:#6b7280;font-size:13px;margin-bottom:22px">GaranTea yonetim paneli</div>
+        <div style="color:var(--g-soluk);font-size:13px;margin-bottom:24px">GaranTea yonetim paneli</div>
 
         <div id="hata" style="display:none" class="alert alert-danger py-2 text-start small"></div>
 
         <form id="form" autocomplete="off">
           <div class="mb-3 text-start">
-            <label class="form-label small ">Kullanici adi</label>
+            <label class="form-label small ">Kullanıcı adı</label>
             <input class="form-control" id="kullanici" autocomplete="username" required autofocus />
           </div>
           <div class="mb-3 text-start">
@@ -50,7 +50,7 @@
           </button>
         </form>
 
-        <div style="color:#9aa1b2;font-size:11px;margin-top:18px;line-height:1.5">
+        <div style="color:var(--g-soluk-2);font-size:11.5px;margin-top:20px;line-height:1.6">
           Oturum sekme kapaninca sona erer.<br>Basarisiz denemeler kademeli olarak yavaslatilir.
         </div>
       </div>
@@ -74,7 +74,7 @@
 
         /*
           BUTON KILITLENIYOR. Sunucu basarisiz denemelerde kasitli olarak bekliyor
-          (kaba kuvvete karsi); o sirada kullanici sabirsizlanip tekrar tiklarsa
+          (kaba kuvvete karşı); o sırada kullanıcı sabırsızlanıp tekrar tıklarsa
           ikinci bir deneme daha sayaca eklenir ve bekleme kendi kendini uzatirdi.
         */
         btn.disabled = true;
