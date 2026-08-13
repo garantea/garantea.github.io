@@ -1,17 +1,6 @@
-﻿<!doctype html>
+<!doctype html>
 <!--
   GARANMIN — Kullanicilar.
-
-  ─── DUZELTILEN HATA ──────────────────────────────────────────────────────
-
-  Onceki surumde sayfa hic acilmiyordu:
-
-      Cannot access 'SAYFA' before initialization
-
-  Sebep: dosyanin ilk satiri `yukle()` cagiriyordu, `const SAYFA = 25` ise iki satir
-  SONRA geliyordu. `const` bildirimi yukari tasinir ama BASLATILANA KADAR erisilemez
-  (temporal dead zone), dolayisiyla `yukle()` icindeki `SAYFA` referansi hemen hata
-  firlatiyor ve sayfa bos kaliyordu. Artik butun tanimlar once, ILK CAGRI en sonda.
 
   ─── DETAY MODAL OLARAK ACILIYOR ──────────────────────────────────────────
 
@@ -22,8 +11,15 @@
   Liste SAYFALANIYOR ve arama SUNUCUDA yapiliyor: butun kullanicilari cekip
   tarayicida suzmek, kullanici sayisi buyudukce hem yavaslar hem de gereksiz yere
   butun e-posta adreslerini agdan gecirir.
+
+  ─── TANIMLAR ONCE, ILK CAGRI EN SONDA ────────────────────────────────────
+
+  Bir onceki surumde dosyanin ilk satiri `yukle()` cagiriyor, `const SAYFA = 25`
+  ise iki satir SONRA geliyordu. `const` bildirimi yukari tasinir ama
+  BASLATILANA KADAR erisilemez (temporal dead zone), dolayisiyla sayfa
+  "Cannot access 'SAYFA' before initialization" ile bos kaliyordu. Sira korunmali.
 -->
-<html lang="tr">
+<html lang="tr" data-theme="light">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -31,63 +27,65 @@
     <title>Garanmin — Kullanicilar</title>
     <link rel="icon" type="image/x-icon" href="assets/img/favicon/favicon.ico" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="assets/vendor/fonts/iconify-icons.css" />
-    <link rel="stylesheet" href="assets/vendor/css/core.css" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="assets/adminator/adminator.css" />
     <link rel="stylesheet" href="assets/css/garanmin.css" />
   </head>
 
   <body>
-    <div class="g-app" id="g-app">
-      <aside class="g-yan" id="garanmin-menu"></aside>
-      <header class="g-ust" id="garanmin-navbar"></header>
+    <div class="shell" id="g-app">
+      <aside class="d-sidebar" id="garanmin-menu"></aside>
 
-      <main class="g-icerik">
-        <div id="garanmin-error"></div>
+      <div class="main">
+        <header class="d-topbar" id="garanmin-navbar"></header>
 
-        <div class="g-satir esit-4" id="serit"></div>
+        <main class="content">
+          <div id="garanmin-error"></div>
+          <div class="kpi-grid" id="serit"></div>
 
-        <div class="g-kart" style="flex:1 1 auto;min-height:0">
-          <div class="g-kart-bas" style="justify-content:space-between">
-            <span><i class="bx bx-group"></i> Kullanıcı listesi</span>
-            <span style="display:flex;gap:6px;align-items:center;text-transform:none;letter-spacing:0">
-              <input id="arama" class="form-control form-control-sm" style="width:230px"
-                     placeholder="E-posta ara..." />
-              <button class="btn btn-sm btn-primary" id="ara-btn" title="Ara"><i class="bx bx-search"></i></button>
-              <button class="btn btn-sm btn-outline-secondary" id="temizle-btn" title="Temizle"><i class="bx bx-x"></i></button>
-            </span>
+          <div class="grid">
+            <section class="card col-12">
+              <div class="card-head">
+                <div class="card-title-wrap">
+                  <span class="eyebrow">Kayitli hesaplar</span>
+                  <h2 class="card-title">Kullanici listesi</h2>
+                </div>
+                <div class="g-arac">
+                  <input id="arama" class="input" placeholder="E-posta ara..." />
+                  <button class="btn btn--primary btn--sm" id="ara-btn" title="Ara">Ara</button>
+                  <button class="btn btn--ghost btn--sm" id="temizle-btn" title="Temizle">Temizle</button>
+                </div>
+              </div>
+
+              <div class="g-tablo-kutu uzun">
+                <table class="table">
+                  <!-- Sutun genislikleri SABIT (gerekce: garanmin.css). Toplam %100. -->
+                  <colgroup>
+                    <col style="width:34%"><col style="width:12%"><col style="width:13%">
+                    <col style="width:9%"><col style="width:9%">
+                    <col style="width:10%"><col style="width:9%"><col style="width:4%">
+                  </colgroup>
+                  <thead>
+                    <tr>
+                      <th>E-posta</th><th>Kayit</th><th>Son giris</th>
+                      <th class="sayi">Cihaz</th><th class="sayi">Kredi</th>
+                      <th class="sayi">Reklam</th><th class="sayi">Talep</th><th></th>
+                    </tr>
+                  </thead>
+                  <tbody id="tbody"><tr><td colspan="8" class="soluk">Yukleniyor...</td></tr></tbody>
+                </table>
+              </div>
+
+              <div class="form-actions" style="margin-top:14px;padding-top:14px">
+                <span class="soluk" style="font-size:12px;color:var(--t-muted)" id="sayfa-bilgi"></span>
+                <span class="spacer"></span>
+                <button class="btn btn--ghost btn--sm" id="onceki">Onceki</button>
+                <button class="btn btn--ghost btn--sm" id="sonraki">Sonraki</button>
+              </div>
+            </section>
           </div>
-
-          <div class="g-kart-govde g-scroll">
-            <table class="g-tablo">
-              <!-- Sütun genişlikleri SABİT (gerekçe: garanmin.css). Toplam %100. -->
-              <colgroup>
-                <col style="width:34%"><col style="width:12%"><col style="width:13%">
-                <col style="width:9%"><col style="width:9%">
-                <col style="width:10%"><col style="width:9%"><col style="width:4%">
-              </colgroup>
-              <thead>
-                <tr>
-                  <th>E-posta</th><th>Kayit</th><th>Son giris</th>
-                  <th class="sayi">Cihaz</th><th class="sayi">Kredi</th>
-                  <th class="sayi">Reklam</th><th class="sayi">Talep</th><th></th>
-                </tr>
-              </thead>
-              <tbody id="tbody">
-                <tr><td colspan="8" class="text-muted">Yukleniyor...</td></tr>
-              </tbody>
-            </table>
-          </div>
-
-          <div style="display:flex;align-items:center;gap:10px;padding-top:9px;flex:0 0 auto">
-            <span class="text-muted" style="font-size:12px" id="sayfa-bilgi"></span>
-            <span style="margin-left:auto;display:flex;gap:6px">
-              <button class="btn btn-sm btn-outline-secondary" id="onceki"><i class="bx bx-chevron-left"></i></button>
-              <button class="btn btn-sm btn-outline-secondary" id="sonraki"><i class="bx bx-chevron-right"></i></button>
-            </span>
-          </div>
-        </div>
-      </main>
+        </main>
+      </div>
     </div>
 
     <script src="assets/js/garanmin-api.js"></script>
@@ -96,38 +94,6 @@
 
       const SAYFA = 25;
       let offset = 0, arama = '';
-
-      function kutu(liste) {
-        document.getElementById('serit').innerHTML = liste.map(function (k) {
-          return '<div class="g-kart"><div class="g-ozet">'
-            + '<div class="g-ozet-ikon ' + k.renk + '"><i class="bx ' + k.ikon + '"></i></div>'
-            + '<div style="min-width:0"><div class="g-ozet-sayi">' + k.deger + '</div>'
-            + '<div class="g-ozet-etiket">' + k.etiket + '</div></div></div></div>';
-        }).join('');
-      }
-
-      function kv(etiket, deger, not) {
-        return '<div class="g-kv"><div class="g-kv-satir">'
-          + '<span class="g-kv-etiket">' + etiket + '</span>'
-          + '<span class="g-kv-deger">' + deger + '</span></div>'
-          + (not ? '<div class="g-kv-not">' + not + '</div>' : '') + '</div>';
-      }
-
-      /**
-       * Bir cihazin garanti durumu — uygulamanin kuralinin AYNISI.
-       *
-       * Esik "%90 tuketildi", "30 gun kaldi" DEGIL. Iki taraf farkli sayarsa panel,
-       * kullanicinin telefonunda gordugunden baska bir tablo gosterir.
-       */
-      function durum(d) {
-        if (!d.bitis) return 'active';
-        const bitis = new Date(d.bitis), bugun = new Date();
-        if (bitis < bugun) return 'expired';
-        if (!d.alim) return 'active';
-        const bas = new Date(d.alim), toplam = bitis - bas;
-        if (toplam <= 0) return 'active';
-        return ((bugun - bas) / toplam) > 0.9 ? 'expiring_soon' : 'active';
-      }
 
       /**
        * Kullanici detayini modal olarak acar.
@@ -140,31 +106,20 @@
        */
       async function detay(id, email) {
         garanminModalAc(
-          '<span class="g-avatar">' + gEsc((email || '?').slice(0, 2).toUpperCase()) + '</span>'
-          + '<div><div style="font-size:14px">' + gEsc(email) + '</div>'
-          + '<div style="font-size:11.5px;color:var(--g-soluk)">Kullanici detayi</div></div>',
-          '<div class="g-bos"><i class="bx bx-loader-alt bx-spin" style="font-size:22px"></i></div>'
+          '<div class="g-modal-kim">'
+          + '<span class="avatar">' + gEsc((email || '?').slice(0, 2).toUpperCase()) + '</span>'
+          + '<div><span class="eyebrow">Kullanici detayi</span>'
+          + '<div class="modal-title">' + gEsc(email) + '</div></div></div>',
+          '<div class="g-bos">' + gIkon('refresh') + '<span>Yukleniyor...</span></div>'
         );
 
         try {
           const v = await garanminData('garanmin_user_detail', { p_user_id: id });
           const p = v.profil, g = v.garanti || {}, c = v.cihazlar || [], t = v.talepler || [];
 
-          const seritHtml = [
-            { etiket: 'Cihaz',          deger: gNum(c.length),   ikon: 'bx-devices', renk: 'mavi' },
-            { etiket: 'Kredi',          deger: gNum(p.credits),  ikon: 'bx-star',    renk: 'turuncu' },
-            { etiket: 'Izlenen reklam', deger: gNum(p.ads),      ikon: 'bx-tv',      renk: 'yesil' },
-            { etiket: 'Destek talebi',  deger: gNum(t.length),   ikon: 'bx-support', renk: 'kirmizi' },
-          ].map(function (k) {
-            return '<div class="g-kart"><div class="g-ozet">'
-              + '<div class="g-ozet-ikon ' + k.renk + '"><i class="bx ' + k.ikon + '"></i></div>'
-              + '<div><div class="g-ozet-sayi">' + k.deger + '</div>'
-              + '<div class="g-ozet-etiket">' + k.etiket + '</div></div></div></div>';
-          }).join('');
-
           const cihazHtml = c.length
             ? c.map(function (d) {
-                const s = gDurum(durum(d));
+                const s = gDurum(gGarantiDurum(d.alim, d.bitis));
                 return '<tr>'
                   + '<td title="' + gEsc(d.ad) + '">' + gEsc(d.ad) + '</td>'
                   + '<td title="' + gEsc(d.marka) + '">' + gEsc(d.marka) + '</td>'
@@ -172,83 +127,94 @@
                   + '<td>' + gEsc(d.oda) + '</td>'
                   + '<td>' + gDate(d.alim) + '</td>'
                   + '<td>' + gDate(d.bitis) + '</td>'
-                  + '<td><span class="g-rozet ' + s.sinif + '">' + s.ad + '</span></td>'
+                  + '<td><span class="badge ' + s.sinif + '">' + s.ad + '</span></td>'
                   + '<td>' + (d.fatura_var
-                      ? '<i class="bx bx-check" style="color:var(--g-yesil)"></i>'
-                      : '<span class="text-muted">-</span>') + '</td>'
+                      ? '<span class="badge success">var</span>'
+                      : '<span class="soluk">-</span>') + '</td>'
                   + '</tr>';
               }).join('')
-            : '<tr><td colspan="8" class="text-muted">Bu kullanicinin cihazi yok</td></tr>';
+            : '<tr><td colspan="8" class="soluk">Bu kullanicinin cihazi yok</td></tr>';
 
           const talepHtml = t.length
             ? t.map(function (x) {
-                return '<tr><td>' + gDateTime(x.created_at) + '</td>'
+                return '<tr><td class="soluk">' + gDateTime(x.created_at) + '</td>'
                   + '<td>' + gEsc(x.kind) + '</td>'
                   + '<td>' + gEsc(x.status) + '</td>'
                   + '<td class="metin">' + gEsc(x.message) + '</td></tr>';
               }).join('')
-            : '<tr><td colspan="4" class="text-muted">Talep yok</td></tr>';
+            : '<tr><td colspan="4" class="soluk">Talep yok</td></tr>';
 
           document.getElementById('g-modal-govde').innerHTML =
-            '<div class="g-satir esit-4">' + seritHtml + '</div>'
-
-            + '<div class="g-satir esit-3">'
-            +   '<div class="g-kart">'
-            +     '<div class="g-kart-bas"><i class="bx bx-id-card"></i> Profil</div>'
-            +     '<div class="g-kart-govde">'
-            +       kv('Kayit tarihi', gDate(p.created_at))
-            +       kv('Son giris', gGoreli(p.last_sign_in_at))
-            +       kv('Giris yontemi', gEsc(p.saglayici))
-            +       kv('Aktif garanti', gNum(g.active || 0))
-            +       kv('Yakinda bitiyor', gNum(g.expiring_soon || 0))
-            +       kv('Suresi dolmus', gNum(g.expired || 0))
-            +     '</div>'
-            +   '</div>'
-
-            +   '<div class="g-kart" style="grid-column: span 2">'
-            +     '<div class="g-kart-bas" style="justify-content:space-between">'
-            +       '<span><i class="bx bx-devices"></i> Cihazlar</span>'
-            +       '<span style="text-transform:none;letter-spacing:0">'
-            +         '<span class="g-rozet mavi">' + gNum(g.active || 0) + ' aktif</span> '
-            +         '<span class="g-rozet turuncu">' + gNum(g.expiring_soon || 0) + ' yakin</span> '
-            +         '<span class="g-rozet kirmizi">' + gNum(g.expired || 0) + ' dolmus</span>'
-            +       '</span>'
-            +     '</div>'
-            /* Cihaz listesi kendi kutusunda kayiyor: 40 cihazi olan bir kullanicida
-               modal ekrandan tasmasin, 2 cihazi olanda da bos yer kalmasin. */
-            +     '<div class="g-kart-govde g-scroll" style="max-height:260px">'
-            +       '<table class="g-tablo">'
-            /* Sutun genislikleri SABIT (gerekce: garanmin.css). Toplam %100. */
-            +       '<colgroup>'
-            +         '<col style="width:18%"><col style="width:12%"><col style="width:13%">'
-            +         '<col style="width:11%"><col style="width:11%"><col style="width:11%">'
-            +         '<col style="width:15%"><col style="width:9%">'
-            +       '</colgroup>'
-            +       '<thead><tr>'
-            +         '<th>Cihaz</th><th>Marka</th><th>Kategori</th><th>Oda</th>'
-            +         '<th>Alim</th><th>Bitis</th><th>Durum</th><th>Fatura</th>'
-            +       '</tr></thead><tbody>' + cihazHtml + '</tbody></table>'
-            +     '</div>'
-            +   '</div>'
+            '<div class="kpi-grid" style="margin-bottom:0">'
+            + gKpi([
+                { etiket: 'Cihaz',          deger: gNum(c.length),  ikon: 'monitor', renk: 'primary' },
+                { etiket: 'Kredi',          deger: gNum(p.credits), ikon: 'star',    renk: 'warning' },
+                { etiket: 'Izlenen reklam', deger: gNum(p.ads),     ikon: 'tv',      renk: 'success' },
+                { etiket: 'Destek talebi',  deger: gNum(t.length),  ikon: 'support', renk: 'danger' },
+              ])
             + '</div>'
 
-            + '<div class="g-kart">'
-            +   '<div class="g-kart-bas"><i class="bx bx-support"></i> Destek talepleri</div>'
-            +   '<div class="g-kart-govde g-scroll" style="max-height:180px">'
-            +     '<table class="g-tablo">'
-            /* Sutun genislikleri SABIT (gerekce: garanmin.css). Toplam %100. */
-            +     '<colgroup>'
-            +       '<col style="width:16%"><col style="width:14%">'
-            +       '<col style="width:12%"><col style="width:58%">'
-            +     '</colgroup>'
-            +     '<thead><tr>'
-            +       '<th>Tarih</th><th>Tur</th><th>Durum</th><th>Mesaj</th>'
-            +     '</tr></thead><tbody>' + talepHtml + '</tbody></table>'
-            +   '</div>'
+            + '<div class="grid">'
+            +   '<section class="card col-4">'
+            +     '<div class="card-head"><div class="card-title-wrap">'
+            +       '<span class="eyebrow">Hesap</span><h2 class="card-title">Profil</h2>'
+            +     '</div></div>'
+            +     gKv('Kayit tarihi', gDate(p.created_at))
+            +     gKv('Son giris', gGoreli(p.last_sign_in_at))
+            +     gKv('Giris yontemi', gEsc(p.saglayici))
+            +     gKv('Aktif garanti', gNum(g.active || 0))
+            +     gKv('Yakinda bitiyor', gNum(g.expiring_soon || 0))
+            +     gKv('Suresi dolmus', gNum(g.expired || 0))
+            +   '</section>'
+
+            +   '<section class="card col-8">'
+            +     '<div class="card-head">'
+            +       '<div class="card-title-wrap">'
+            +         '<span class="eyebrow">Kayitli</span><h2 class="card-title">Cihazlar</h2>'
+            +       '</div>'
+            +       '<div class="g-arac">'
+            +         '<span class="badge success">' + gNum(g.active || 0) + ' aktif</span>'
+            +         '<span class="badge warning">' + gNum(g.expiring_soon || 0) + ' yakin</span>'
+            +         '<span class="badge danger">' + gNum(g.expired || 0) + ' dolmus</span>'
+            +       '</div>'
+            +     '</div>'
+            /* Cihaz listesi kendi kutusunda kayiyor: 40 cihazi olan bir
+               kullanicida modal ekrandan tasmasin, 2 cihazi olanda da bos yer
+               kalmasin. */
+            +     '<div class="g-tablo-kutu kisa">'
+            +       '<table class="table">'
+            +         '<colgroup>'
+            +           '<col style="width:18%"><col style="width:12%"><col style="width:13%">'
+            +           '<col style="width:11%"><col style="width:11%"><col style="width:11%">'
+            +           '<col style="width:15%"><col style="width:9%">'
+            +         '</colgroup>'
+            +         '<thead><tr>'
+            +           '<th>Cihaz</th><th>Marka</th><th>Kategori</th><th>Oda</th>'
+            +           '<th>Alim</th><th>Bitis</th><th>Durum</th><th>Fatura</th>'
+            +         '</tr></thead><tbody>' + cihazHtml + '</tbody></table>'
+            +     '</div>'
+            +   '</section>'
+
+            +   '<section class="card col-12">'
+            +     '<div class="card-head"><div class="card-title-wrap">'
+            +       '<span class="eyebrow">Iletisim</span><h2 class="card-title">Destek talepleri</h2>'
+            +     '</div></div>'
+            +     '<div class="g-tablo-kutu kisa">'
+            +       '<table class="table">'
+            +         '<colgroup>'
+            +           '<col style="width:16%"><col style="width:14%">'
+            +           '<col style="width:12%"><col style="width:58%">'
+            +         '</colgroup>'
+            +         '<thead><tr>'
+            +           '<th>Tarih</th><th>Tur</th><th>Durum</th><th>Mesaj</th>'
+            +         '</tr></thead><tbody>' + talepHtml + '</tbody></table>'
+            +     '</div>'
+            +   '</section>'
             + '</div>';
         } catch (e) {
           document.getElementById('g-modal-govde').innerHTML =
-            '<div class="alert alert-danger mb-0">' + gEsc(e.message) + '</div>';
+            '<div class="g-uyari danger" style="margin:0">' + gIkon('alert')
+            + '<span>' + gEsc(e.message) + '</span></div>';
         }
       }
 
@@ -260,21 +226,21 @@
 
           const tb = document.getElementById('tbody');
           if (!v.length) {
-            tb.innerHTML = '<tr><td colspan="8" class="text-muted">Kayit yok</td></tr>';
+            tb.innerHTML = '<tr><td colspan="8" class="soluk">Kayit yok</td></tr>';
           } else {
             tb.innerHTML = v.map(function (u) {
               const eposta = gEsc(u.email || '-');
-              return '<tr class="tiklanir" onclick="detay(\'' + gEsc(u.id) + '\',\'' + eposta + '\')">'
+              return '<tr style="cursor:pointer" onclick="detay(\'' + gEsc(u.id) + '\',\'' + eposta + '\')">'
                 /* `title`: sutun sabit genislikte oldugu icin uzun e-posta
                    kesiliyor; tam degere ustune gelince ulasilabilsin. */
                 + '<td title="' + eposta + '">' + eposta + '</td>'
-                + '<td>' + gDate(u.created_at) + '</td>'
-                + '<td>' + gGoreli(u.last_sign_in_at) + '</td>'
-                + '<td class="sayi"><span class="g-rozet mavi">' + gNum(u.device_count) + '</span></td>'
+                + '<td class="soluk">' + gDate(u.created_at) + '</td>'
+                + '<td class="soluk">' + gGoreli(u.last_sign_in_at) + '</td>'
+                + '<td class="sayi">' + gNum(u.device_count) + '</td>'
                 + '<td class="sayi">' + gNum(u.credits) + '</td>'
                 + '<td class="sayi">' + gNum(u.ad_watch_count) + '</td>'
                 + '<td class="sayi">' + gNum(u.ticket_count) + '</td>'
-                + '<td class="text-muted"><i class="bx bx-chevron-right"></i></td>'
+                + '<td class="soluk">&rsaquo;</td>'
                 + '</tr>';
             }).join('');
           }
@@ -283,9 +249,9 @@
             v.length ? (offset + 1) + '-' + (offset + v.length) + ' arasi gosteriliyor' : 'Kayit yok';
 
           /*
-            "Sonraki" DONEN KAYIT SAYISINA gore kapaniyor. Toplam sayiyi ayrica sormak
-            her sayfa cevirmede fazladan bir sorgu demek olurdu; sayfa dolmadiysa son
-            sayfadayiz.
+            "Sonraki" DONEN KAYIT SAYISINA gore kapaniyor. Toplam sayiyi ayrica
+            sormak her sayfa cevirmede fazladan bir sorgu demek olurdu; sayfa
+            dolmadiysa son sayfadayiz.
           */
           document.getElementById('sonraki').disabled = v.length < SAYFA;
           document.getElementById('onceki').disabled = offset === 0;
@@ -295,11 +261,11 @@
       async function seritYukle() {
         try {
           const s = await garanminData('garanmin_stats');
-          kutu([
-            { etiket: 'Toplam kullanıcı', deger: gNum(s.total_users),        ikon: 'bx-group',      renk: 'mavi' },
-            { etiket: 'Gunluk aktif',     deger: gNum(s.dau),                ikon: 'bx-run',        renk: 'yesil' },
-            { etiket: 'Cihaz ekleyen',    deger: gNum(s.users_with_devices), ikon: 'bx-user-check', renk: 'turuncu' },
-            { etiket: 'Yeni (7 gun)',     deger: gNum(s.new_users_7d),       ikon: 'bx-user-plus',  renk: 'mor' },
+          gKpiYaz('serit', [
+            { etiket: 'Toplam kullanici', deger: gNum(s.total_users),        ikon: 'users',     renk: 'primary' },
+            { etiket: 'Gunluk aktif',     deger: gNum(s.dau),                ikon: 'run',       renk: 'success' },
+            { etiket: 'Cihaz ekleyen',    deger: gNum(s.users_with_devices), ikon: 'userCheck', renk: 'warning' },
+            { etiket: 'Yeni (7 gun)',     deger: gNum(s.new_users_7d),       ikon: 'userPlus',  renk: 'purple' },
           ]);
         } catch (e) { gError(e.message); }
       }
@@ -320,9 +286,9 @@
       };
       document.getElementById('sonraki').onclick = function () { offset += SAYFA; yukle(); };
 
-      /* ── İLK ÇAĞRI EN SONDA (yukarıdaki hata notuna bakın) ─────────────── */
+      /* ── İLK ÇAĞRI EN SONDA (yukarıdaki nota bakın) ────────────────────── */
       if (garanminGuardPage()) {
-        garanminShell('garanmin-users.html', 'Kullanicilar');
+        garanminShell('garanmin-users.html', 'Kullanicilar', 'Kullanicilar');
         seritYukle();
         yukle();
       }

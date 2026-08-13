@@ -1,20 +1,21 @@
-﻿<!doctype html>
+<!doctype html>
 <!--
   GARANMIN — Destek / Talepler.
 
   ─── TALEP TURU `kind` SUTUNUNDAN OKUNUYOR ────────────────────────────────
 
   Uygulama destek kaydini `insert({ user_id, kind, data })` seklinde yaziyor: tur
-  UST DUZEYDE bir sutun, mesaj/durum/puan ise `data` JSONB'sinin icinde. Onceki surum
-  turu `data->>'kind'` diye okuyordu ve orada hicbir zaman bir deger yok — grafik her
-  zaman tek bir "Diger" dilimi gosterirdi. Cihaz tarafinda duzeltilen hatanin destek
-  tarafindaki esi; ikisi de `garantea_kurulum.sql` icinde duzeltildi.
+  UST DUZEYDE bir sutun, mesaj/durum/puan ise `data` JSONB'sinin icinde. Onceki
+  surum turu `data->>'kind'` diye okuyordu ve orada hicbir zaman bir deger yok —
+  grafik her zaman tek bir "Diger" dilimi gosterirdi. Cihaz tarafinda duzeltilen
+  hatanin destek tarafindaki esi.
 
   MESAJLAR KULLANICININ YAZDIGI METIN: hepsi `gEsc` ile kacirilarak basiliyor.
-  Dogrudan basilsaydi, mesajina `<img onerror=...>` yazan bir kullanici yoneticinin
-  tarayicisinda kod calistirabilirdi — ve o tarayicida gecerli bir yonetici oturumu var.
+  Dogrudan basilsaydi, mesajina `<img onerror=...>` yazan bir kullanici
+  yoneticinin tarayicisinda kod calistirabilirdi — ve o tarayicida gecerli bir
+  yonetici oturumu var.
 -->
-<html lang="tr">
+<html lang="tr" data-theme="light">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -22,47 +23,58 @@
     <title>Garanmin — Destek</title>
     <link rel="icon" type="image/x-icon" href="assets/img/favicon/favicon.ico" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="assets/vendor/fonts/iconify-icons.css" />
-    <link rel="stylesheet" href="assets/vendor/css/core.css" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="assets/adminator/adminator.css" />
     <link rel="stylesheet" href="assets/css/garanmin.css" />
   </head>
 
   <body>
-    <div class="g-app" id="g-app">
-      <aside class="g-yan" id="garanmin-menu"></aside>
-      <header class="g-ust" id="garanmin-navbar"></header>
+    <div class="shell" id="g-app">
+      <aside class="d-sidebar" id="garanmin-menu"></aside>
 
-      <main class="g-icerik">
-        <div id="garanmin-error"></div>
+      <div class="main">
+        <header class="d-topbar" id="garanmin-navbar"></header>
 
-        <div class="g-satir esit-4" id="serit"></div>
+        <main class="content">
+          <div id="garanmin-error"></div>
+          <div class="kpi-grid" id="serit"></div>
 
-        <div class="g-satir esit-3 buyuk">
-          <div class="g-kart" style="grid-column: span 2">
-            <div class="g-kart-bas"><i class="bx bx-message-detail"></i> Talepler</div>
-            <div class="g-kart-govde g-scroll">
-              <table class="g-tablo">
-                <!-- Sütun genişlikleri SABİT (gerekçe: garanmin.css). Toplam %100.
-                     Mesaj sütunu en geniş: kesilmek yerine saran tek sütun o. -->
-                <colgroup>
-                  <col style="width:15%"><col style="width:18%"><col style="width:12%">
-                  <col style="width:11%"><col style="width:14%"><col style="width:30%">
-                </colgroup>
-                <thead>
-                  <tr><th>Tarih</th><th>Kullanıcı</th><th>Tür</th><th>Durum</th><th>Cihaz</th><th>Mesaj</th></tr>
-                </thead>
-                <tbody id="tbody"><tr><td colspan="6" class="text-muted">Yukleniyor...</td></tr></tbody>
-              </table>
-            </div>
+          <div class="grid">
+            <section class="card col-8">
+              <div class="card-head">
+                <div class="card-title-wrap">
+                  <span class="eyebrow">Son 200 kayit</span>
+                  <h2 class="card-title">Talepler</h2>
+                </div>
+              </div>
+              <div class="g-tablo-kutu uzun">
+                <table class="table">
+                  <!-- Sutun genislikleri SABIT (gerekce: garanmin.css). Toplam %100.
+                       Mesaj sutunu en genis: kesilmek yerine saran tek sutun o. -->
+                  <colgroup>
+                    <col style="width:15%"><col style="width:18%"><col style="width:12%">
+                    <col style="width:11%"><col style="width:14%"><col style="width:30%">
+                  </colgroup>
+                  <thead>
+                    <tr><th>Tarih</th><th>Kullanici</th><th>Tur</th><th>Durum</th><th>Cihaz</th><th>Mesaj</th></tr>
+                  </thead>
+                  <tbody id="tbody"><tr><td colspan="6" class="soluk">Yukleniyor...</td></tr></tbody>
+                </table>
+              </div>
+            </section>
+
+            <section class="card col-4">
+              <div class="card-head">
+                <div class="card-title-wrap">
+                  <span class="eyebrow">Dagilim</span>
+                  <h2 class="card-title">Talep turleri</h2>
+                </div>
+              </div>
+              <div class="g-grafik uzun" id="c-tur"></div>
+            </section>
           </div>
-
-          <div class="g-kart">
-            <div class="g-kart-bas"><i class="bx bx-pie-chart-alt-2"></i> Talep turleri</div>
-            <div class="g-kart-govde" id="c-tur"></div>
-          </div>
-        </div>
-      </main>
+        </main>
+      </div>
     </div>
 
     <script src="assets/vendor/libs/apex-charts/apexcharts.js"></script>
@@ -70,16 +82,7 @@
     <script>
       /* Uygulamadaki `SupportTicketKind` degerlerinin okunur karsiligi. */
       const TUR = { device_issue: 'Cihaz sorunu', general: 'Genel', feedback: 'Geri bildirim' };
-      const ROZET = { open: 'turuncu', closed: 'yesil', pending: 'mavi' };
-
-      function kutu(liste) {
-        document.getElementById('serit').innerHTML = liste.map(function (k) {
-          return '<div class="g-kart"><div class="g-ozet">'
-            + '<div class="g-ozet-ikon ' + k.renk + '"><i class="bx ' + k.ikon + '"></i></div>'
-            + '<div><div class="g-ozet-sayi">' + k.deger + '</div>'
-            + '<div class="g-ozet-etiket">' + k.etiket + '</div></div></div></div>';
-        }).join('');
-      }
+      const ROZET = { open: 'warning', closed: 'success', pending: 'primary' };
 
       async function yukle() {
         try {
@@ -95,45 +98,43 @@
             ? (puanli.reduce(function (a, t) { return a + Number(t.rating); }, 0) / puanli.length).toFixed(1)
             : '-';
 
-          kutu([
-            { etiket: 'Toplam talep',   deger: gNum(stats.support_tickets_total), ikon: 'bx-support', renk: 'mavi' },
-            { etiket: 'Son 7 gun',      deger: gNum(stats.support_tickets_7d),    ikon: 'bx-calendar', renk: 'mor' },
-            { etiket: 'Acik',           deger: gNum(acik),                        ikon: 'bx-time',    renk: 'turuncu' },
-            { etiket: 'Ortalama puan',  deger: ortPuan,                           ikon: 'bx-star',    renk: 'yesil' },
+          gKpiYaz('serit', [
+            { etiket: 'Toplam talep',  deger: gNum(stats.support_tickets_total), ikon: 'support',  renk: 'primary' },
+            { etiket: 'Son 7 gun',     deger: gNum(stats.support_tickets_7d),    ikon: 'calendar', renk: 'purple' },
+            { etiket: 'Acik',          deger: gNum(acik),                        ikon: 'clock',    renk: 'warning' },
+            { etiket: 'Ortalama puan', deger: ortPuan,                           ikon: 'star',     renk: 'success' },
           ]);
 
           const tb = document.getElementById('tbody');
           tb.innerHTML = liste.length
             ? liste.map(function (t) {
                 return '<tr>'
-                  + '<td>' + gDateTime(t.created_at) + '</td>'
+                  + '<td class="soluk">' + gDateTime(t.created_at) + '</td>'
                   + '<td title="' + gEsc(t.email || '-') + '">' + gEsc(t.email || '-') + '</td>'
                   + '<td>' + gEsc(TUR[t.kind] || t.kind) + '</td>'
-                  + '<td><span class="g-rozet ' + (ROZET[t.status] || 'mavi') + '">'
+                  + '<td><span class="badge ' + (ROZET[t.status] || 'primary') + '">'
                     + gEsc(t.status) + '</span></td>'
-                  + '<td>' + gEsc(t.device_name || '-') + '</td>'
-                  /* `metin` sinifi: genisligi colgroup veriyor, hucre sarmali.
-                     Inline `max-width` sabit duzende yok sayiliyor. */
+                  + '<td title="' + gEsc(t.device_name || '-') + '">' + gEsc(t.device_name || '-') + '</td>'
+                  /* `metin` sinifi: genisligi colgroup veriyor, hucre sarmali. */
                   + '<td class="metin">' + gEsc(t.message) + '</td>'
                   + '</tr>';
               }).join('')
-            : '<tr><td colspan="6" class="text-muted">Talep yok</td></tr>';
+            : '<tr><td colspan="6" class="soluk">Talep yok</td></tr>';
 
           if (!gBos('c-tur', tur)) {
             const t2 = gGrafikTemel(); t2.chart.type = 'donut';
-            new ApexCharts(document.getElementById('c-tur'), Object.assign(t2, {
+            new ApexCharts(gKap('c-tur'), Object.assign(t2, {
               series: tur.map(function (d) { return Number(d.count); }),
               labels: tur.map(function (d) { return TUR[d.kind] || d.kind; }),
-              colors: G_RENK,
-              legend: { position: 'bottom', fontSize: '12px' },
-              plotOptions: { pie: { donut: { size: '60%' } } },
+              legend: { position: 'bottom', fontSize: '11.5px' },
+              plotOptions: { pie: { donut: { size: '62%' } } },
             })).render();
           }
         } catch (e) { gError(e.message); }
       }
 
       if (garanminGuardPage()) {
-        garanminShell('garanmin-support.html', 'Destek Talepleri');
+        garanminShell('garanmin-support.html', 'Destek Talepleri', 'Destek');
         yukle();
       }
     </script>

@@ -1,18 +1,23 @@
-﻿<!doctype html>
+<!doctype html>
 <!--
   GARANMIN — Genel Bakis (Ozet).
 
   ─── BU SAYFA NEYE ODAKLI ─────────────────────────────────────────────────
 
-  Agirlik VERITABANINDA. Ustteki serit dogrudan tablo satir sayilarini ve veritabani
-  boyutunu gosteriyor; "kac kullanici" gibi is metrikleri bunun altinda. Sebep: panelin
-  ilk isi sistemin saglikli oldugunu soylemek; is metrikleri ancak veri akiyorsa anlamli.
+  Agirlik VERITABANINDA. Ustteki serit dogrudan tablo satir sayilarini ve
+  veritabani boyutunu gosteriyor; "kac kullanici" gibi is metrikleri bunun
+  altinda. Sebep: panelin ilk isi sistemin saglikli oldugunu soylemek; is
+  metrikleri ancak veri akiyorsa anlamli.
 
-  HER SAYI SUNUCUDAN. Sabit ("mock") veri YOK — sablonun ornek sayfalarinda gomulu
-  rakamlar vardi ve birakilsaydi bos bir veritabaninda bile dolu bir panel gorunur,
-  sorun oldugunda kimse fark etmezdi.
+  HER SAYI SUNUCUDAN. Sabit ("mock") veri YOK — sablonun ornek sayfalarinda
+  gomulu rakamlar vardi ve birakilsaydi bos bir veritabaninda bile dolu bir panel
+  gorunur, sorun oldugunda kimse fark etmezdi.
+
+  ARAYUZ: puikinsh/Adminator sablonu (assets/adminator/adminator.css, MIT).
+  Sinif adlari sablonun kendi adlari — `.shell`, `.d-sidebar`, `.card`,
+  `.kpi-grid`, `.grid`, `.col-*`.
 -->
-<html lang="tr">
+<html lang="tr" data-theme="light">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -20,84 +25,97 @@
     <title>Garanmin — Genel Bakis</title>
     <link rel="icon" type="image/x-icon" href="assets/img/favicon/favicon.ico" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="assets/vendor/fonts/iconify-icons.css" />
-    <link rel="stylesheet" href="assets/vendor/css/core.css" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="assets/adminator/adminator.css" />
     <link rel="stylesheet" href="assets/css/garanmin.css" />
   </head>
 
   <body>
-    <div class="g-app" id="g-app">
-      <aside class="g-yan" id="garanmin-menu"></aside>
-      <header class="g-ust" id="garanmin-navbar"></header>
+    <div class="shell" id="g-app">
+      <aside class="d-sidebar" id="garanmin-menu"></aside>
 
-      <main class="g-icerik">
-        <div id="garanmin-error"></div>
+      <div class="main">
+        <header class="d-topbar" id="garanmin-navbar"></header>
 
-        <!-- VERITABANI SERIDI -->
-        <div class="g-satir esit-4" id="db-serit"></div>
+        <main class="content">
+          <div id="garanmin-error"></div>
 
-        <!-- IS METRIKLERI -->
-        <div class="g-satir esit-4" id="is-serit"></div>
+          <!-- VERITABANI SERIDI -->
+          <div class="kpi-grid" id="db-serit"></div>
+          <!-- IS METRIKLERI -->
+          <div class="kpi-grid" id="is-serit"></div>
 
-        <div class="g-satir esit-3 buyuk">
-          <div class="g-kart" style="grid-column: span 2">
-            <div class="g-kart-bas"><i class="bx bx-line-chart"></i> Son 30 gün — kullanıcı, cihaz, destek</div>
-            <div class="g-kart-govde" id="c-akis"></div>
-          </div>
-          <div class="g-kart">
-            <div class="g-kart-bas"><i class="bx bx-shield-quarter"></i> Garanti durumu</div>
-            <div class="g-kart-govde" id="c-garanti"></div>
-          </div>
-        </div>
+          <div class="grid">
+            <section class="card col-8">
+              <div class="card-head">
+                <div class="card-title-wrap">
+                  <span class="eyebrow">Son 30 gun</span>
+                  <h2 class="card-title">Kayit akisi</h2>
+                </div>
+                <span class="badge">kullanici · cihaz · destek</span>
+              </div>
+              <div class="g-grafik uzun" id="c-akis"></div>
+            </section>
 
-        <div class="g-satir esit-3 grafik">
-          <div class="g-kart">
-            <div class="g-kart-bas"><i class="bx bx-category"></i> Kategoriler</div>
-            <div class="g-kart-govde" id="c-kategori"></div>
+            <section class="card col-4">
+              <div class="card-head">
+                <div class="card-title-wrap">
+                  <span class="eyebrow">Cihazlar</span>
+                  <h2 class="card-title">Garanti durumu</h2>
+                </div>
+              </div>
+              <div class="g-grafik uzun" id="c-garanti"></div>
+            </section>
+
+            <section class="card col-4">
+              <div class="card-head">
+                <div class="card-title-wrap">
+                  <span class="eyebrow">Kirilim</span>
+                  <h2 class="card-title">Kategoriler</h2>
+                </div>
+              </div>
+              <div class="g-grafik" id="c-kategori"></div>
+            </section>
+
+            <section class="card col-4">
+              <div class="card-head">
+                <div class="card-title-wrap">
+                  <span class="eyebrow">Kirilim</span>
+                  <h2 class="card-title">Markalar</h2>
+                </div>
+              </div>
+              <div class="g-grafik" id="c-marka"></div>
+            </section>
+
+            <section class="card col-4">
+              <div class="card-head">
+                <div class="card-title-wrap">
+                  <span class="eyebrow">Canli</span>
+                  <h2 class="card-title">Son eklenen cihazlar</h2>
+                </div>
+              </div>
+              <div class="g-tablo-kutu" style="max-height:260px">
+                <table class="table">
+                  <!-- Sutun genislikleri SABIT (gerekce: garanmin.css). Toplam %100. -->
+                  <colgroup><col style="width:40%"><col style="width:24%"><col style="width:36%"></colgroup>
+                  <thead><tr><th>Cihaz</th><th>Marka</th><th>Kullanici</th></tr></thead>
+                  <tbody id="son-cihaz"><tr><td colspan="3" class="soluk">Yukleniyor...</td></tr></tbody>
+                </table>
+              </div>
+            </section>
           </div>
-          <div class="g-kart">
-            <div class="g-kart-bas"><i class="bx bx-purchase-tag"></i> Markalar</div>
-            <div class="g-kart-govde" id="c-marka"></div>
-          </div>
-          <div class="g-kart">
-            <div class="g-kart-bas"><i class="bx bx-time-five"></i> Son eklenen cihazlar</div>
-            <div class="g-kart-govde g-scroll">
-              <table class="g-tablo">
-                <!-- Sütun genişlikleri SABİT (gerekçe: garanmin.css). Toplam %100. -->
-                <colgroup><col style="width:40%"><col style="width:25%"><col style="width:35%"></colgroup>
-                <thead><tr><th>Cihaz</th><th>Marka</th><th>Kullanıcı</th></tr></thead>
-                <tbody id="son-cihaz"><tr><td colspan="3" class="text-muted">Yukleniyor...</td></tr></tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </main>
+        </main>
+      </div>
     </div>
 
     <script src="assets/vendor/libs/apex-charts/apexcharts.js"></script>
     <script src="assets/js/garanmin-api.js"></script>
     <script>
-      if (garanminGuardPage()) {
-        garanminShell('garanmin-dashboard.html', 'Genel Bakis');
-        yukle();
-      }
-
-      function kutu(hedef, liste) {
-        document.getElementById(hedef).innerHTML = liste.map(function (k) {
-          return '<div class="g-kart"><div class="g-ozet">'
-            + '<div class="g-ozet-ikon ' + k.renk + '"><i class="bx ' + k.ikon + '"></i></div>'
-            + '<div><div class="g-ozet-sayi">' + k.deger + '</div>'
-            + '<div class="g-ozet-etiket">' + k.etiket + '</div></div>'
-            + '</div></div>';
-        }).join('');
-      }
-
       async function yukle() {
         try {
           /*
-            HEPSI PARALEL. Siraya dizilseydi alti ayri gidis-donus ust uste binerdi;
-            `Promise.all` ile toplam sure en yavas cagri kadar oluyor.
+            HEPSI PARALEL. Siraya dizilseydi sekiz ayri gidis-donus ust uste
+            binerdi; `Promise.all` ile toplam sure en yavas cagri kadar oluyor.
           */
           const [stats, tablolar, saglik, akis, garanti, kategori, marka, son] = await Promise.all([
             garanminData('garanmin_stats'),
@@ -112,18 +130,18 @@
 
           const satir = tablolar.reduce(function (t, x) { return t + Number(x.satir); }, 0);
 
-          kutu('db-serit', [
-            { etiket: 'Veritabani boyutu', deger: saglik.db_size_text, ikon: 'bx-data',     renk: 'mor' },
-            { etiket: 'Toplam satir',      deger: gNum(satir),         ikon: 'bx-table',    renk: 'mavi' },
-            { etiket: 'Tablo',             deger: tablolar.length,     ikon: 'bx-layer',    renk: 'yesil' },
-            { etiket: 'Cihaz kaydi',       deger: gNum(stats.total_devices), ikon: 'bx-devices', renk: 'turuncu' },
+          gKpiYaz('db-serit', [
+            { etiket: 'Veritabani boyutu', deger: saglik.db_size_text, ikon: 'database', renk: 'purple' },
+            { etiket: 'Toplam satir',      deger: gNum(satir),         ikon: 'list',     renk: 'primary' },
+            { etiket: 'Tablo',             deger: tablolar.length,     ikon: 'layers',   renk: 'info' },
+            { etiket: 'Cihaz kaydi',       deger: gNum(stats.total_devices), ikon: 'monitor', renk: 'success' },
           ]);
 
-          kutu('is-serit', [
-            { etiket: 'Kullanıcı',        deger: gNum(stats.total_users),          ikon: 'bx-group',      renk: 'mavi' },
-            { etiket: 'Aylik aktif',      deger: gNum(stats.mau),                  ikon: 'bx-pulse',      renk: 'yesil' },
-            { etiket: 'Toplam kredi',     deger: gNum(stats.total_credits_sum),    ikon: 'bx-star',       renk: 'turuncu' },
-            { etiket: 'Destek talebi',    deger: gNum(stats.support_tickets_total),ikon: 'bx-support',    renk: 'kirmizi' },
+          gKpiYaz('is-serit', [
+            { etiket: 'Kullanici',     deger: gNum(stats.total_users),           ikon: 'users',   renk: 'primary' },
+            { etiket: 'Aylik aktif',   deger: gNum(stats.mau),                   ikon: 'activity',renk: 'success' },
+            { etiket: 'Toplam kredi',  deger: gNum(stats.total_credits_sum),     ikon: 'star',    renk: 'warning' },
+            { etiket: 'Destek talebi', deger: gNum(stats.support_tickets_total), ikon: 'support', renk: 'danger' },
           ]);
 
           cizAkis(akis);
@@ -138,16 +156,16 @@
         if (gBos('c-akis', v)) return;
         const t = gGrafikTemel();
         t.chart.type = 'area';
-        new ApexCharts(document.getElementById('c-akis'), Object.assign(t, {
+        new ApexCharts(gKap('c-akis'), Object.assign(t, {
           series: [
-            { name: 'Kullanıcı', data: v.map(function (d) { return Number(d.kullanici); }) },
+            { name: 'Kullanici', data: v.map(function (d) { return Number(d.kullanici); }) },
             { name: 'Cihaz',     data: v.map(function (d) { return Number(d.cihaz); }) },
             { name: 'Destek',    data: v.map(function (d) { return Number(d.talep); }) },
           ],
           xaxis: { categories: v.map(function (d) { return gDate(d.gun); }),
                    labels: { rotate: 0, hideOverlappingLabels: true } },
           stroke: { curve: 'smooth', width: 2 },
-          fill: { type: 'gradient', gradient: { opacityFrom: .35, opacityTo: .02 } },
+          fill: { type: 'gradient', gradient: { opacityFrom: .28, opacityTo: .02 } },
           colors: [G_RENK[0], G_RENK[1], G_RENK[3]],
           legend: { position: 'top', horizontalAlign: 'right' },
         })).render();
@@ -157,12 +175,12 @@
         if (gBos('c-garanti', v)) return;
         const t = gGrafikTemel();
         t.chart.type = 'donut';
-        new ApexCharts(document.getElementById('c-garanti'), Object.assign(t, {
+        new ApexCharts(gKap('c-garanti'), Object.assign(t, {
           series: v.map(function (d) { return Number(d.count); }),
           labels: v.map(function (d) { return gDurum(d.status).ad; }),
           colors: v.map(function (d) { return gDurum(d.status).renk; }),
           legend: { position: 'bottom' },
-          plotOptions: { pie: { donut: { size: '62%' } } },
+          plotOptions: { pie: { donut: { size: '64%' } } },
         })).render();
       }
 
@@ -170,12 +188,11 @@
         if (gBos('c-kategori', v)) return;
         const t = gGrafikTemel();
         t.chart.type = 'bar';
-        new ApexCharts(document.getElementById('c-kategori'), Object.assign(t, {
+        new ApexCharts(gKap('c-kategori'), Object.assign(t, {
           series: [{ name: 'Cihaz', data: v.map(function (d) { return Number(d.count); }) }],
           xaxis: { categories: v.map(function (d) { return gKategori(d.category); }) },
           plotOptions: { bar: { borderRadius: 5, distributed: true, columnWidth: '55%' } },
           legend: { show: false },
-          colors: G_RENK,
         })).render();
       }
 
@@ -183,7 +200,7 @@
         if (gBos('c-marka', v)) return;
         const t = gGrafikTemel();
         t.chart.type = 'bar';
-        new ApexCharts(document.getElementById('c-marka'), Object.assign(t, {
+        new ApexCharts(gKap('c-marka'), Object.assign(t, {
           series: [{ name: 'Cihaz', data: v.map(function (d) { return Number(d.count); }) }],
           xaxis: { categories: v.map(function (d) { return d.brand; }) },
           plotOptions: { bar: { horizontal: true, borderRadius: 5, barHeight: '62%' } },
@@ -194,17 +211,23 @@
       function sonCihaz(v) {
         const tb = document.getElementById('son-cihaz');
         if (!v || !v.length) {
-          tb.innerHTML = '<tr><td colspan="3" class="text-muted">Kayit yok</td></tr>';
+          tb.innerHTML = '<tr><td colspan="3" class="soluk">Kayit yok</td></tr>';
           return;
         }
-        // Kullanici verisi `gEsc` ile kaciriliyor (gerekce: garanmin-api.js).
+        /* Kullanici verisi `gEsc` ile kaciriliyor (gerekce: garanmin-api.js).
+           `title`: sutunlar sabit genislikte, uzun deger kesiliyor. */
         tb.innerHTML = v.map(function (d) {
-          /* `title`: sutunlar sabit genislikte, uzun deger kesiliyor. */
-          return '<tr><td title="' + gEsc(d.name) + '">' + gEsc(d.name) + '</td>'
+          return '<tr>'
+            + '<td title="' + gEsc(d.name) + '">' + gEsc(d.name) + '</td>'
             + '<td title="' + gEsc(d.brand) + '">' + gEsc(d.brand) + '</td>'
-            + '<td class="text-muted" title="' + gEsc(d.email || '-') + '">'
-              + gEsc(d.email || '-') + '</td></tr>';
+            + '<td class="soluk" title="' + gEsc(d.email || '-') + '">' + gEsc(d.email || '-') + '</td>'
+            + '</tr>';
         }).join('');
+      }
+
+      if (garanminGuardPage()) {
+        garanminShell('garanmin-dashboard.html', 'Genel Bakis', 'Panel');
+        yukle();
       }
     </script>
   </body>

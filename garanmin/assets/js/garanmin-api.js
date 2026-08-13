@@ -4,12 +4,25 @@
  * Bütün sayfalar Supabase'e buradan konuşuyor, iskeleti (kenar menü + üst çubuk)
  * buradan alıyor ve oturumu buradan kontrol ediyor.
  *
+ * ─── ARAYÜZ: ADMINATOR ────────────────────────────────────────────────────
+ *
+ * Panel, puikinsh/Adminator-admin-dashboard şablonunun DERLENMİŞ stil dosyası
+ * üzerine kuruldu (assets/adminator/adminator.css, MIT). Şablonun sınıf adları
+ * olduğu gibi kullanılıyor — `.shell`, `.d-sidebar`, `.d-topbar`, `.card`,
+ * `.kpi-card`, `.table`, `.badge`, `.btn`… Kendi karşılıklarını yazmak yerine
+ * şablonun kendi sınıflarını kullanmak, şablonun bir sonraki sürümüne geçmeyi
+ * dosya değiştirmek kadar basit tutuyor.
+ *
+ * İKONLAR SVG, İKON YAZI TİPİ DEĞİL. Şablonun bütün ikon kuralları
+ * `.nav-link > svg`, `.kpi-icon svg`, `.btn svg` gibi seçicilerle yazılmış;
+ * boxicons'ın `<i class="bx">` etiketleri bu kuralların hiçbirine uymuyordu.
+ * `gIkon()` şablonun kullandığı çizgi (feather) ailesinden satır içi SVG üretiyor.
+ *
  * ─── NEDEN TEK DOSYA ──────────────────────────────────────────────────────
  *
- * Panel statik HTML sayfalarından oluşuyor. Menü her sayfaya kopyalansaydı yeni bir
- * sayfa eklemek on dosyayı birden düzenlemek olurdu ve biri unutulduğunda kullanıcı
- * menüde görünmeyen bir sayfada kalırdı. Menü tek yerde üretiliyor; sayfalar yalnızca
- * kendi içeriğini yazıyor.
+ * Panel statik HTML sayfalarından oluşuyor. Menü her sayfaya kopyalansaydı yeni
+ * bir sayfa eklemek on dosyayı birden düzenlemek olurdu ve biri unutulduğunda
+ * kullanıcı menüde görünmeyen bir sayfada kalırdı. Menü tek yerde üretiliyor.
  */
 
 /* ══════════════════════════════════════════════════════════════════════════
@@ -22,20 +35,20 @@ const GARANMIN = {
   /*
     ANON ANAHTARI — GİZLİ DEĞİL, gizli olması da beklenmiyor.
 
-    Aynı anahtar mobil uygulamanın içinde de dağıtılıyor; tarayıcıdan okunabilir olması
-    yeni bir açık üretmiyor. Verinin kapısı bu anahtar değil, sunucudaki oturum kontrolü:
-    her `garanmin_*` fonksiyonu ilk satırında jetonu doğruluyor (`garanmin_guard`).
-    Anahtarla tek başına hiçbir veri okunamıyor.
+    Aynı anahtar mobil uygulamanın içinde de dağıtılıyor; tarayıcıdan okunabilir
+    olması yeni bir açık üretmiyor. Verinin kapısı bu anahtar değil, sunucudaki
+    oturum kontrolü: her `garanmin_*` fonksiyonu ilk satırında jetonu doğruluyor
+    (`garanmin_guard`). Anahtarla tek başına hiçbir veri okunamıyor.
   */
   anonKey: 'sb_publishable_OQXQZLhb_4coBQvG6AM2TQ_qtyl59LY',
 
   /*
     JETON `sessionStorage`'DA — `localStorage`'da DEĞİL.
 
-    `localStorage` sekme kapanınca da kalıyor; ortak kullanılan bir bilgisayarda bu,
-    tarayıcıyı kapatıp giden yöneticinin oturumunu bir sonrakine devretmek demek.
-    `sessionStorage` sekmeyle birlikte siliniyor. Sunucuda da 8 saatlik ömür var,
-    yani iki taraf birden sınırlıyor.
+    `localStorage` sekme kapanınca da kalıyor; ortak kullanılan bir bilgisayarda
+    bu, tarayıcıyı kapatıp giden yöneticinin oturumunu bir sonrakine devretmek
+    demek. `sessionStorage` sekmeyle birlikte siliniyor. Sunucuda da 8 saatlik
+    ömür var, yani iki taraf birden sınırlıyor.
   */
   tokenKey: 'garanmin_token',
   userKey:  'garanmin_user',
@@ -62,8 +75,6 @@ function garanminSetSession(s) {
   if (s.username)   sessionStorage.setItem(GARANMIN.userKey, s.username);
   if (s.expires_at) sessionStorage.setItem(GARANMIN.expKey, s.expires_at);
 }
-/* Eski adıyla da çağrılabilsin diye korunuyor. */
-function garanminSetToken(t) { sessionStorage.setItem(GARANMIN.tokenKey, t); }
 
 function garanminClearToken() {
   sessionStorage.removeItem(GARANMIN.tokenKey);
@@ -74,9 +85,10 @@ function garanminClearToken() {
 /**
  * Supabase RPC çağrısı.
  *
- * HATA MESAJI OLDUĞU GİBİ AKTARILIYOR: sunucudan gelen "Oturum gecersiz veya suresi
- * dolmus" gibi mesajlar kullanıcıya söylenecek şeyin ta kendisi. Genel bir "bir hata
- * oluştu" metnine çevirmek, sebebi yalnızca ağ sekmesinde görünür kılardı.
+ * HATA MESAJI OLDUĞU GİBİ AKTARILIYOR: sunucudan gelen "Oturum gecersiz veya
+ * suresi dolmus" gibi mesajlar kullanıcıya söylenecek şeyin ta kendisi. Genel bir
+ * "bir hata oluştu" metnine çevirmek, sebebi yalnızca ağ sekmesinde görünür
+ * kılardı.
  */
 async function garanminRpc(fn, params = {}) {
   const res = await fetch(`${GARANMIN.supabaseUrl}/rest/v1/rpc/${fn}`, {
@@ -97,9 +109,9 @@ async function garanminRpc(fn, params = {}) {
     const mesaj = (body && (body.message || body.hint)) || `Sunucu hatasi (${res.status})`;
     const hata = new Error(mesaj);
     /*
-      OTURUM HATASI AYRI İŞARETLENİYOR. Çağıran taraf bunu görünce kullanıcıyı giriş
-      sayfasına yolluyor; başka bir hatada sayfada kalıp mesajı gösteriyor. İkisi
-      ayrılmasaydı geçici bir ağ hatası da kullanıcıyı oturumdan atardı.
+      OTURUM HATASI AYRI İŞARETLENİYOR. Çağıran taraf bunu görünce kullanıcıyı
+      giriş sayfasına yolluyor; başka bir hatada sayfada kalıp mesajı gösteriyor.
+      İkisi ayrılmasaydı geçici bir ağ hatası da kullanıcıyı oturumdan atardı.
     */
     hata.oturumBitti = /oturum|session|jwt|unauthor/i.test(mesaj);
     throw hata;
@@ -142,6 +154,74 @@ async function garanminLogout() {
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
+   İKONLAR
+   ══════════════════════════════════════════════════════════════════════════
+
+   Şablonun ikon kuralları `svg` seçicileri üzerine kurulu; ikon yazı tipi
+   (boxicons) bu kuralların hiçbirine uymuyor ve hizalama/boyut şablondan
+   kopuyordu. Buradaki yollar şablonun kullandığı çizgi ailesinden.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+const G_IKON = {
+  grid:      '<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>',
+  database:  '<ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.7 4 3 9 3s9-1.3 9-3V5"/><path d="M3 12c0 1.7 4 3 9 3s9-1.3 9-3"/>',
+  users:     '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+  monitor:   '<rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/>',
+  wallet:    '<path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4z"/>',
+  support:   '<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><path d="m4.93 4.93 4.24 4.24m5.66 5.66 4.24 4.24m0-14.14-4.24 4.24m-5.66 5.66-4.24 4.24"/>',
+  server:    '<rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><path d="M6 6h.01M6 18h.01"/>',
+  activity:  '<path d="M22 12h-4l-3 9L9 3l-3 9H2"/>',
+  chart:     '<path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/>',
+  bar:       '<path d="M12 20V10M18 20V4M6 20v-4"/>',
+  pie:       '<path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/>',
+  layers:    '<path d="m12 2 9 5-9 5-9-5 9-5z"/><path d="m3 17 9 5 9-5"/><path d="m3 12 9 5 9-5"/>',
+  shield:    '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>',
+  check:     '<path d="M20 6 9 17l-5-5"/>',
+  clock:     '<circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>',
+  alert:     '<circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/>',
+  x:         '<path d="M18 6 6 18M6 6l12 12"/>',
+  star:      '<path d="m12 2 3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z"/>',
+  tv:        '<rect x="2" y="7" width="20" height="15" rx="2"/><path d="m17 2-5 5-5-5"/>',
+  tag:       '<path d="M20.59 13.41 12 22l-9-9V3h10l7.59 7.59a2 2 0 0 1 0 2.82z"/><path d="M7 7h.01"/>',
+  box:       '<path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="m3.3 7 8.7 5 8.7-5M12 22V12"/>',
+  home:      '<path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/>',
+  userPlus:  '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/>',
+  userCheck: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="m17 11 2 2 4-4"/>',
+  run:       '<path d="M13 4a2 2 0 1 0 0-.01"/><path d="m8 21 3-6 3 2 2 4"/><path d="m5 12 3-5 4 2 3 3 3 1"/>',
+  trend:     '<path d="m22 7-8.5 8.5-5-5L2 17"/><path d="M16 7h6v6"/>',
+  minus:     '<circle cx="12" cy="12" r="10"/><path d="M8 12h8"/>',
+  calc:      '<rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8M8 10h.01M12 10h.01M16 10h.01M8 14h.01M12 14h.01M16 14h.01M8 18h8"/>',
+  trophy:    '<path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M6 2h12v7a6 6 0 0 1-12 0z"/><path d="M9 22h6M12 15v7"/>',
+  list:      '<path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>',
+  hdd:       '<rect x="2" y="14" width="20" height="8" rx="2"/><path d="M6.5 18h.01M10 18h.01"/><path d="m5 14 2.5-8h9L19 14"/>',
+  calendar:  '<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>',
+  search:    '<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>',
+  logout:    '<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5M21 12H9"/>',
+  login:     '<path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="m10 17 5-5-5-5M15 12H3"/>',
+  menu:      '<path d="M3 12h18M3 6h18M3 18h18"/>',
+  chevRight: '<path d="m9 18 6-6-6-6"/>',
+  chevLeft:  '<path d="m15 18-6-6 6-6"/>',
+  info:      '<circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/>',
+  message:   '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',
+  file:      '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/>',
+  idCard:    '<rect x="2" y="4" width="20" height="16" rx="2"/><circle cx="8" cy="12" r="2.5"/><path d="M14 10h5M14 14h5M4 17c.7-1.7 2.2-2.5 4-2.5s3.3.8 4 2.5"/>',
+  refresh:   '<path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 3v6h-6"/>',
+};
+
+/**
+ * Satır içi SVG ikon.
+ *
+ * @param ad     G_IKON anahtarı
+ * @param sinif  isteğe bağlı ek sınıf
+ */
+function gIkon(ad, sinif) {
+  const yol = G_IKON[ad] || G_IKON.info;
+  return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"'
+    + ' stroke-linecap="round" stroke-linejoin="round"'
+    + (sinif ? ' class="' + sinif + '"' : '') + ' aria-hidden="true">' + yol + '</svg>';
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
    MENÜ TANIMI
    ══════════════════════════════════════════════════════════════════════════
 
@@ -151,11 +231,11 @@ async function garanminLogout() {
    ══════════════════════════════════════════════════════════════════════════ */
 
 const GARANMIN_MENU = [
-  { ad: 'Genel', ikon: 'bx-grid-alt', alt: [
+  { ad: 'Genel', ikon: 'grid', alt: [
     { href: 'garanmin-dashboard.html', ad: 'Ozet' },
     { href: 'garanmin-sistem.html',    ad: 'Sistem Durumu' },
   ]},
-  { ad: 'Veri Tabani', ikon: 'bx-data', alt: [
+  { ad: 'Veri Tabani', ikon: 'database', alt: [
     { href: 'garanmin-db.html',   ad: 'Tablolar' },
     { href: 'garanmin-akis.html', ad: 'Zaman Akisi' },
   ]},
@@ -163,17 +243,17 @@ const GARANMIN_MENU = [
      aciliyor. Ayri bir sayfa olsaydi geri donuldugunde arama kutusu bosalir,
      sayfa numarasi sifirlanir ve kullanici aradigi satiri yeniden bulmak
      zorunda kalirdi. */
-  { ad: 'Kullanicilar', ikon: 'bx-group', alt: [
+  { ad: 'Kullanicilar', ikon: 'users', alt: [
     { href: 'garanmin-users.html', ad: 'Liste' },
   ]},
-  { ad: 'Cihazlar', ikon: 'bx-devices', alt: [
+  { ad: 'Cihazlar', ikon: 'monitor', alt: [
     { href: 'garanmin-devices.html',     ad: 'Kirilimlar' },
     { href: 'garanmin-devices-son.html', ad: 'Son Eklenenler' },
   ]},
-  { ad: 'Gelir Gider', ikon: 'bx-wallet', alt: [
+  { ad: 'Gelir Gider', ikon: 'wallet', alt: [
     { href: 'garanmin-ekonomi.html', ad: 'Kredi Ekonomisi' },
   ]},
-  { ad: 'Destek', ikon: 'bx-support', alt: [
+  { ad: 'Destek', ikon: 'support', alt: [
     { href: 'garanmin-support.html', ad: 'Talepler' },
   ]},
 ];
@@ -190,38 +270,30 @@ const GARANMIN_MENU = [
  * buhar çubuğu kademeli olarak yükseliyor.
  *
  * MASKE YOK — uygulamada da yok. Belgeyi gizleyen şey boyama sırası: fincanın ön
- * gövdesi belgeden SONRA çiziliyor, dolayısıyla üstünü örtüyor. (Uygulamada maske
- * bir dönem vardı ama react-native-svg'nin `Mask` desteği Android'de sessizce
- * çalışmadığı için kaldırılmıştı; tarayıcıda da gerek yok.)
- *
- * `gradyanEk` — aynı sayfada iki logo olduğunda degrade kimlikleri çakışmasın diye
- * son ek alıyor. SVG'de `id`ler belge genelinde benzersiz olmak zorunda; iki kopya
- * aynı kimliği kullansaydı ikincisi birincinin degradesini devralır ve renkler
- * beklenmedik şekilde değişirdi.
+ * gövdesi belgeden SONRA çiziliyor, dolayısıyla üstünü örtüyor.
  */
-function garanminLogo(gradyanEk) {
-  const e = gradyanEk || 'a';
+function garanminLogo() {
   return `
 <svg class="g-logo" viewBox="0 0 200 200" aria-hidden="true">
   <defs>
-    <linearGradient id="cup-${e}" x1="0%" y1="0%" x2="100%" y2="0%">
+    <linearGradient id="cup-g" x1="0%" y1="0%" x2="100%" y2="0%">
       <stop offset="0%" stop-color="#053582"/><stop offset="20%" stop-color="#0B57D0"/>
       <stop offset="80%" stop-color="#4285F4"/><stop offset="100%" stop-color="#8ab4f8"/>
     </linearGradient>
-    <linearGradient id="ins-${e}" x1="0%" y1="0%" x2="100%" y2="0%">
+    <linearGradient id="ins-g" x1="0%" y1="0%" x2="100%" y2="0%">
       <stop offset="0%" stop-color="#03204e"/><stop offset="20%" stop-color="#053582"/>
       <stop offset="80%" stop-color="#0B57D0"/><stop offset="100%" stop-color="#1a73e8"/>
     </linearGradient>
-    <linearGradient id="sau-${e}" x1="0%" y1="0%" x2="100%" y2="0%">
+    <linearGradient id="sau-g" x1="0%" y1="0%" x2="100%" y2="0%">
       <stop offset="0%" stop-color="#1a73e8"/><stop offset="100%" stop-color="#0f4185"/>
     </linearGradient>
-    <linearGradient id="doc-${e}" x1="0%" y1="0%" x2="100%" y2="100%">
+    <linearGradient id="doc-g" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#EA4335"/><stop offset="100%" stop-color="#B31412"/>
     </linearGradient>
   </defs>
 
   <ellipse cx="100" cy="176" rx="65" ry="8" fill="#e2e8f0"/>
-  <ellipse cx="100" cy="165" rx="80" ry="16" fill="url(#sau-${e})"/>
+  <ellipse cx="100" cy="165" rx="80" ry="16" fill="url(#sau-g)"/>
   <ellipse cx="100" cy="165" rx="50" ry="10" fill="#1558b0" opacity="0.6"/>
   <ellipse cx="100" cy="165" rx="49" ry="9" fill="none" stroke="#8ab4f8" stroke-width="1.5"/>
   <ellipse cx="100" cy="165" rx="40" ry="8" fill="#0f4185" opacity="0.5"/>
@@ -229,12 +301,12 @@ function garanminLogo(gradyanEk) {
   <path d="M 155 105 C 190 105, 185 145, 140 148" fill="none" stroke="#1a73e8"
         stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
 
-  <ellipse cx="100" cy="95" rx="55" ry="13.5" fill="url(#ins-${e})"/>
-  <ellipse cx="100" cy="95" rx="59" ry="15" fill="none" stroke="url(#cup-${e})" stroke-width="2.5"/>
+  <ellipse cx="100" cy="95" rx="55" ry="13.5" fill="url(#ins-g)"/>
+  <ellipse cx="100" cy="95" rx="59" ry="15" fill="none" stroke="url(#cup-g)" stroke-width="2.5"/>
 
   <g class="g-belge">
     <g transform="translate(75, 10)">
-      <rect x="0" y="0" width="50" height="70" rx="6" fill="url(#doc-${e})"/>
+      <rect x="0" y="0" width="50" height="70" rx="6" fill="url(#doc-g)"/>
       <rect x="0" y="0" width="50" height="2" rx="1" fill="#ffffff" opacity="0.4"/>
       <rect x="12" y="14" width="26" height="4" rx="2" fill="#ffffff"/>
       <rect x="12" y="24" width="16" height="4" rx="2" fill="#ffffff"/>
@@ -244,7 +316,7 @@ function garanminLogo(gradyanEk) {
   </g>
 
   <path d="M 41 95 A 59 15 0 0 0 159 95 C 159 150, 135 165, 100 165 C 65 165, 41 150, 41 95 Z"
-        fill="url(#cup-${e})" stroke="url(#cup-${e})" stroke-width="2.5" stroke-linejoin="round"/>
+        fill="url(#cup-g)" stroke="url(#cup-g)" stroke-width="2.5" stroke-linejoin="round"/>
 
   <rect class="b1" x="70"  y="65" width="6" height="14" rx="3" fill="#8ab4f8"/>
   <rect class="b2" x="84"  y="60" width="6" height="20" rx="3" fill="#669df6"/>
@@ -254,8 +326,7 @@ function garanminLogo(gradyanEk) {
 </svg>`;
 }
 
-/* Eski adıyla da kullanılabilsin (giriş sayfası bunu okuyor). */
-const GARANMIN_LOGO = garanminLogo('menu');
+const GARANMIN_LOGO = garanminLogo();
 
 /* ══════════════════════════════════════════════════════════════════════════
    İSKELET
@@ -269,19 +340,21 @@ const GARANMIN_LOGO = garanminLogo('menu');
  *               dosya yerel diskten (file://) açıldığında yol biçimi işletim
  *               sistemine göre değişiyor; parametre geçmek her ortamda aynı.
  * @param baslik üst çubuktaki sayfa başlığı.
+ * @param ustBil başlığın üstündeki küçük etiket (şablonun `.eyebrow`'u).
  */
-function garanminShell(aktif, baslik) {
+function garanminShell(aktif, baslik, ustBil) {
   const menuHtml = GARANMIN_MENU.map((g, i) => {
     const grupAktif = g.alt.some(a => a.href === aktif);
     return `
-      <div class="g-grup ${grupAktif ? 'acik aktif-grup' : ''}" data-grup="${i}">
-        <div class="g-grup-bas" onclick="garanminGrupAc(${i})" title="${g.ad}">
-          <i class="bx ${g.ikon}"></i>
-          <span class="g-metin-gizle">${g.ad}</span>
-          <i class="bx bx-chevron-right ok g-metin-gizle"></i>
-        </div>
-        <div class="g-alt">
-          ${g.alt.map(a => `<a href="${a.href}" class="${a.href === aktif ? 'aktif' : ''}">${a.ad}</a>`).join('')}
+      <div class="nav-item-group${grupAktif ? ' is-open' : ''}" data-grup="${i}">
+        <a class="nav-link${grupAktif ? ' is-active' : ''}" href="javascript:void(0)"
+           onclick="garanminGrupAc(${i})" title="${gEsc(g.ad)}">
+          ${gIkon(g.ikon)}
+          <span>${gEsc(g.ad)}</span>
+          ${gIkon('chevRight', 'chev')}
+        </a>
+        <div class="nav-submenu">
+          ${g.alt.map(a => `<a href="${a.href}" class="${a.href === aktif ? 'is-active' : ''}">${gEsc(a.ad)}</a>`).join('')}
         </div>
       </div>`;
   }).join('');
@@ -291,26 +364,39 @@ function garanminShell(aktif, baslik) {
       ${GARANMIN_LOGO}
       <span class="g-marka-yazi"><span class="a">Garan</span><span class="b">min</span></span>
     </div>
-    <nav class="g-menu">${menuHtml}</nav>`;
+    <nav class="nav-section">
+      <div class="nav-label">Panel</div>
+      ${menuHtml}
+    </nav>
+    <div class="sidebar-footer">
+      <div class="eyebrow" style="margin-bottom:6px">Oturum</div>
+      <div style="font-size:12.5px;color:var(--t-base)">${gEsc(garanminUser())}</div>
+      <div class="g-kalan" id="g-oturum">-</div>
+    </div>`;
 
   const bas = garanminUser().slice(0, 2).toUpperCase();
   document.getElementById('garanmin-navbar').innerHTML = `
-    <button class="g-katla" onclick="garanminKatla()" title="Menuyu ac/kapat" aria-label="Menuyu ac/kapat">
-      <i class="bx bx-menu"></i>
-    </button>
-    <h1 class="g-baslik">${gEsc(baslik || '')}</h1>
-    <div class="g-sag">
-      <span class="g-canli" id="g-canli" title="Veritabani baglantisi">
-        <span class="g-nokta"></span><span id="g-canli-yazi">baglaniyor</span>
-      </span>
-      <div class="g-saat"><div class="s" id="g-saat">--:--:--</div><div class="t" id="g-tarih">-</div></div>
-      <div class="g-kullanici" title="Oturum: ${gEsc(garanminUser())}">
-        <span class="g-avatar">${gEsc(bas)}</span>
-        <span><span class="ad">${gEsc(garanminUser())}</span><br><span class="rol" id="g-oturum">yonetici</span></span>
+    <div class="g-ust-sol">
+      <button class="icon-btn" onclick="garanminKatla()" title="Menuyu ac/kapat"
+              aria-label="Menuyu ac/kapat">${gIkon('menu')}</button>
+      <div class="g-ust-baslik">
+        <span class="eyebrow">${gEsc(ustBil || 'Garanmin')}</span>
+        <h1>${gEsc(baslik || '')}</h1>
       </div>
-      <button class="btn btn-sm btn-outline-secondary" onclick="garanminLogout()" title="Cikis">
-        <i class="bx bx-log-out"></i>
-      </button>
+    </div>
+    <div class="topbar-actions">
+      <span class="badge dot" id="g-canli" title="Veritabani baglantisi">
+        <span id="g-canli-yazi">baglaniyor</span>
+      </span>
+      <div class="g-saat">
+        <div class="s" id="g-saat">--:--:--</div>
+        <div class="t" id="g-tarih">-</div>
+      </div>
+      <button class="icon-btn" onclick="location.reload()" title="Yenile"
+              aria-label="Yenile">${gIkon('refresh')}</button>
+      <button class="icon-btn" onclick="garanminLogout()" title="Cikis"
+              aria-label="Cikis">${gIkon('logout')}</button>
+      <span class="avatar" title="Oturum: ${gEsc(garanminUser())}">${gEsc(bas)}</span>
     </div>`;
 
   garanminKatlaUygula(localStorage.getItem('garanmin_dar') === '1');
@@ -322,8 +408,7 @@ function garanminShell(aktif, baslik) {
  * Bir grubu açıp diğerlerini kapatır (akordiyon).
  *
  * HEPSİ AYNI ANDA AÇIK OLABİLİRDİ ama o zaman menü, kenar çubuğundan uzun olur ve
- * içeride ayrıca kaydırma gerekirdi — "her şey tek ekranda" kuralının menüde
- * bozulması demek.
+ * içeride ayrıca kaydırma gerekirdi.
  */
 function garanminGrupAc(i) {
   // Simge durumundayken tıklamak menüyü açıyor: kapalı bir menüde alt başlıkları
@@ -331,11 +416,11 @@ function garanminGrupAc(i) {
   if (document.getElementById('g-app').classList.contains('dar')) {
     garanminKatlaUygula(false);
   }
-  const hedef = document.querySelector('.g-grup[data-grup="' + i + '"]');
-  const zatenAcik = hedef && hedef.classList.contains('acik');
-  document.querySelectorAll('.g-grup').forEach(el => el.classList.remove('acik'));
+  const hedef = document.querySelector('.nav-item-group[data-grup="' + i + '"]');
+  const zatenAcik = hedef && hedef.classList.contains('is-open');
+  document.querySelectorAll('.nav-item-group').forEach(el => el.classList.remove('is-open'));
   // Açık olana tekrar tıklamak kapatıyor; başkasına tıklamak öbürünü kapatıp bunu açıyor.
-  if (hedef && !zatenAcik) hedef.classList.add('acik');
+  if (hedef && !zatenAcik) hedef.classList.add('is-open');
 }
 
 function garanminKatla() {
@@ -350,12 +435,10 @@ function garanminKatla() {
  *
  * Menü katlanınca içerik alanı ~176 piksel genişliyor. ApexCharts kendi boyutunu
  * yalnızca PENCERE yeniden boyutlandığında hesaplıyor; pencere değişmediği için
- * grafikler eski genişlikte kalıyor ve kartın sağında boş bir şerit bırakıyordu
- * (açarken de tersi: grafik kartın dışına taşıyordu). Geçiş bittikten sonra
- * yapay bir `resize` olayı, grafiklerin kendi kendini yeniden ölçmesini sağlıyor.
- *
- * 240 ms, CSS'teki .2s geçişten biraz uzun: geçiş sırasında ölçüm alınırsa
- * grafik ARADAKİ genişliğe göre çizilir ve sorun aynen kalır.
+ * grafikler eski genişlikte kalıyor ve kartın sağında boş bir şerit bırakıyordu.
+ * Geçiş bittikten sonra yapay bir `resize` olayı, grafiklerin kendini yeniden
+ * ölçmesini sağlıyor. 240 ms, CSS'teki geçişten biraz uzun: geçiş sırasında ölçüm
+ * alınırsa grafik ARADAKİ genişliğe göre çizilir ve sorun aynen kalır.
  */
 function garanminKatlaUygula(dar) {
   document.getElementById('g-app').classList.toggle('dar', !!dar);
@@ -377,15 +460,15 @@ function garanminSaatBaslat() {
     if (!s) return;
     s.textContent = d.toLocaleTimeString('tr-TR');
     t.textContent = d.toLocaleDateString('tr-TR') + ' · ' + gunler[d.getDay()];
-    // Oturumun kalan süresi de burada: 8 saatlik ömür sessizce dolup kullanıcıyı
-    // beklenmedik bir anda girişe atmasın.
+    // Oturumun kalan süresi: 8 saatlik ömür sessizce dolup kullanıcıyı beklenmedik
+    // bir anda girişe atmasın.
     const exp = garanminExp();
     const o = document.getElementById('g-oturum');
     if (exp && o) {
       const kalan = Math.max(0, Math.round((new Date(exp) - d) / 60000));
       o.textContent = kalan > 60
-        ? 'oturum ' + Math.floor(kalan / 60) + ' sa ' + (kalan % 60) + ' dk'
-        : 'oturum ' + kalan + ' dk';
+        ? Math.floor(kalan / 60) + ' sa ' + (kalan % 60) + ' dk kaldi'
+        : kalan + ' dk kaldi';
     }
   }
   tik();
@@ -428,8 +511,7 @@ function garanminCanli(ok, not) {
   const el = document.getElementById('g-canli');
   const yazi = document.getElementById('g-canli-yazi');
   if (!el || !yazi) return;
-  el.classList.toggle('ok', !!ok);
-  el.classList.toggle('hata', !ok);
+  el.className = 'badge dot ' + (ok ? 'success g-nabiz' : 'danger');
   yazi.textContent = ok ? (not || 'canli') : 'baglanti yok';
   if (not) el.title = not;
 }
@@ -442,8 +524,8 @@ function garanminCanli(ok, not) {
  * Modalı açar.
  *
  * ESC VE PERDEYE TIKLAMA İLE DE KAPANIYOR. Yalnızca çarpı düğmesi bırakılsaydı,
- * kapatmanın tek yolu ekranın sağ üst köşesindeki 30 piksellik bir hedefe nişan
- * almak olurdu; ikisi de kullanıcının refleksle denediği yollar.
+ * kapatmanın tek yolu ekranın sağ üst köşesindeki küçük bir hedefe nişan almak
+ * olurdu; ikisi de kullanıcının refleksle denediği yollar.
  */
 function garanminModalAc(baslikHtml, govdeHtml) {
   let p = document.getElementById('g-modal-perde');
@@ -452,9 +534,9 @@ function garanminModalAc(baslikHtml, govdeHtml) {
     p.id = 'g-modal-perde';
     p.className = 'g-modal-perde';
     p.innerHTML = `
-      <div class="g-modal" id="g-modal">
-        <div class="g-modal-bas" id="g-modal-bas"></div>
-        <div class="g-modal-govde" id="g-modal-govde"></div>
+      <div class="modal-demo g-modal" id="g-modal">
+        <div class="modal-head" id="g-modal-bas"></div>
+        <div class="modal-body g-modal-govde" id="g-modal-govde"></div>
       </div>`;
     document.body.appendChild(p);
 
@@ -465,8 +547,8 @@ function garanminModalAc(baslikHtml, govdeHtml) {
     });
   }
   document.getElementById('g-modal-bas').innerHTML = baslikHtml
-    + '<button class="g-modal-kapat" onclick="garanminModalKapat()" aria-label="Kapat">'
-    + '<i class="bx bx-x"></i></button>';
+    + '<button class="icon-btn" onclick="garanminModalKapat()" aria-label="Kapat">'
+    + gIkon('x') + '</button>';
   document.getElementById('g-modal-govde').innerHTML = govdeHtml;
   p.classList.add('acik');
 }
@@ -474,6 +556,58 @@ function garanminModalAc(baslikHtml, govdeHtml) {
 function garanminModalKapat() {
   const p = document.getElementById('g-modal-perde');
   if (p) p.classList.remove('acik');
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   BİLEŞEN ÜRETİCİLERİ — şablonun sınıflarıyla
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/**
+ * KPI kartı — şablonun `.kpi-card` yapısı.
+ *
+ * `c-<renk>` sınıfı kartın köşesindeki yumuşak parıltıyı da o renge boyuyor
+ * (şablonda `.kpi-card:before` `currentColor` kullanıyor), bu yüzden ikon rengi
+ * ile kart rengi AYRI DEĞİL, tek bir değerden geliyor.
+ */
+function gKpi(liste) {
+  return liste.map(function (k) {
+    const renk = k.renk || 'primary';
+    return '<div class="kpi-card c-' + renk + '">'
+      +   '<div class="kpi-top">'
+      +     '<div class="kpi-identity" style="display:flex;align-items:center">'
+      +       '<div class="kpi-icon ' + renk + '">' + gIkon(k.ikon) + '</div>'
+      +       '<div class="kpi-label">' + gEsc(k.etiket) + '</div>'
+      +     '</div>'
+      +   '</div>'
+      +   '<div class="kpi-value">' + k.deger + '</div>'
+      +   (k.alt ? '<div class="kpi-compare">' + k.alt + '</div>' : '')
+      + '</div>';
+  }).join('');
+}
+
+/** KPI şeridini hedef kaba yazar. */
+function gKpiYaz(hedef, liste) {
+  const el = document.getElementById(hedef);
+  if (el) el.innerHTML = gKpi(liste);
+}
+
+/** Kart başlığı — şablonun `.card-head` yapısı. */
+function gKartBas(ustBil, baslik, sag) {
+  return '<div class="card-head">'
+    +   '<div class="card-title-wrap">'
+    +     '<span class="eyebrow">' + gEsc(ustBil) + '</span>'
+    +     '<h2 class="card-title">' + gEsc(baslik) + '</h2>'
+    +   '</div>'
+    +   (sag ? '<div>' + sag + '</div>' : '')
+    + '</div>';
+}
+
+/** Anahtar/değer satırı (profil, sistem bilgileri). */
+function gKv(etiket, deger, not) {
+  return '<div class="g-kv"><div class="g-kv-satir">'
+    + '<span class="g-kv-etiket">' + etiket + '</span>'
+    + '<span class="g-kv-deger">' + deger + '</span></div>'
+    + (not ? '<div class="g-kv-not">' + not + '</div>' : '') + '</div>';
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
@@ -520,9 +654,10 @@ function gGoreli(v) {
 /**
  * HTML KAÇIŞI — tabloya basılan HER kullanıcı verisi buradan geçiyor.
  *
- * Cihaz adı, marka ve destek mesajı KULLANICININ YAZDIĞI metin. Doğrudan `innerHTML`'e
- * konsaydı, adına `<img onerror=...>` yazan bir kullanıcı yöneticinin tarayıcısında kod
- * çalıştırabilirdi — ve o tarayıcıda geçerli bir yönetici oturumu duruyor.
+ * Cihaz adı, marka ve destek mesajı KULLANICININ YAZDIĞI metin. Doğrudan
+ * `innerHTML`'e konsaydı, adına `<img onerror=...>` yazan bir kullanıcı
+ * yöneticinin tarayıcısında kod çalıştırabilirdi — ve o tarayıcıda geçerli bir
+ * yönetici oturumu duruyor.
  */
 function gEsc(v) {
   return String(v ?? '')
@@ -534,16 +669,30 @@ function gEsc(v) {
 function gError(mesaj) {
   const el = document.getElementById('garanmin-error');
   if (!el) { console.error(mesaj); return; }
-  el.innerHTML = `<div class="alert alert-danger py-2 mb-0">
-    <i class="bx bx-error-circle me-1"></i> ${gEsc(mesaj)}</div>`;
+  el.innerHTML = '<div class="g-uyari danger">' + gIkon('alert') + '<span>'
+    + gEsc(mesaj) + '</span></div>';
 }
 
 /** Veri yokken kartın içine yazılan not. Boş bir grafik yerine açık bir cümle. */
 function gBos(el, veri) {
   if (veri && veri.length) return false;
   const d = document.getElementById(el);
-  if (d) d.innerHTML = '<div class="g-bos">Gosterilecek veri yok</div>';
+  if (d) d.innerHTML = '<div class="g-bos">' + gIkon('info') + '<span>Gosterilecek veri yok</span></div>';
   return true;
+}
+
+/**
+ * Grafik kabını çizimden ÖNCE boşaltır ve döndürür.
+ *
+ * Aralık düğmesiyle yeniden yüklenen sayfalarda kap daha önce `gBos` tarafından
+ * "Gosterilecek veri yok" yazısıyla doldurulmuş olabiliyor. ApexCharts kabı
+ * temizlemeden kendi öğesini EKLİYOR; sonuç, grafiğin üstünde asılı kalmış eski
+ * bir "veri yok" satırı oluyordu.
+ */
+function gKap(id) {
+  const d = document.getElementById(id);
+  if (d) d.innerHTML = '';
+  return d;
 }
 
 /** Kategori kodlarını okunur Türkçeye çevirir (uygulamadaki `DeviceCategory` ile aynı). */
@@ -554,77 +703,70 @@ const GARANMIN_KATEGORI = {
 };
 function gKategori(k) { return GARANMIN_KATEGORI[k] || k || 'Diger'; }
 
-/** Garanti durumu → etiket + renk. Rozet sınıflarıyla AYNI renk ailesi. */
+/**
+ * Garanti durumu → etiket + renk + rozet sınıfı.
+ *
+ * Renkler ŞABLONUN değişkenlerinden alınmış değerler; rozet sınıfı da şablonun
+ * `.badge.success` / `.badge.warning` / `.badge.danger` ailesinden. Grafikteki
+ * renk ile rozetteki renk aynı olsun diye ikisi tek yerde tanımlı.
+ */
 const GARANMIN_DURUM = {
-  active:        { ad: 'Aktif',            renk: '#5D87FF', sinif: 'mavi' },
-  expiring_soon: { ad: 'Yakinda bitiyor',  renk: '#FFAE1F', sinif: 'turuncu' },
-  expired:       { ad: 'Suresi dolmus',    renk: '#FA896B', sinif: 'kirmizi' },
+  active:        { ad: 'Aktif',           renk: '#10b981', sinif: 'success' },
+  expiring_soon: { ad: 'Yakinda bitiyor', renk: '#f59e0b', sinif: 'warning' },
+  expired:       { ad: 'Suresi dolmus',   renk: '#ef4444', sinif: 'danger' },
 };
-function gDurum(k) { return GARANMIN_DURUM[k] || { ad: k, renk: '#6b7280', sinif: '' }; }
+function gDurum(k) { return GARANMIN_DURUM[k] || { ad: k, renk: '#64748b', sinif: '' }; }
 
 /**
- * Grafik kabını çizimden ÖNCE boşaltır ve döndürür.
+ * Bir cihazın garanti durumu — UYGULAMANIN KURALININ AYNISI.
  *
- * Aralık düğmesiyle yeniden yüklenen sayfalarda (Zaman Akışı) kap daha önce
- * `gBos` tarafından "Gosterilecek veri yok" yazısıyla doldurulmuş olabiliyor.
- * ApexCharts kabı temizlemeden kendi öğesini EKLİYOR; sonuç, grafiğin üstünde
- * asılı kalmış eski bir "veri yok" satırı oluyordu.
+ * Eşik "%90 tüketildi", "30 gün kaldı" DEĞİL (`lib/warranty.ts`). İki taraf farklı
+ * sayarsa panel, kullanıcının telefonunda gördüğünden başka bir tablo gösterir ve
+ * hangisinin doğru olduğu anlaşılmaz.
  */
-function gKap(id) {
-  const d = document.getElementById(id);
-  if (d) d.innerHTML = '';
-  return d;
+function gGarantiDurum(alim, bitis) {
+  if (!bitis) return 'active';
+  const b = new Date(bitis), bugun = new Date();
+  if (b < bugun) return 'expired';
+  if (!alim) return 'active';
+  const a = new Date(alim), toplam = b - a;
+  if (toplam <= 0) return 'active';
+  return ((bugun - a) / toplam) > 0.9 ? 'expiring_soon' : 'active';
 }
 
-/**
- * ApexCharts için ortak ayarlar — grafikler birbirine benzesin diye tek yerde.
- *
- * PALET CSS'TEKİYLE AYNI. Grafik renkleri ayrı seçilseydi, aynı "yakında bitiyor"
- * kavramı rozette bir turuncu, halkada başka bir turuncu olurdu ve iki şeyden
- * bahsedildiği izlenimi doğardı.
- *
- * Eksen ve ızgara SOLUK: veri çizgisinden daha görünür bir ızgara, okunması
- * gereken şeyle yarışıyor.
- */
-const G_RENK = ['#5D87FF', '#13DEB9', '#FFAE1F', '#FA896B', '#7C4DFF', '#49BEFF', '#7C8FAC'];
+/* ══════════════════════════════════════════════════════════════════════════
+   GRAFİKLER
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/** Şablonun vurgu renkleri — CSS değişkenleriyle aynı değerler. */
+const G_RENK = ['#2563eb', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#0ea5e9', '#14b8a6'];
 
 /*
-  EKSEN/IZGARA BİÇİMİ `window.Apex` İLE VERİLİYOR — `gGrafikTemel` İÇİNDE DEĞİL.
+  EKSEN/IZGARA BİÇİMİ `window.Apex` İLE VERİLİYOR.
 
   Sayfalar seçenekleri `Object.assign(temel, ayar)` ile birleştiriyor ve bu SIĞ
   bir birleştirme: bir sayfa kendi `xaxis: { categories: [...] }` nesnesini
-  verdiğinde temeldeki `xaxis` tamamen SİLİNİYOR — etiket rengi, kaldırılmış
-  eksen çizgisi, hepsi. Yani biçimi temele koymak, biçimi kullanan sayfalarda
-  sessizce kaybetmek demekti.
-
-  ApexCharts `window.Apex`'i her grafiğe DERİN birleştiriyor: sayfa yalnızca
-  `categories`'i verse bile geri kalan biçim yerinde kalıyor. On sayfayı tek tek
-  düzenlemeye de gerek kalmıyor.
+  verdiğinde temeldeki `xaxis` tamamen SİLİNİYOR. ApexCharts `window.Apex`'i her
+  grafiğe DERİN birleştirdiği için biçim burada güvende.
 */
 window.Apex = {
   chart: { fontFamily: 'inherit', toolbar: { show: false },
            animations: { easing: 'easeout', speed: 500 } },
   dataLabels: { enabled: false },
   stroke: { lineCap: 'round' },
-  /* Izgara veri çizgisinden daha soluk: okunması gereken şeyle yarışmasın. */
-  grid: { borderColor: '#EDF2F7', strokeDashArray: 4, padding: { left: 6, right: 6 } },
+  grid: { borderColor: '#eef1f5', strokeDashArray: 4, padding: { left: 6, right: 6 } },
   xaxis: {
     axisBorder: { show: false }, axisTicks: { show: false },
-    labels: { style: { colors: '#7C8FAC', fontSize: '11.5px' } },
+    labels: { style: { colors: '#94a3b8', fontSize: '11px' } },
   },
-  yaxis: { labels: { style: { colors: '#7C8FAC', fontSize: '11.5px' } } },
+  yaxis: { labels: { style: { colors: '#94a3b8', fontSize: '11px' } } },
   legend: {
-    fontSize: '12.5px', fontWeight: 500, labels: { colors: '#5A6A85' },
-    markers: { radius: 12, width: 10, height: 10 }, itemMargin: { horizontal: 7, vertical: 2 },
+    fontSize: '12px', fontWeight: 500, labels: { colors: '#64748b' },
+    markers: { radius: 12, width: 9, height: 9 }, itemMargin: { horizontal: 7, vertical: 2 },
   },
-  tooltip: { theme: 'light', style: { fontSize: '12.5px' } },
-  plotOptions: { pie: { donut: { labels: { value: { color: '#2A3547' },
-                                           total: { color: '#5A6A85' } } } } },
+  tooltip: { theme: 'light', style: { fontSize: '12px' } },
 };
 
 function gGrafikTemel(yukseklik) {
-  return {
-    chart: { height: yukseklik || '100%' },
-    colors: G_RENK,
-  };
+  return { chart: { height: yukseklik || '100%' }, colors: G_RENK };
 }

@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <!--
   GARANMIN — Veri Tabani / Zaman Akisi.
 
@@ -6,12 +6,12 @@
 
   ─── BOS GUNLER SIFIR OLARAK GELIYOR ──────────────────────────────────────
 
-  Sunucudaki `garanmin_akis` butun gunleri `generate_series` ile uretiyor. Yalnizca
-  veri olan gunler donseydi, uc seri farkli gunlerde baslar ve grafikte tarihler
-  birbirinin uzerine kayardi — 3 Agustos'taki cihaz artisi 7 Agustos'taki kullanici
-  artisiyla ayni sutunda gorunurdu. "Veri yok" ile "sifir" ayri seyler.
+  Sunucudaki `garanmin_akis` butun gunleri `generate_series` ile uretiyor.
+  Yalnizca veri olan gunler donseydi, uc seri farkli gunlerde baslar ve grafikte
+  tarihler birbirinin uzerine kayardi — 3 Agustos'taki cihaz artisi 7 Agustos'taki
+  kullanici artisiyla ayni sutunda gorunurdu. "Veri yok" ile "sifir" ayri seyler.
 -->
-<html lang="tr">
+<html lang="tr" data-theme="light">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -19,49 +19,70 @@
     <title>Garanmin — Zaman Akisi</title>
     <link rel="icon" type="image/x-icon" href="assets/img/favicon/favicon.ico" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="assets/vendor/fonts/iconify-icons.css" />
-    <link rel="stylesheet" href="assets/vendor/css/core.css" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="assets/adminator/adminator.css" />
     <link rel="stylesheet" href="assets/css/garanmin.css" />
   </head>
 
   <body>
-    <div class="g-app" id="g-app">
-      <aside class="g-yan" id="garanmin-menu"></aside>
-      <header class="g-ust" id="garanmin-navbar"></header>
+    <div class="shell" id="g-app">
+      <aside class="d-sidebar" id="garanmin-menu"></aside>
 
-      <main class="g-icerik">
-        <div id="garanmin-error"></div>
+      <div class="main">
+        <header class="d-topbar" id="garanmin-navbar"></header>
 
-        <div class="g-satir esit-4" id="serit"></div>
+        <main class="content">
+          <div id="garanmin-error"></div>
+          <div class="kpi-grid" id="serit"></div>
 
-        <div class="g-kart" style="flex:1 1 auto;min-height:0">
-          <div class="g-kart-bas" style="justify-content:space-between">
-            <span><i class="bx bx-line-chart"></i> Gunluk kayit akisi</span>
-            <span style="text-transform:none;letter-spacing:0;display:flex;gap:5px">
-              <button class="btn btn-sm btn-outline-secondary" onclick="setGun(7)"  id="g7">7 gun</button>
-              <button class="btn btn-sm btn-primary"           onclick="setGun(30)" id="g30">30 gun</button>
-              <button class="btn btn-sm btn-outline-secondary" onclick="setGun(90)" id="g90">90 gun</button>
-            </span>
-          </div>
-          <div class="g-kart-govde" id="c-akis"></div>
-        </div>
+          <div class="grid">
+            <section class="card col-12">
+              <div class="card-head">
+                <div class="card-title-wrap">
+                  <span class="eyebrow">Gunluk</span>
+                  <h2 class="card-title">Kayit akisi</h2>
+                </div>
+                <div class="g-arac">
+                  <button class="btn btn--ghost btn--sm"   onclick="setGun(7)"  id="g7">7 gun</button>
+                  <button class="btn btn--primary btn--sm" onclick="setGun(30)" id="g30">30 gun</button>
+                  <button class="btn btn--ghost btn--sm"   onclick="setGun(90)" id="g90">90 gun</button>
+                </div>
+              </div>
+              <div class="g-grafik uzun" id="c-akis"></div>
+            </section>
 
-        <div class="g-satir esit-3 grafik">
-          <div class="g-kart">
-            <div class="g-kart-bas"><i class="bx bx-user-plus"></i> Kullanıcı</div>
-            <div class="g-kart-govde" id="c-k"></div>
+            <section class="card col-4">
+              <div class="card-head">
+                <div class="card-title-wrap">
+                  <span class="eyebrow">Gunluk</span>
+                  <h2 class="card-title">Kullanici</h2>
+                </div>
+              </div>
+              <div class="g-grafik kisa" id="c-k"></div>
+            </section>
+
+            <section class="card col-4">
+              <div class="card-head">
+                <div class="card-title-wrap">
+                  <span class="eyebrow">Gunluk</span>
+                  <h2 class="card-title">Cihaz</h2>
+                </div>
+              </div>
+              <div class="g-grafik kisa" id="c-c"></div>
+            </section>
+
+            <section class="card col-4">
+              <div class="card-head">
+                <div class="card-title-wrap">
+                  <span class="eyebrow">Gunluk</span>
+                  <h2 class="card-title">Destek</h2>
+                </div>
+              </div>
+              <div class="g-grafik kisa" id="c-t"></div>
+            </section>
           </div>
-          <div class="g-kart">
-            <div class="g-kart-bas"><i class="bx bx-devices"></i> Cihaz</div>
-            <div class="g-kart-govde" id="c-c"></div>
-          </div>
-          <div class="g-kart">
-            <div class="g-kart-bas"><i class="bx bx-support"></i> Destek</div>
-            <div class="g-kart-govde" id="c-t"></div>
-          </div>
-        </div>
-      </main>
+        </main>
+      </div>
     </div>
 
     <script src="assets/vendor/libs/apex-charts/apexcharts.js"></script>
@@ -69,8 +90,8 @@
     <script>
       let gun = 30;
       /* Cizilen grafikler tutuluyor: aralik degistiginde eskisi YOK EDILMELI.
-         Yok edilmezse ApexCharts ayni kapsayiciya ikinci bir grafik cizer ve ustuste
-         binen iki tablo olusur. */
+         Yok edilmezse ApexCharts ayni kapsayiciya ikinci bir grafik cizer ve
+         ustuste binen iki tablo olusur. */
       let grafikler = [];
 
       function temizle() {
@@ -78,20 +99,11 @@
         grafikler = [];
       }
 
-      function kutu(liste) {
-        document.getElementById('serit').innerHTML = liste.map(function (k) {
-          return '<div class="g-kart"><div class="g-ozet">'
-            + '<div class="g-ozet-ikon ' + k.renk + '"><i class="bx ' + k.ikon + '"></i></div>'
-            + '<div><div class="g-ozet-sayi">' + k.deger + '</div>'
-            + '<div class="g-ozet-etiket">' + k.etiket + '</div></div></div></div>';
-        }).join('');
-      }
-
       function setGun(g) {
         gun = g;
         [7, 30, 90].forEach(function (x) {
-          const b = document.getElementById('g' + x);
-          b.className = 'btn btn-sm ' + (x === g ? 'btn-primary' : 'btn-outline-secondary');
+          document.getElementById('g' + x).className =
+            'btn btn--sm ' + (x === g ? 'btn--primary' : 'btn--ghost');
         });
         yukle();
       }
@@ -100,10 +112,9 @@
         if (gBos(hedef, veri)) return;
         const t = gGrafikTemel();
         t.chart.type = 'bar';
-        t.chart.sparkline = { enabled: false };
         const g = new ApexCharts(gKap(hedef), Object.assign(t, {
           series: [{ name: 'Adet', data: veri }],
-          xaxis: { categories: etiketler, labels: { show: false }, axisTicks: { show: false } },
+          xaxis: { categories: etiketler, labels: { show: false } },
           yaxis: { labels: { show: false } },
           plotOptions: { bar: { borderRadius: 3, columnWidth: '70%' } },
           colors: [renk],
@@ -121,12 +132,12 @@
           const t = v.map(function (d) { return Number(d.talep); });
           const top = function (a) { return a.reduce(function (x, y) { return x + y; }, 0); };
 
-          kutu([
-            { etiket: 'Yeni kullanıcı (' + gun + ' gün)', deger: gNum(top(k)), ikon: 'bx-user-plus', renk: 'mavi' },
-            { etiket: 'Eklenen cihaz',   deger: gNum(top(c)), ikon: 'bx-devices', renk: 'yesil' },
-            { etiket: 'Destek talebi',   deger: gNum(top(t)), ikon: 'bx-support', renk: 'kirmizi' },
+          gKpiYaz('serit', [
+            { etiket: 'Yeni kullanici (' + gun + ' gun)', deger: gNum(top(k)), ikon: 'userPlus', renk: 'primary' },
+            { etiket: 'Eklenen cihaz', deger: gNum(top(c)), ikon: 'monitor', renk: 'success' },
+            { etiket: 'Destek talebi', deger: gNum(top(t)), ikon: 'support', renk: 'danger' },
             { etiket: 'Gunluk ortalama cihaz',
-              deger: gNum((top(c) / Math.max(1, v.length)).toFixed(1)), ikon: 'bx-trending-up', renk: 'turuncu' },
+              deger: gNum((top(c) / Math.max(1, v.length)).toFixed(1)), ikon: 'trend', renk: 'warning' },
           ]);
 
           if (!gBos('c-akis', v)) {
@@ -134,7 +145,7 @@
             base.chart.type = 'line';
             const g = new ApexCharts(gKap('c-akis'), Object.assign(base, {
               series: [
-                { name: 'Kullanıcı', data: k },
+                { name: 'Kullanici', data: k },
                 { name: 'Cihaz',     data: c },
                 { name: 'Destek',    data: t },
               ],
@@ -154,7 +165,7 @@
       }
 
       if (garanminGuardPage()) {
-        garanminShell('garanmin-akis.html', 'Zaman Akisi');
+        garanminShell('garanmin-akis.html', 'Zaman Akisi', 'Veri Tabani');
         yukle();
       }
     </script>

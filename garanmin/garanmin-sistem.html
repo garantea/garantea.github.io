@@ -1,18 +1,19 @@
-﻿<!doctype html>
+<!doctype html>
 <!--
   GARANMIN — Sistem Durumu.
 
-  Ust cubuktaki canli gostergesi "baglanti var mi" sorusunu tek bakista cevapliyor;
-  bu sayfa AYRINTIYI veriyor: sunucu saati, tarayici saatiyle farki, veritabaninin
-  ne zamandir ayakta oldugu, kaydin buyumesi ve oturum bilgisi.
+  Ust cubuktaki canli gostergesi "baglanti var mi" sorusunu tek bakista
+  cevapliyor; bu sayfa AYRINTIYI veriyor: sunucu saati, tarayici saatiyle farki,
+  veritabaninin ne zamandir ayakta oldugu, kaydin buyumesi ve oturum bilgisi.
 
   ─── SAAT FARKI NEDEN ONEMLI ──────────────────────────────────────────────
 
-  Garanti hesaplarinin tamami tarihe bagli. Tarayicinin saati kaymissa panel yanlis
-  ama TUTARLI gorunen bir tablo gosterir: hicbir yerde hata cikmaz, yalnizca "yakinda
-  bitiyor" sayisi gercegin disinda olur. Bu yuzden fark aciktan yaziliyor.
+  Garanti hesaplarinin tamami tarihe bagli. Tarayicinin saati kaymissa panel
+  yanlis ama TUTARLI gorunen bir tablo gosterir: hicbir yerde hata cikmaz,
+  yalnizca "yakinda bitiyor" sayisi gercegin disinda olur. Bu yuzden fark
+  aciktan yaziliyor.
 -->
-<html lang="tr">
+<html lang="tr" data-theme="light">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -20,56 +21,49 @@
     <title>Garanmin — Sistem Durumu</title>
     <link rel="icon" type="image/x-icon" href="assets/img/favicon/favicon.ico" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="assets/vendor/fonts/iconify-icons.css" />
-    <link rel="stylesheet" href="assets/vendor/css/core.css" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="assets/adminator/adminator.css" />
     <link rel="stylesheet" href="assets/css/garanmin.css" />
   </head>
 
   <body>
-    <div class="g-app" id="g-app">
-      <aside class="g-yan" id="garanmin-menu"></aside>
-      <header class="g-ust" id="garanmin-navbar"></header>
+    <div class="shell" id="g-app">
+      <aside class="d-sidebar" id="garanmin-menu"></aside>
 
-      <main class="g-icerik">
-        <div id="garanmin-error"></div>
+      <div class="main">
+        <header class="d-topbar" id="garanmin-navbar"></header>
 
-        <div class="g-satir esit-4" id="serit"></div>
+        <main class="content">
+          <div id="garanmin-error"></div>
+          <div class="kpi-grid" id="serit"></div>
 
-        <div class="g-satir esit-2 buyuk">
-          <div class="g-kart">
-            <div class="g-kart-bas"><i class="bx bx-server"></i> Sunucu</div>
-            <div class="g-kart-govde g-scroll" id="sunucu"></div>
+          <div class="grid">
+            <section class="card col-6">
+              <div class="card-head">
+                <div class="card-title-wrap">
+                  <span class="eyebrow">Baglanti</span>
+                  <h2 class="card-title">Sunucu</h2>
+                </div>
+              </div>
+              <div id="sunucu"></div>
+            </section>
+
+            <section class="card col-6">
+              <div class="card-head">
+                <div class="card-title-wrap">
+                  <span class="eyebrow">Erisim</span>
+                  <h2 class="card-title">Oturum ve guvenlik</h2>
+                </div>
+              </div>
+              <div id="oturum"></div>
+            </section>
           </div>
-          <div class="g-kart">
-            <div class="g-kart-bas"><i class="bx bx-shield-quarter"></i> Oturum ve guvenlik</div>
-            <div class="g-kart-govde g-scroll" id="oturum"></div>
-          </div>
-        </div>
-      </main>
+        </main>
+      </div>
     </div>
 
     <script src="assets/js/garanmin-api.js"></script>
     <script>
-      function kutu(liste) {
-        document.getElementById('serit').innerHTML = liste.map(function (k) {
-          return '<div class="g-kart"><div class="g-ozet">'
-            + '<div class="g-ozet-ikon ' + k.renk + '"><i class="bx ' + k.ikon + '"></i></div>'
-            + '<div><div class="g-ozet-sayi" style="font-size:18px">' + k.deger + '</div>'
-            + '<div class="g-ozet-etiket">' + k.etiket + '</div></div></div></div>';
-        }).join('');
-      }
-
-      /* Renkler ELLE YAZILMIYOR: `.g-kv` sinifi temadan geliyor. Onceki surumde
-         gri tonlari inline yazilmisti ve tema degistiginde bu liste eski paletle
-         kalip geri kalan her seyden ayri dusuyordu. */
-      function satir(etiket, deger, not) {
-        return '<div class="g-kv"><div class="g-kv-satir">'
-          + '<span class="g-kv-etiket">' + etiket + '</span>'
-          + '<span class="g-kv-deger">' + deger + '</span></div>'
-          + (not ? '<div class="g-kv-not">' + not + '</div>' : '') + '</div>';
-      }
-
       function sure(ms) {
         const dk = Math.floor(ms / 60000);
         if (dk < 60) return dk + ' dakika';
@@ -90,49 +84,51 @@
           const toplamSatir = t.reduce(function (a, x) { return a + Number(x.satir); }, 0);
           const rlsKapali = t.filter(function (x) { return !x.rls; });
 
-          kutu([
-            { etiket: 'Baglanti', deger: 'CANLI',            ikon: 'bx-broadcast', renk: 'yesil' },
-            { etiket: 'Veritabani boyutu', deger: h.db_size_text, ikon: 'bx-data', renk: 'mor' },
-            { etiket: 'Toplam satir', deger: gNum(toplamSatir), ikon: 'bx-table',  renk: 'mavi' },
+          gKpiYaz('serit', [
+            { etiket: 'Baglanti',            deger: 'CANLI',            ikon: 'activity', renk: 'success' },
+            { etiket: 'Veritabani boyutu',   deger: h.db_size_text,     ikon: 'database', renk: 'purple' },
+            { etiket: 'Toplam satir',        deger: gNum(toplamSatir),  ikon: 'list',     renk: 'primary' },
             { etiket: 'RLS acik olmayan tablo', deger: rlsKapali.length,
-              ikon: rlsKapali.length ? 'bx-error' : 'bx-check-shield',
-              renk: rlsKapali.length ? 'kirmizi' : 'yesil' },
+              ikon: rlsKapali.length ? 'alert' : 'shield',
+              renk: rlsKapali.length ? 'danger' : 'success' },
           ]);
 
           document.getElementById('sunucu').innerHTML =
-            satir('Sunucu saati', sunucuSaat.toLocaleString('tr-TR'))
-            + satir('Tarayici saati', new Date().toLocaleString('tr-TR'))
-            + satir('Fark', Math.abs(fark) + ' saniye',
+            gKv('Sunucu saati', sunucuSaat.toLocaleString('tr-TR'))
+            + gKv('Tarayici saati', new Date().toLocaleString('tr-TR'))
+            + gKv('Fark', Math.abs(fark) + ' saniye',
                 Math.abs(fark) > 120
                   ? 'DIKKAT: iki saat arasinda 2 dakikadan fazla fark var. Garanti hesaplari tarihe bagli oldugu icin panel yaniltici olabilir.'
                   : 'Kabul edilebilir araligin icinde.')
-            + satir('Veritabani ayakta', sure(new Date() - new Date(h.started_at)),
+            + gKv('Veritabani ayakta', sure(new Date() - new Date(h.started_at)),
                 'Baslangic: ' + gDateTime(h.started_at))
-            + satir('Veritabani boyutu', h.db_size_text + ' (' + gNum(h.db_size) + ' bayt)')
-            + satir('Adres', '<code style="font-size:10.5px">' + gEsc(GARANMIN.supabaseUrl.replace('https://','')) + '</code>');
+            + gKv('Veritabani boyutu', h.db_size_text + ' (' + gNum(h.db_size) + ' bayt)')
+            + gKv('Adres', '<span style="font-family:\'JetBrains Mono\',monospace;font-size:11px">'
+                + gEsc(GARANMIN.supabaseUrl.replace('https://', '')) + '</span>');
 
           const exp = garanminExp();
           document.getElementById('oturum').innerHTML =
-            satir('Oturum sahibi', gEsc(garanminUser()))
-            + satir('Oturum bitisi', exp ? gDateTime(exp) : '-',
+            gKv('Oturum sahibi', gEsc(garanminUser()))
+            + gKv('Oturum bitisi', exp ? gDateTime(exp) : '-',
                 'Jeton 8 saat sonra sunucuda gecersiz oluyor.')
-            + satir('Jeton nerede', 'sessionStorage',
+            + gKv('Jeton nerede', 'sessionStorage',
                 'Sekme kapaninca siliniyor; ortak bilgisayarda oturum bir sonraki kisiye devrolmuyor.')
-            + satir('Parola saklama', 'bcrypt (maliyet 12)',
+            + gKv('Parola saklama', 'bcrypt (maliyet 12)',
                 'Tek bir deneme ~250 ms suruyor; cevrimici kaba kuvvet pratikte imkansiz.')
-            + satir('Basarisiz denemede', 'Kademeli gecikme',
+            + gKv('Basarisiz denemede', 'Kademeli gecikme',
                 'Kilitleme YOK — kilitleme, saldirganin yoneticiyi disarida birakmasina izin verirdi.')
-            + satir('Panel yetkisi', 'Yalnizca okuma',
+            + gKv('Panel yetkisi', 'Yalnizca okuma',
                 'Hicbir fonksiyon veri yazmiyor ya da silmiyor.')
             + (rlsKapali.length
-                ? '<div class="alert alert-danger py-2 mt-3 mb-0 small">RLS kapali tablo: '
-                  + rlsKapali.map(function (x) { return gEsc(x.tablo); }).join(', ') + '</div>'
+                ? '<div class="g-uyari danger" style="margin:16px 0 0">' + gIkon('alert')
+                  + '<span>RLS kapali tablo: '
+                  + rlsKapali.map(function (x) { return gEsc(x.tablo); }).join(', ') + '</span></div>'
                 : '');
         } catch (e) { gError(e.message); }
       }
 
       if (garanminGuardPage()) {
-        garanminShell('garanmin-sistem.html', 'Sistem Durumu');
+        garanminShell('garanmin-sistem.html', 'Sistem Durumu', 'Genel');
         yukle();
       }
     </script>

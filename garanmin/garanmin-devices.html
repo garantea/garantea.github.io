@@ -1,17 +1,18 @@
-﻿<!doctype html>
+<!doctype html>
 <!--
   GARANMIN — Cihazlar / Kirilimlar.
 
   Butun sayilar `devices.data` JSONB'sinden okunuyor. Uygulama cihazin butun
   alanlarini tek bir JSONB sutununa yaziyor; duz sutunlar (brand, category, room)
   tabloda hic yok. Onceki panel onlari okudugu icin sayilar dogru ama kirilimlar
-  bombosti — hata vermeyen, tesbisi en zor turden bir yanlislik.
+  bombosti — hata vermeyen, teshisi en zor turden bir yanlislik.
 
-  GARANTI ESIGI "%90 TUKENDI", "30 GUN KALDI" DEGIL: uygulamadaki `lib/warranty.ts`
-  boyle sayiyor. Iki taraf farkli sayarsa panel, kullanicinin telefonunda gordugunden
-  baska bir tablo gosterir ve hangisinin dogru oldugu anlasilmaz.
+  GARANTI ESIGI "%90 TUKENDI", "30 GUN KALDI" DEGIL: uygulamadaki
+  `lib/warranty.ts` boyle sayiyor. Iki taraf farkli sayarsa panel, kullanicinin
+  telefonunda gordugunden baska bir tablo gosterir ve hangisinin dogru oldugu
+  anlasilmaz.
 -->
-<html lang="tr">
+<html lang="tr" data-theme="light">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -19,58 +20,70 @@
     <title>Garanmin — Cihazlar</title>
     <link rel="icon" type="image/x-icon" href="assets/img/favicon/favicon.ico" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="assets/vendor/fonts/iconify-icons.css" />
-    <link rel="stylesheet" href="assets/vendor/css/core.css" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="assets/adminator/adminator.css" />
     <link rel="stylesheet" href="assets/css/garanmin.css" />
   </head>
 
   <body>
-    <div class="g-app" id="g-app">
-      <aside class="g-yan" id="garanmin-menu"></aside>
-      <header class="g-ust" id="garanmin-navbar"></header>
+    <div class="shell" id="g-app">
+      <aside class="d-sidebar" id="garanmin-menu"></aside>
 
-      <main class="g-icerik">
-        <div id="garanmin-error"></div>
+      <div class="main">
+        <header class="d-topbar" id="garanmin-navbar"></header>
 
-        <div class="g-satir esit-4" id="serit"></div>
+        <main class="content">
+          <div id="garanmin-error"></div>
+          <div class="kpi-grid" id="serit"></div>
 
-        <div class="g-satir esit-2 buyuk">
-          <div class="g-kart">
-            <div class="g-kart-bas"><i class="bx bx-category"></i> Kategoriler</div>
-            <div class="g-kart-govde" id="c-kategori"></div>
-          </div>
-          <div class="g-kart">
-            <div class="g-kart-bas"><i class="bx bx-purchase-tag"></i> En cok eklenen markalar</div>
-            <div class="g-kart-govde" id="c-marka"></div>
-          </div>
-        </div>
+          <div class="grid">
+            <section class="card col-7">
+              <div class="card-head">
+                <div class="card-title-wrap">
+                  <span class="eyebrow">Kirilim</span>
+                  <h2 class="card-title">Kategoriler</h2>
+                </div>
+              </div>
+              <div class="g-grafik uzun" id="c-kategori"></div>
+            </section>
 
-        <div class="g-satir esit-2 grafik">
-          <div class="g-kart">
-            <div class="g-kart-bas"><i class="bx bx-shield-quarter"></i> Garanti durumu</div>
-            <div class="g-kart-govde" id="c-garanti"></div>
+            <section class="card col-5">
+              <div class="card-head">
+                <div class="card-title-wrap">
+                  <span class="eyebrow">Cihazlar</span>
+                  <h2 class="card-title">Garanti durumu</h2>
+                </div>
+              </div>
+              <div class="g-grafik uzun" id="c-garanti"></div>
+            </section>
+
+            <section class="card col-6">
+              <div class="card-head">
+                <div class="card-title-wrap">
+                  <span class="eyebrow">Kirilim</span>
+                  <h2 class="card-title">En cok eklenen markalar</h2>
+                </div>
+              </div>
+              <div class="g-grafik" id="c-marka"></div>
+            </section>
+
+            <section class="card col-6">
+              <div class="card-head">
+                <div class="card-title-wrap">
+                  <span class="eyebrow">Kirilim</span>
+                  <h2 class="card-title">Odalar</h2>
+                </div>
+              </div>
+              <div class="g-grafik" id="c-oda"></div>
+            </section>
           </div>
-          <div class="g-kart">
-            <div class="g-kart-bas"><i class="bx bx-home"></i> Odalar</div>
-            <div class="g-kart-govde" id="c-oda"></div>
-          </div>
-        </div>
-      </main>
+        </main>
+      </div>
     </div>
 
     <script src="assets/vendor/libs/apex-charts/apexcharts.js"></script>
     <script src="assets/js/garanmin-api.js"></script>
     <script>
-      function kutu(liste) {
-        document.getElementById('serit').innerHTML = liste.map(function (k) {
-          return '<div class="g-kart"><div class="g-ozet">'
-            + '<div class="g-ozet-ikon ' + k.renk + '"><i class="bx ' + k.ikon + '"></i></div>'
-            + '<div><div class="g-ozet-sayi">' + k.deger + '</div>'
-            + '<div class="g-ozet-etiket">' + k.etiket + '</div></div></div></div>';
-        }).join('');
-      }
-
       async function yukle() {
         try {
           const [stats, kategori, marka, garanti, oda] = await Promise.all([
@@ -86,19 +99,27 @@
             return x ? Number(x.count) : 0;
           };
 
-          kutu([
-            { etiket: 'Toplam cihaz',    deger: gNum(stats.total_devices), ikon: 'bx-devices', renk: 'mavi' },
-            { etiket: 'Aktif garanti',   deger: gNum(bul('active')),        ikon: 'bx-check-shield', renk: 'yesil' },
-            { etiket: 'Yakinda bitiyor', deger: gNum(bul('expiring_soon')), ikon: 'bx-time-five', renk: 'turuncu' },
-            { etiket: 'Suresi dolmus',   deger: gNum(bul('expired')),       ikon: 'bx-x-circle', renk: 'kirmizi' },
+          gKpiYaz('serit', [
+            { etiket: 'Toplam cihaz',    deger: gNum(stats.total_devices),  ikon: 'monitor', renk: 'primary' },
+            { etiket: 'Aktif garanti',   deger: gNum(bul('active')),        ikon: 'shield',  renk: 'success' },
+            { etiket: 'Yakinda bitiyor', deger: gNum(bul('expiring_soon')), ikon: 'clock',   renk: 'warning' },
+            { etiket: 'Suresi dolmus',   deger: gNum(bul('expired')),       ikon: 'alert',   renk: 'danger' },
           ]);
 
           ciz('c-kategori', 'bar', {
             series: [{ name: 'Cihaz', data: kategori.map(function (d) { return Number(d.count); }) }],
             xaxis: { categories: kategori.map(function (d) { return gKategori(d.category); }) },
             plotOptions: { bar: { borderRadius: 5, distributed: true, columnWidth: '55%' } },
-            legend: { show: false }, colors: G_RENK,
+            legend: { show: false },
           }, kategori);
+
+          ciz('c-garanti', 'donut', {
+            series: garanti.map(function (d) { return Number(d.count); }),
+            labels: garanti.map(function (d) { return gDurum(d.status).ad; }),
+            colors: garanti.map(function (d) { return gDurum(d.status).renk; }),
+            legend: { position: 'bottom' },
+            plotOptions: { pie: { donut: { size: '64%' } } },
+          }, garanti);
 
           ciz('c-marka', 'bar', {
             series: [{ name: 'Cihaz', data: marka.map(function (d) { return Number(d.count); }) }],
@@ -106,14 +127,6 @@
             plotOptions: { bar: { horizontal: true, borderRadius: 5, barHeight: '60%' } },
             colors: [G_RENK[2]],
           }, marka);
-
-          ciz('c-garanti', 'donut', {
-            series: garanti.map(function (d) { return Number(d.count); }),
-            labels: garanti.map(function (d) { return gDurum(d.status).ad; }),
-            colors: garanti.map(function (d) { return gDurum(d.status).renk; }),
-            legend: { position: 'right', fontSize: '12px' },
-            plotOptions: { pie: { donut: { size: '62%' } } },
-          }, garanti);
 
           ciz('c-oda', 'bar', {
             series: [{ name: 'Cihaz', data: oda.map(function (d) { return Number(d.count); }) }],
@@ -124,18 +137,18 @@
         } catch (e) { gError(e.message); }
       }
 
-      /* Veri yoksa grafik CIZILMIYOR, "veri yok" yaziliyor: ApexCharts bos bir dizide
-         eksenleri ve bos bir izgarayi yine de cizer ve bu, "veri gelmedi" ile "veri
-         sifir" arasindaki farki gorunmez kilar. */
+      /* Veri yoksa grafik CIZILMIYOR, "veri yok" yaziliyor: ApexCharts bos bir
+         dizide eksenleri ve bos bir izgarayi yine de cizer ve bu, "veri gelmedi"
+         ile "veri sifir" arasindaki farki gorunmez kilar. */
       function ciz(hedef, tip, ayar, veri) {
         if (gBos(hedef, veri)) return;
         const t = gGrafikTemel();
         t.chart.type = tip;
-        new ApexCharts(document.getElementById(hedef), Object.assign(t, ayar)).render();
+        new ApexCharts(gKap(hedef), Object.assign(t, ayar)).render();
       }
 
       if (garanminGuardPage()) {
-        garanminShell('garanmin-devices.html', 'Cihaz Kirilimlari');
+        garanminShell('garanmin-devices.html', 'Cihaz Kirilimlari', 'Cihazlar');
         yukle();
       }
     </script>

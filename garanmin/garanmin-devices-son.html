@@ -1,15 +1,15 @@
-﻿<!doctype html>
+<!doctype html>
 <!--
   GARANMIN — Cihazlar / Son Eklenenler.
 
   Panelin "canli akis" tablosu: en son yazilan cihaz kayitlari.
 
   E-POSTA GOSTERILIYOR ama FATURA GORSELI, SERI NUMARASI ve FIYAT GOSTERILMIYOR —
-  sunucudaki fonksiyon zaten dondurmuyor. Panelin isi isletmeyi yonetmek; kullanicinin
-  belgelerini goruntulemek icin bir sebep yok ve her gosterilen alan, sizdiginda
-  sorumluluk doguran bir alan.
+  sunucudaki fonksiyon zaten dondurmuyor. Panelin isi isletmeyi yonetmek;
+  kullanicinin belgelerini goruntulemek icin bir sebep yok ve her gosterilen alan,
+  sizdiginda sorumluluk doguran bir alan.
 -->
-<html lang="tr">
+<html lang="tr" data-theme="light">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -17,49 +17,55 @@
     <title>Garanmin — Son Eklenen Cihazlar</title>
     <link rel="icon" type="image/x-icon" href="assets/img/favicon/favicon.ico" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="assets/vendor/fonts/iconify-icons.css" />
-    <link rel="stylesheet" href="assets/vendor/css/core.css" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="assets/adminator/adminator.css" />
     <link rel="stylesheet" href="assets/css/garanmin.css" />
   </head>
 
   <body>
-    <div class="g-app" id="g-app">
-      <aside class="g-yan" id="garanmin-menu"></aside>
-      <header class="g-ust" id="garanmin-navbar"></header>
+    <div class="shell" id="g-app">
+      <aside class="d-sidebar" id="garanmin-menu"></aside>
 
-      <main class="g-icerik">
-        <div id="garanmin-error"></div>
+      <div class="main">
+        <header class="d-topbar" id="garanmin-navbar"></header>
 
-        <div class="g-satir esit-4" id="serit"></div>
+        <main class="content">
+          <div id="garanmin-error"></div>
+          <div class="kpi-grid" id="serit"></div>
 
-        <div class="g-kart" style="flex:1 1 auto;min-height:0">
-          <div class="g-kart-bas" style="justify-content:space-between">
-            <span><i class="bx bx-time-five"></i> Son eklenen cihazlar</span>
-            <span style="text-transform:none;letter-spacing:0;display:flex;gap:5px">
-              <button class="btn btn-sm btn-primary"           onclick="setAdet(50)"  id="a50">50</button>
-              <button class="btn btn-sm btn-outline-secondary" onclick="setAdet(100)" id="a100">100</button>
-              <button class="btn btn-sm btn-outline-secondary" onclick="setAdet(200)" id="a200">200</button>
-            </span>
+          <div class="grid">
+            <section class="card col-12">
+              <div class="card-head">
+                <div class="card-title-wrap">
+                  <span class="eyebrow">Canli akis</span>
+                  <h2 class="card-title">Son eklenen cihazlar</h2>
+                </div>
+                <div class="g-arac">
+                  <button class="btn btn--primary btn--sm" onclick="setAdet(50)"  id="a50">50</button>
+                  <button class="btn btn--ghost btn--sm"   onclick="setAdet(100)" id="a100">100</button>
+                  <button class="btn btn--ghost btn--sm"   onclick="setAdet(200)" id="a200">200</button>
+                </div>
+              </div>
+              <div class="g-tablo-kutu uzun">
+                <table class="table">
+                  <!-- Sutun genislikleri SABIT (gerekce: garanmin.css). Toplam %100. -->
+                  <colgroup>
+                    <col style="width:18%"><col style="width:12%"><col style="width:12%">
+                    <col style="width:10%"><col style="width:11%"><col style="width:13%">
+                    <col style="width:16%"><col style="width:8%">
+                  </colgroup>
+                  <thead>
+                    <tr><th>Cihaz</th><th>Marka</th><th>Kategori</th>
+                        <th>Alim</th><th>Garanti bitisi</th><th>Durum</th>
+                        <th>Kullanici</th><th>Kayit</th></tr>
+                  </thead>
+                  <tbody id="tbody"><tr><td colspan="8" class="soluk">Yukleniyor...</td></tr></tbody>
+                </table>
+              </div>
+            </section>
           </div>
-          <div class="g-kart-govde g-scroll">
-            <table class="g-tablo">
-              <!-- Sütun genişlikleri SABİT (gerekçe: garanmin.css). Toplam %100. -->
-              <colgroup>
-                <col style="width:18%"><col style="width:12%"><col style="width:12%">
-                <col style="width:10%"><col style="width:11%"><col style="width:13%">
-                <col style="width:16%"><col style="width:8%">
-              </colgroup>
-              <thead>
-                <tr><th>Cihaz</th><th>Marka</th><th>Kategori</th>
-                    <th>Alim</th><th>Garanti bitisi</th><th>Durum</th>
-                    <th>Kullanıcı</th><th>Kayıt</th></tr>
-              </thead>
-              <tbody id="tbody"><tr><td colspan="8" class="text-muted">Yukleniyor...</td></tr></tbody>
-            </table>
-          </div>
-        </div>
-      </main>
+        </main>
+      </div>
     </div>
 
     <script src="assets/js/garanmin-api.js"></script>
@@ -70,70 +76,51 @@
         adet = n;
         [50, 100, 200].forEach(function (x) {
           document.getElementById('a' + x).className =
-            'btn btn-sm ' + (x === n ? 'btn-primary' : 'btn-outline-secondary');
+            'btn btn--sm ' + (x === n ? 'btn--primary' : 'btn--ghost');
         });
         yukle();
-      }
-
-      /* Durum kurali uygulamayla AYNI: %90 tuketildiyse "yakinda bitiyor". */
-      function durum(alim, bitis) {
-        if (!bitis) return 'active';
-        const b = new Date(bitis), bugun = new Date();
-        if (b < bugun) return 'expired';
-        if (!alim) return 'active';
-        const a = new Date(alim), toplam = b - a;
-        if (toplam <= 0) return 'active';
-        return ((bugun - a) / toplam) > 0.9 ? 'expiring_soon' : 'active';
-      }
-
-      function kutu(liste) {
-        document.getElementById('serit').innerHTML = liste.map(function (k) {
-          return '<div class="g-kart"><div class="g-ozet">'
-            + '<div class="g-ozet-ikon ' + k.renk + '"><i class="bx ' + k.ikon + '"></i></div>'
-            + '<div><div class="g-ozet-sayi">' + k.deger + '</div>'
-            + '<div class="g-ozet-etiket">' + k.etiket + '</div></div></div></div>';
-        }).join('');
       }
 
       async function yukle() {
         try {
           const v = await garanminData('garanmin_recent_devices', { p_limit: adet });
           const say = { active: 0, expiring_soon: 0, expired: 0 };
-          v.forEach(function (d) { say[durum(d.purchase_date, d.warranty_end)]++; });
+          /* Durum kurali uygulamayla AYNI: %90 tuketildiyse "yakinda bitiyor".
+             Hesap `gGarantiDurum` icinde, tek yerde (garanmin-api.js). */
+          v.forEach(function (d) { say[gGarantiDurum(d.purchase_date, d.warranty_end)]++; });
 
-          kutu([
-            { etiket: 'Listelenen',      deger: gNum(v.length),          ikon: 'bx-list-ul',      renk: 'mavi' },
-            { etiket: 'Aktif',           deger: gNum(say.active),        ikon: 'bx-check-shield', renk: 'yesil' },
-            { etiket: 'Yakinda bitiyor', deger: gNum(say.expiring_soon), ikon: 'bx-time-five',    renk: 'turuncu' },
-            { etiket: 'Suresi dolmus',   deger: gNum(say.expired),       ikon: 'bx-x-circle',     renk: 'kirmizi' },
+          gKpiYaz('serit', [
+            { etiket: 'Listelenen',      deger: gNum(v.length),          ikon: 'list',    renk: 'primary' },
+            { etiket: 'Aktif',           deger: gNum(say.active),        ikon: 'shield',  renk: 'success' },
+            { etiket: 'Yakinda bitiyor', deger: gNum(say.expiring_soon), ikon: 'clock',   renk: 'warning' },
+            { etiket: 'Suresi dolmus',   deger: gNum(say.expired),       ikon: 'alert',   renk: 'danger' },
           ]);
 
           const tb = document.getElementById('tbody');
           if (!v.length) {
-            tb.innerHTML = '<tr><td colspan="8" class="text-muted">Kayit yok</td></tr>';
+            tb.innerHTML = '<tr><td colspan="8" class="soluk">Kayit yok</td></tr>';
             return;
           }
-          // Kullanici verisi `gEsc` ile kaciriliyor (gerekce: garanmin-api.js).
+          /* Kullanici verisi `gEsc` ile kaciriliyor (gerekce: garanmin-api.js).
+             `title`: sutunlar sabit genislikte, uzun deger kesiliyor. */
           tb.innerHTML = v.map(function (d) {
-            const s = gDurum(durum(d.purchase_date, d.warranty_end));
-            /* `title`: sutunlar sabit genislikte oldugu icin uzun cihaz adi ve
-               e-posta kesiliyor; tam degere ustune gelince ulasilabilsin. */
+            const s = gDurum(gGarantiDurum(d.purchase_date, d.warranty_end));
             return '<tr>'
               + '<td title="' + gEsc(d.name) + '">' + gEsc(d.name) + '</td>'
               + '<td title="' + gEsc(d.brand) + '">' + gEsc(d.brand) + '</td>'
               + '<td>' + gEsc(gKategori(d.category)) + '</td>'
               + '<td>' + gDate(d.purchase_date) + '</td>'
               + '<td>' + gDate(d.warranty_end) + '</td>'
-              + '<td><span class="g-rozet ' + s.sinif + '">' + s.ad + '</span></td>'
-              + '<td class="text-muted" title="' + gEsc(d.email || '-') + '">' + gEsc(d.email || '-') + '</td>'
-              + '<td class="text-muted">' + gGoreli(d.updated_at) + '</td>'
+              + '<td><span class="badge ' + s.sinif + '">' + s.ad + '</span></td>'
+              + '<td class="soluk" title="' + gEsc(d.email || '-') + '">' + gEsc(d.email || '-') + '</td>'
+              + '<td class="soluk">' + gGoreli(d.updated_at) + '</td>'
               + '</tr>';
           }).join('');
         } catch (e) { gError(e.message); }
       }
 
       if (garanminGuardPage()) {
-        garanminShell('garanmin-devices-son.html', 'Son Eklenen Cihazlar');
+        garanminShell('garanmin-devices-son.html', 'Son Eklenen Cihazlar', 'Cihazlar');
         yukle();
       }
     </script>

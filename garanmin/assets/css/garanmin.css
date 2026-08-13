@@ -1,504 +1,127 @@
 /* ==========================================================================
-   GARANMIN — panel teması ve düzeni
+   GARANMIN — Adminator üzerine ince katman
    ==========================================================================
 
-   ─── TASARIM SİSTEMİ: MODERNIZE ──────────────────────────────────────────
+   Panelin görünümünün TAMAMI `assets/adminator/adminator.css` dosyasından
+   geliyor: puikinsh/Adminator-admin-dashboard şablonunun derlenmiş stil dosyası
+   (MIT), olduğu gibi, tek satır değiştirilmeden.
 
-   Görsel dil adminmart'ın "Modernize" şablonundan alındı (saf HTML/CSS, MIT).
-   Alınanlar üç şey: RENK MANTIĞI, YÜZEY ve TİPOGRAFİ.
+   ─── BU DOSYA NE YAPIYOR ──────────────────────────────────────────────────
 
-   1. Her vurgu renginin bir de "yumuşak" eşi var (#5D87FF ↔ #ECF2FF). Rozetler,
-      simge kutuları ve seçili menü öğesi doygun rengi zeminde değil YAZIDA
-      kullanıyor; zemin daima soluk eş. Yan yana altı renkli kutu koyduğunuzda
-      göz yorulmuyor — panelin "profesyonel" görünmesini sağlayan asıl şey bu.
+   Yalnızca şablonda KARŞILIĞI OLMAYAN şeyleri ekliyor. Şablonun kendi sınıflarını
+   (`.card`, `.kpi-card`, `.table`, `.badge`, `.btn`, `.nav-link`…) taklit eden
+   ya da ezen tek bir kural yok — bir öncekinin battığı yer tam olarak burasıydı:
+   şablonun kurallarıyla kendi kurallarımız yarışınca her sayfada başka bir yerde
+   bozuluyordu.
 
-   2. Kartların KENARLIĞI YOK. Ayrımı geniş yayılan yumuşak bir gölge kuruyor
-      (0 7px 30px rgba(90,114,123,.11)). Kenarlık + gölge birlikte kullanılınca
-      kart "çerçeveli" görünür; şablonun tercihi gölge, burada da öyle.
+   Buradaki her blok, "şablonda bunun karşılığı yok, çünkü şablon bu işi
+   yapmıyor" diyebildiğim şeyler:
 
-   3. Plus Jakarta Sans. Rakamları dar ve okunaklı; sayı yoğun bir panelde
-      Public Sans'tan belirgin şekilde daha derli toplu duruyor.
+     1. Katlanabilir kenar çubuğu   — şablonun menüsü sabit genişlikte.
+     2. Marka bloğu + logo animasyonu — uygulamanın simgesi.
+     3. Saat / canlılık göstergesi   — şablonda yok.
+     4. Sabit sütunlu tablo düzeni   — şablonun tablosu içeriğe göre boyutlanıyor.
+     5. Modal perdesi                — şablonda modal var, PERDESİ yok.
+     6. Anahtar/değer listesi, boş durum, uyarı kutusu.
 
-   ─── ALINMAYAN ŞEY: KALIN AĞIRLIKLAR ──────────────────────────────────────
-
-   Modernize başlıklarda 600-700 kullanıyor. Burada TEK kalın metin marka yazısı;
-   geri kalan her yer en fazla 500. Vurgu renk, boşluk ve hiyerarşiyle veriliyor.
-
-   ─── MARKA RENGİ NEDEN #5D87FF ───────────────────────────────────────────
-
-   Şablonun anahtar rengi bu ve bütün yumuşak eşler ondan türetilmiş. GaranTea'nın
-   #2563eb'si logoda duruyor ve ikisi aynı aileden; paletin tamamını #2563eb'ye
-   çevirmek, uyumu kuran türetilmiş tonları da elle yeniden uydurmak demekti.
-   Logo markayı taşıyor, arayüz sistemi taşıyor.
-
-   ─── NEDEN ŞABLONUN KENDİ DÜZENİ KULLANILMIYOR ───────────────────────────
-
-   Modernize de Sneat de sayfanın uzamasına göre kaydırılmak üzere tasarlanmış.
-   Buradaki gereksinim tam tersi: her sayfa TEK EKRANA sığmalı. Bu yüzden iskelet
-   (ızgara, katlanan menü, tek ekran kuralı) kendi kodumuz; şablondan gelen şey
-   yüzeyin görünümü.
-
-   `dvh` BİLİNÇLİ (`vh` değil): mobil tarayıcılarda adres çubuğu kayarken `vh`
-   sabit kalıyor ve sayfanın altı ekranın dışında kalıyor.
+   TEMA: `<html data-theme="light">`. Şablonun bütün değişkenleri
+   `:root[data-theme=light]` altında tanımlı; öznitelik olmazsa hiçbir renk
+   çözülmez ve sayfa siyah beyaz açılır. Koyu tema bilinçli olarak kullanılmıyor.
    ========================================================================== */
 
-:root {
-  /* ── Vurgu renkleri: doygun + yumuşak eş ─────────────────────────────── */
-  --g-primary:       #5D87FF;
-  --g-primary-koyu:  #4570EA;
-  --g-primary-acik:  #ECF2FF;
-
-  --g-info:          #49BEFF;
-  --g-info-acik:     #E8F7FF;
-
-  --g-yesil:         #13DEB9;
-  --g-yesil-koyu:    #02B3A9;
-  --g-yesil-acik:    #E6FFFA;
-
-  --g-kirmizi:       #FA896B;
-  --g-kirmizi-koyu:  #F3704D;
-  --g-kirmizi-acik:  #FDEDE8;
-
-  --g-turuncu:       #FFAE1F;
-  --g-turuncu-koyu:  #AE8E59;
-  --g-turuncu-acik:  #FEF5E5;
-
-  --g-mor:           #7C4DFF;
-  --g-mor-acik:      #F1EDFF;
-
-  /* ── Yüzeyler ve metin ───────────────────────────────────────────────── */
-  --g-zemin:         #F2F6FA;
-  --g-kart:          #FFFFFF;
-  --g-cizgi:         #E5EAEF;
-  --g-cizgi-acik:    #F2F6FA;
-  --g-metin:         #2A3547;   /* textPrimary */
-  --g-soluk:         #5A6A85;   /* textSecondary */
-  --g-soluk-2:       #7C8FAC;   /* ipucu, dipnot */
-
-  --g-kenar:         248px;
-  --g-kenar-dar:     72px;
-  --g-ust:           60px;
-
-  /* Şablonun imzası: geniş yayılan, düşük yoğunluklu gölge. */
-  --g-golge:         0 7px 30px 0 rgba(90, 114, 123, .11);
-  --g-golge-kucuk:   0 2px 6px 0 rgba(90, 114, 123, .10);
-  --g-golge-buyuk:   0 24px 60px 0 rgba(90, 114, 123, .28);
-  --g-yuvarlak:      7px;
-}
-
-* { box-sizing: border-box; }
-
-html, body {
-  height: 100%;
-  margin: 0;
-  /* SAYFA KAYDIRMASI KAPALI. Kaydırma, ihtiyaç duyan panelin İÇİNDE oluyor. */
-  overflow: hidden;
-  font-family: 'Plus Jakarta Sans', -apple-system, 'Segoe UI', Roboto, sans-serif;
-  background: var(--g-zemin);
-  color: var(--g-metin);
-  font-size: 13.5px;
-  font-weight: 400;
-  line-height: 1.5;
-  letter-spacing: .1px;
-  -webkit-font-smoothing: antialiased;
-}
-
-/* ── IZGARA ─────────────────────────────────────────────────────────────── */
-
-.g-app {
-  display: grid;
-  grid-template-columns: var(--g-kenar) 1fr;
-  grid-template-rows: var(--g-ust) 1fr;
-  grid-template-areas: "yan ust" "yan icerik";
-  height: 100dvh;
-  transition: grid-template-columns .22s ease;
-}
-.g-app.dar { grid-template-columns: var(--g-kenar-dar) 1fr; }
-
-/* ── KENAR MENÜ ─────────────────────────────────────────────────────────── */
-
-.g-yan {
-  grid-area: yan;
-  background: var(--g-kart);
-  display: flex; flex-direction: column;
-  overflow: hidden;
-  /* Kenarlık yerine gölge: içerik alanıyla arasındaki ayrım daha yumuşak. */
-  box-shadow: 1px 0 20px 0 rgba(90, 114, 123, .08);
-  z-index: 3;
-}
-
-.g-marka {
-  height: var(--g-ust);
-  display: flex; align-items: center; gap: 11px;
-  padding: 0 20px;
-  flex: 0 0 auto;
-}
-.g-app.dar .g-marka { padding: 0; justify-content: center; }
-
-/* PANELDEKİ TEK KALIN METİN. */
-.g-marka-yazi { font-weight: 800; font-size: 18px; letter-spacing: -.5px; white-space: nowrap; }
-.g-marka-yazi .a { color: var(--g-primary); }
-.g-marka-yazi .b { color: var(--g-kirmizi-koyu); }
-
-/* Simge durumunda yazılar kayboluyor. `display:none` yerine genişlik/opaklık
-   kullanılıyor ki geçiş ani olmasın. */
-.g-app.dar .g-marka-yazi,
-.g-app.dar .g-metin-gizle { opacity: 0; width: 0; overflow: hidden; }
-
-.g-menu { flex: 1 1 auto; overflow-y: auto; padding: 6px 14px 16px; }
-.g-menu::-webkit-scrollbar { width: 5px; }
-.g-menu::-webkit-scrollbar-thumb { background: #DFE5EF; border-radius: 3px; }
-
-.g-grup { margin-bottom: 2px; }
-
-.g-grup-bas {
-  display: flex; align-items: center; gap: 12px;
-  padding: 9px 12px; border-radius: var(--g-yuvarlak); cursor: pointer;
-  color: var(--g-soluk); font-weight: 500; font-size: 13.5px;
-  white-space: nowrap; user-select: none;
-  transition: background .15s ease, color .15s ease;
-}
-.g-grup-bas:hover { background: var(--g-primary-acik); color: var(--g-primary); }
-.g-grup-bas i:first-child { font-size: 20px; min-width: 21px; text-align: center; }
-.g-grup-bas i.ok { margin-left: auto; font-size: 16px; transition: transform .2s ease; opacity: .55; }
-.g-grup.acik .g-grup-bas i.ok { transform: rotate(90deg); }
-.g-grup.aktif-grup > .g-grup-bas { color: var(--g-primary); background: var(--g-primary-acik); }
-
-.g-alt { max-height: 0; overflow: hidden; transition: max-height .22s ease; }
-.g-grup.acik .g-alt { max-height: 320px; }
-
-.g-alt a {
-  display: flex; align-items: center; gap: 9px;
-  margin: 2px 0 2px 16px;
-  padding: 8px 12px; border-radius: var(--g-yuvarlak);
-  color: var(--g-soluk); text-decoration: none; font-size: 13px;
-  white-space: nowrap;
-  transition: background .15s ease, color .15s ease;
-}
-/* Alt başlıkların önündeki nokta: girinti tek başına hiyerarşiyi zayıf
-   anlatıyordu, nokta seviyeyi bir bakışta belli ediyor. */
-.g-alt a::before {
-  content: ''; width: 6px; height: 6px; border-radius: 50%;
-  background: #C7D0E0; flex: 0 0 auto; transition: background .15s ease;
-}
-.g-alt a:hover { background: var(--g-primary-acik); color: var(--g-primary); }
-.g-alt a:hover::before { background: var(--g-primary); }
-.g-alt a.aktif {
-  background: var(--g-primary); color: #fff; font-weight: 500;
-  box-shadow: 0 4px 12px 0 rgba(93, 135, 255, .38);
-}
-.g-alt a.aktif::before { background: rgba(255, 255, 255, .85); }
-
-/* Simge durumunda alt başlıklar tamamen gizleniyor: 72 piksele sığmazlar ve
-   yarısı kesilmiş bir metin, hiç göstermemekten kötüdür. */
-.g-app.dar .g-alt { display: none; }
-.g-app.dar .g-grup-bas { justify-content: center; padding: 11px 0; }
-.g-app.dar .g-grup-bas i.ok { display: none; }
-
-/* ── ÜST ÇUBUK ──────────────────────────────────────────────────────────── */
-
-.g-ust {
-  grid-area: ust;
-  background: var(--g-kart);
-  display: flex; align-items: center; gap: 12px;
-  padding: 0 20px;
-  box-shadow: var(--g-golge-kucuk);
-  z-index: 2;
-  /* Üst çubuk TAŞMIYOR. Sağdaki grup sabit genişlikte; dar bir pencerede taşan
-     tek şey başlık olmalı ve o da kesilip "..." ile bitmeli. Aksi halde çıkış
-     düğmesi ekranın dışına itiliyordu. */
-  overflow: hidden;
-}
-
-.g-katla {
-  border: 0; background: var(--g-primary-acik);
-  width: 36px; height: 36px; border-radius: var(--g-yuvarlak);
-  display: grid; place-items: center; cursor: pointer; color: var(--g-primary);
-  flex: 0 0 auto; font-size: 20px;
-  transition: background .15s ease;
-}
-.g-katla:hover { background: #DBE6FF; }
-
-.g-baslik {
-  font-weight: 500; font-size: 15.5px; margin: 0; color: var(--g-metin);
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  min-width: 0; flex: 0 1 auto;
-}
-.g-sag { margin-left: auto; display: flex; align-items: center; gap: 10px; flex: 0 0 auto; }
-
-/* Canlı göstergesi: nokta yanıp sönüyor. Yanıp sönmenin kendisi bilgi taşıyor —
-   donmuş bir sayfada nokta da donar. */
-.g-canli {
-  display: flex; align-items: center; gap: 7px;
-  font-size: 12px; font-weight: 500;
-  padding: 6px 12px; border-radius: 999px;
-  background: var(--g-cizgi-acik); color: var(--g-soluk); white-space: nowrap;
-}
-.g-nokta { width: 7px; height: 7px; border-radius: 50%; background: var(--g-soluk-2); }
-.g-canli.ok   { color: var(--g-yesil-koyu); background: var(--g-yesil-acik); }
-.g-canli.ok   .g-nokta { background: var(--g-yesil); animation: nabiz 1.8s infinite; }
-.g-canli.hata { color: var(--g-kirmizi-koyu); background: var(--g-kirmizi-acik); }
-.g-canli.hata .g-nokta { background: var(--g-kirmizi); }
-@keyframes nabiz {
-  0%   { box-shadow: 0 0 0 0 rgba(19, 222, 185, .55); }
-  70%  { box-shadow: 0 0 0 7px rgba(19, 222, 185, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(19, 222, 185, 0); }
-}
-
-.g-saat { text-align: right; line-height: 1.2; }
-.g-saat .s { font-weight: 500; font-size: 14px; font-variant-numeric: tabular-nums; }
-.g-saat .t { font-size: 11px; color: var(--g-soluk-2); }
-
-.g-kullanici {
-  display: flex; align-items: center; gap: 9px;
-  padding: 4px 12px 4px 4px; border-radius: 999px;
-  background: var(--g-cizgi-acik);
-}
-.g-avatar {
-  width: 30px; height: 30px; border-radius: 50%;
-  background: linear-gradient(135deg, var(--g-primary), var(--g-mor));
-  color: #fff; display: grid; place-items: center;
-  font-weight: 500; font-size: 11.5px; flex: 0 0 auto;
-}
-.g-kullanici .ad  { font-weight: 500; font-size: 12.5px; line-height: 1.2; }
-.g-kullanici .rol { font-size: 10.5px; color: var(--g-soluk-2); }
-
-/* ── İÇERİK ─────────────────────────────────────────────────────────────── */
-
-.g-icerik {
-  grid-area: icerik;
-  padding: 16px 18px 18px;
-  overflow: hidden;
-  display: flex; flex-direction: column; gap: 14px;
-  min-height: 0;
-}
-
-/*
-  SATIRLAR İÇERİĞE GÖRE BOYUTLANIYOR.
-
-  `.buyuk` kalan bütün alanı alıyor; diğerleri içeriklerinin gerektirdiği kadar
-  yer kaplıyor. Sabit piksel yükseklikler kullanılmıyor: 210px'e sabitlenmiş bir
-  kart, içindeki tablo 4 satır olduğunda boş, 40 satır olduğunda okunmaz oluyor.
-*/
-.g-satir { display: grid; gap: 14px; min-height: 0; }
-.g-satir.esit-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-.g-satir.esit-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-.g-satir.esit-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-.g-satir.buyuk  { flex: 1 1 auto; }
-/* Grafik satırları için makul bir alt sınır: bunun altında eksen etiketleri
-   üst üste biniyor ve grafik okunmuyor. */
-.g-satir.grafik { flex: 1 1 auto; min-height: 240px; }
-
-/* KENARLIK YOK — ayrım gölgeyle. (Dosya başındaki not.) */
-.g-kart {
-  background: var(--g-kart);
-  border: 0;
-  border-radius: var(--g-yuvarlak);
-  box-shadow: var(--g-golge);
-  padding: 16px 18px;
-  display: flex; flex-direction: column;
-  min-height: 0; min-width: 0;
-}
-
-.g-kart-bas {
-  font-size: 14px; font-weight: 500; letter-spacing: 0;
-  text-transform: none; color: var(--g-metin);
-  margin-bottom: 12px; flex: 0 0 auto;
-  display: flex; align-items: center; gap: 9px; min-height: 24px;
-}
-/*
-  Başlık simgesi de yumuşak zeminli kutu içinde — kart başlıkları şeritteki özet
-  kutularıyla aynı dili konuşsun.
-
-  İKİ SEÇİCİ GEREKLİ. Kart başlıkları iki biçimde yazılmış: doğrudan
-  `<div class="g-kart-bas"><i>…` ve sağda düğme olan kartlarda
-  `<div class="g-kart-bas"><span><i>…</span><span>düğmeler</span>`. Yalnızca
-  `> i` yazılsaydı ikinci biçimdeki başlıklar (Zaman Akışı, Kullanıcılar, Son
-  Eklenenler) simgesiz kalırdı. `.g-kart-bas i` gibi genel bir seçici ise
-  sağdaki düğmelerin içindeki simgeleri de kutulardı.
-*/
-.g-kart-bas > i:first-child,
-.g-kart-bas > span:first-child > i:first-child {
-  font-size: 16px; color: var(--g-primary);
-  background: var(--g-primary-acik);
-  width: 26px; height: 26px; border-radius: 6px;
-  display: grid; place-items: center; flex: 0 0 auto;
-}
-/* İkinci biçimdeki sarmalayıcı span de esnek kutu olmalı: içindeki simge blok
-   seviyesine çıktığı için, span satır içi kalsaydı yazı simgenin altına düşerdi. */
-.g-kart-bas > span:first-child { display: flex; align-items: center; gap: 9px; min-width: 0; }
-.g-kart-govde { flex: 1 1 auto; min-height: 0; position: relative; }
-
-/* Uzun listeler yalnızca KENDİ kutusunda kayıyor: sayfa sabit kalırken tablo
-   yine de tamamen okunabiliyor. */
-/* YATAY KAYDIRMA KAPALI. Sütunlar artık `colgroup` ile yüzde olarak tanımlı,
-   yani tablo her genişlikte kartın içine tam oturuyor; yatay kaydırma çubuğu
-   yalnızca eski `auto` düzenin taşmasını gizlemek için vardı. */
-.g-scroll { overflow-y: auto; overflow-x: hidden; height: 100%; }
-.g-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
-.g-scroll::-webkit-scrollbar-thumb { background: #DFE5EF; border-radius: 4px; }
-.g-scroll::-webkit-scrollbar-thumb:hover { background: #C7D0E0; }
-
-/* ── ÖZET KUTUSU (şerit kartları) ───────────────────────────────────────── */
-
-.g-ozet { display: flex; align-items: center; gap: 13px; }
-.g-ozet-ikon {
-  width: 42px; height: 42px; border-radius: 9px;
-  display: grid; place-items: center; font-size: 22px; flex: 0 0 auto;
-}
-.g-ozet-sayi {
-  font-size: 22px; font-weight: 500; line-height: 1.2; color: var(--g-metin);
-  font-variant-numeric: tabular-nums; white-space: nowrap;
-  overflow: hidden; text-overflow: ellipsis;
-}
-.g-ozet-etiket { font-size: 12.5px; color: var(--g-soluk); white-space: nowrap;
-                 overflow: hidden; text-overflow: ellipsis; }
-
-/*
-  RENK SINIFLARI — doygun yazı, yumuşak zemin.
-
-  Doygun rengi ZEMİNE vermek (beyaz yazı üstünde dolu mavi kutu) altı kutu yan
-  yana geldiğinde ekranı bağırtıyor. Şablonun kuralı tersi ve panel sayı yoğun
-  olduğu için burada belirgin fark yaratıyor.
-*/
-.mavi    { background: var(--g-primary-acik); color: var(--g-primary); }
-.yesil   { background: var(--g-yesil-acik);   color: var(--g-yesil-koyu); }
-.turuncu { background: var(--g-turuncu-acik); color: var(--g-turuncu-koyu); }
-.kirmizi { background: var(--g-kirmizi-acik); color: var(--g-kirmizi-koyu); }
-.mor     { background: var(--g-mor-acik);     color: var(--g-mor); }
-.bilgi   { background: var(--g-info-acik);    color: var(--g-info); }
-.gri     { background: var(--g-cizgi-acik);   color: var(--g-soluk); }
-
-/* ── TABLO ──────────────────────────────────────────────────────────────── */
-
-/*
-  ─── SÜTUN GENİŞLİKLERİ SABİT ─────────────────────────────────────────────
-
-  `table-layout: fixed` ve her tablonun kendi `<colgroup>`'u var.
-
-  Varsayılan `auto` düzende tarayıcı sütun genişliğini O AN İÇERİDEKİ VERİYE
-  göre hesaplıyor. Sonucu iki ayrı arıza oluyordu:
-
-  1. Tablo "Yukleniyor..." ile açılıyor, veri gelince genişlikler yeniden
-     hesaplanıyor ve bütün sütunlar zıplıyordu. Sayfa numarası değiştiğinde de
-     aynı şey oluyordu: uzun bir e-posta içeren sayfada sütunlar bir yerde,
-     kısa olanlarda başka yerde duruyordu.
-  2. Hücreler `nowrap` olduğu için tablonun doğal genişliği kartı aşıyor ve
-     içerik beyaz alanın dışına taşıyordu.
-
-  `fixed` düzende genişlikler `colgroup`'tan geliyor; veri hiç etkilemiyor.
-  Sığmayan metin kesilip "..." ile bitiyor — tam değer `title` ile hâlâ
-  erişilebilir olduğu için bilgi kaybı yok.
-*/
-table.g-tablo {
-  width: 100%; table-layout: fixed;
-  border-collapse: separate; border-spacing: 0; font-size: 13px;
-}
-table.g-tablo th, table.g-tablo td { overflow: hidden; text-overflow: ellipsis; }
-table.g-tablo th {
-  text-align: left; font-size: 12px; text-transform: none; letter-spacing: 0;
-  color: var(--g-soluk); font-weight: 500;
-  padding: 10px 10px; background: var(--g-kart);
-  /*
-    BAŞLIK YAPIŞKAN. Uzun bir listede aşağı inildiğinde hangi sütunun ne olduğu
-    kayboluyordu. `border-bottom` yerine `box-shadow`: yapışkan hücrelerde
-    kenarlık kaydırma sırasında birlikte kaymıyor ve çizgi kayboluyor.
-  */
-  position: sticky; top: 0; z-index: 2;
-  box-shadow: inset 0 -1px 0 var(--g-cizgi);
-  white-space: nowrap;
-}
-table.g-tablo td {
-  padding: 11px 10px; border-bottom: 1px solid var(--g-cizgi-acik);
-  white-space: nowrap; vertical-align: middle; color: var(--g-metin);
-}
-table.g-tablo tbody tr:last-child td { border-bottom: 0; }
-table.g-tablo tbody tr:hover { background: var(--g-cizgi-acik); }
-table.g-tablo tr.tiklanir { cursor: pointer; }
-table.g-tablo tr.tiklanir:hover { background: var(--g-primary-acik); }
-/* Sayı sütunları hizalı okunsun. */
-table.g-tablo td.sayi, table.g-tablo th.sayi { text-align: right; font-variant-numeric: tabular-nums; }
-/* Uzun serbest metin (destek mesajı) kesilmek yerine SARSIN. Genişliği zaten
-   `colgroup` veriyor; `min-width`/`max-width` sabit düzende yok sayılıyor. */
-table.g-tablo td.metin {
-  white-space: normal; overflow: visible; text-overflow: clip;
-  line-height: 1.45; vertical-align: top; word-break: break-word;
-}
-table.g-tablo tr:has(td.metin) td { vertical-align: top; }
-table.g-tablo .text-muted { color: var(--g-soluk-2) !important; }
-
-.g-rozet {
-  display: inline-block; padding: 4px 11px; border-radius: 6px;
-  font-size: 11.5px; font-weight: 500; white-space: nowrap; line-height: 1.4;
-}
-
-.g-bos {
-  display: grid; place-items: center; height: 100%; min-height: 90px;
-  color: var(--g-soluk-2); font-size: 13px; text-align: center;
-}
-
-/* Anahtar/değer listesi (profil, sistem bilgileri) */
-.g-kv { padding: 9px 0; border-bottom: 1px solid var(--g-cizgi-acik); }
-.g-kv:last-child { border-bottom: 0; }
-.g-kv-satir { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; }
-.g-kv-etiket { color: var(--g-soluk); font-size: 12.5px; }
-.g-kv-deger  { font-weight: 500; font-size: 13px; text-align: right; }
-.g-kv-not    { font-size: 11px; color: var(--g-soluk-2); margin-top: 3px; line-height: 1.45; }
-
 /* ══════════════════════════════════════════════════════════════════════════
-   MODAL — kullanıcı detayı
-   ══════════════════════════════════════════════════════════════════════════
-
-   Detay ayrı bir sayfa yerine modal: listedeki yer kaybolmuyor. Ayrı sayfada
-   geri dönüldüğünde arama kutusu boşalıyor, sayfa numarası sıfırlanıyor ve
-   kullanıcı aradığı satırı yeniden bulmak zorunda kalıyordu.
+   1. İSKELET — katlanabilir kenar çubuğu
    ══════════════════════════════════════════════════════════════════════════ */
 
-.g-modal-perde {
-  position: fixed; inset: 0; z-index: 50;
-  background: rgba(42, 53, 71, .42);
-  backdrop-filter: blur(3px);
-  display: none; place-items: center; padding: 24px;
-}
-.g-modal-perde.acik { display: grid; }
+html, body { margin: 0; min-height: 100%; }
 
-.g-modal {
-  background: var(--g-zemin);
-  width: min(1120px, 96vw);
-  max-height: 90dvh;
-  border-radius: 12px;
-  box-shadow: var(--g-golge-buyuk);
-  display: flex; flex-direction: column;
-  overflow: hidden;
-  animation: modalGir .18s ease-out;
+/* Şablonun `.shell`'i 248px sabit. Katlanabilmesi için genişlik değişkene
+   bağlandı; şablonun kendi kuralı ezilmiyor, üzerine yazılıyor. */
+.shell {
+  --g-kenar: 248px;
+  grid-template-columns: var(--g-kenar) 1fr;
+  transition: grid-template-columns .22s cubic-bezier(.2, .7, .2, 1);
 }
-@keyframes modalGir {
-  from { opacity: 0; transform: translateY(10px) scale(.99); }
-  to   { opacity: 1; transform: none; }
+.shell.dar { --g-kenar: 76px; }
+
+.d-sidebar { gap: 18px; }
+
+/* Simge durumu: yazılar `display:none` ile değil, genişlik/opaklıkla kayboluyor
+   ki geçiş ani olmasın. Alt başlıklar tamamen gizleniyor — 76 piksele sığmazlar
+   ve yarısı kesilmiş bir metin, hiç göstermemekten kötüdür. */
+.shell.dar .nav-link > span:not(.nav-badge),
+.shell.dar .nav-label,
+.shell.dar .sidebar-footer,
+.shell.dar .g-marka-yazi { opacity: 0; width: 0; overflow: hidden; padding: 0; }
+.shell.dar .nav-submenu { display: none; }
+.shell.dar .nav-link { justify-content: center; padding: 10px 0; }
+.shell.dar .nav-link .chev { display: none; }
+.shell.dar .g-marka { justify-content: center; }
+
+/* Şablonun üst çubuğu `.d-topbar`; iki yana yaslama zaten onda, buraya yalnızca
+   esnek kutu ve sol grubun düzeni ekleniyor. */
+.d-topbar { display: flex; align-items: center; gap: 16px; }
+.g-ust-sol { display: flex; align-items: center; gap: 14px; min-width: 0; }
+.g-ust-baslik { min-width: 0; }
+.g-ust-baslik h1 {
+  font-family: 'Inter Tight', Inter, sans-serif;
+  font-size: 16px; font-weight: 700; letter-spacing: -.02em;
+  margin: 2px 0 0; color: var(--t-base);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 
-.g-modal-bas {
-  display: flex; align-items: center; gap: 13px;
-  padding: 16px 20px; background: var(--g-kart);
-  box-shadow: var(--g-golge-kucuk);
-  flex: 0 0 auto; z-index: 1;
+/* Üst çubuktaki saat. Şablonda karşılığı yok. */
+.g-saat { text-align: right; line-height: 1.2; padding: 0 4px; }
+.g-saat .s {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12.5px; font-weight: 500; color: var(--t-base);
 }
-.g-modal-govde {
-  padding: 16px 20px 20px; overflow-y: auto; min-height: 0;
-  display: flex; flex-direction: column; gap: 14px;
+.g-saat .t { font-size: 10.5px; color: var(--t-light); }
+
+/* Canlılık noktası nabız atıyor: yanıp sönmenin kendisi bilgi taşıyor — donmuş
+   bir sayfada nokta da donar. */
+.badge.g-nabiz:before { animation: gNabiz 1.8s infinite; }
+@keyframes gNabiz {
+  0%   { box-shadow: 0 0 0 0 currentColor; opacity: 1; }
+  70%  { box-shadow: 0 0 0 5px transparent; opacity: .75; }
+  100% { box-shadow: 0 0 0 0 transparent; opacity: 1; }
 }
-.g-modal-govde::-webkit-scrollbar { width: 6px; }
-.g-modal-govde::-webkit-scrollbar-thumb { background: #DFE5EF; border-radius: 4px; }
-.g-modal-kapat {
-  margin-left: auto; border: 0; background: var(--g-cizgi-acik);
-  width: 34px; height: 34px; border-radius: var(--g-yuvarlak); cursor: pointer;
-  display: grid; place-items: center; color: var(--g-soluk); font-size: 20px;
-  transition: background .15s ease, color .15s ease;
+
+/*
+  KPI DEĞERİ — şablonun 44 pikseli METİN değerlerde taşıyordu.
+
+  Şablonun örnek sayfalarındaki değerler kısa sayılar ("128", "%42"). Buradaki
+  şeritte ise "8853 kB", "1.2 MB" gibi metinler var ve dört kutu yan yana
+  duruyor: 44 piksellik bir yazı bu genişliğe sığmayıp kutunun dışına çıkıyordu.
+  Boyut ekrana göre esniyor, sığmayan durumda kesiliyor.
+*/
+.kpi-value {
+  font-size: clamp(26px, 2.4vw, 40px);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
-.g-modal-kapat:hover { background: var(--g-kirmizi-acik); color: var(--g-kirmizi-koyu); }
+
+.g-kalan {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px; color: var(--t-light); margin-top: 2px;
+}
 
 /* ══════════════════════════════════════════════════════════════════════════
-   GARANTEA ANİMASYONU
+   2. MARKA BLOĞU
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.g-marka { display: flex; align-items: center; gap: 10px; padding: 0 6px; }
+
+/* PANELDEKİ TEK KALIN METİN marka yazısı. Geri kalan her yerde ağırlığı şablon
+   belirliyor. */
+.g-marka-yazi {
+  font-family: 'Inter Tight', Inter, sans-serif;
+  font-weight: 800; font-size: 17px; letter-spacing: -.03em; white-space: nowrap;
+}
+.g-marka-yazi .a { color: var(--primary); }
+.g-marka-yazi .b { color: var(--danger); }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   3. GARANTEA LOGO ANİMASYONU
    ══════════════════════════════════════════════════════════════════════════
 
    Uygulamadaki simgenin (src/components/GaranTeaLogo.tsx) birebir karşılığı:
@@ -508,16 +131,12 @@ table.g-tablo .text-muted { color: var(--g-soluk-2) !important; }
    BELGE FİNCANIN ARKASINA GİRİYOR. Uygulamada bunu iki şey birlikte yapıyor:
    fincanın ön gövdesi belgeden SONRA çiziliyor (dolayısıyla üstünü örtüyor) ve
    grubun saydamlığı geri kalanını siliyor. SVG'de boyama sırası aynı olduğu için
-   burada da maskeye gerek kalmıyor — zaten uygulamada maske Android'de sessizce
+   burada da maskeye gerek yok — zaten uygulamada maske Android'de sessizce
    çalışmadığı için kaldırılmıştı.
+   ══════════════════════════════════════════════════════════════════════════ */
 
-   `prefers-reduced-motion` UYULUYOR: hareket hassasiyeti olan kullanıcılarda
-   animasyon duruyor. Sürekli hareket eden bir öğe, günün çoğunu bu panelde
-   geçirecek biri için yorucu olabilir.
-   ========================================================================= */
-
-.g-logo { width: 34px; height: 34px; flex: 0 0 auto; overflow: visible; }
-.g-giris-logo { width: 108px; height: 108px; }
+.g-logo { width: 32px; height: 32px; flex: 0 0 auto; overflow: visible; }
+.g-giris-logo { width: 58px; height: 58px; }
 
 .g-logo .g-belge { animation: gBelge 4s linear infinite; }
 @keyframes gBelge {
@@ -560,128 +179,219 @@ table.g-tablo .text-muted { color: var(--g-soluk-2) !important; }
   100%    { transform: translateY(-15px); opacity: 0; }
 }
 
+/* Hareket hassasiyeti olan kullanıcılarda animasyon duruyor. Sürekli hareket eden
+   bir öğe, günün çoğunu bu panelde geçirecek biri için yorucu olabilir. */
 @media (prefers-reduced-motion: reduce) {
   .g-logo .g-belge, .g-logo [class^="b"] { animation: none; }
   .g-logo .g-belge { opacity: 0; }
-  .g-canli.ok .g-nokta { animation: none; }
-  .g-app, .g-alt, .g-grup-bas i.ok, .g-modal { transition: none; animation: none; }
+  .badge.g-nabiz:before { animation: none; }
+  .shell, .g-modal { transition: none; animation: none; }
 }
 
-/* ── GİRİŞ EKRANI ───────────────────────────────────────────────────────── */
+/* ══════════════════════════════════════════════════════════════════════════
+   4. TABLOLAR — SABİT SÜTUN GENİŞLİKLERİ
+   ══════════════════════════════════════════════════════════════════════════
 
-.g-giris {
-  height: 100dvh; display: grid; place-items: center;
-  background:
-    radial-gradient(880px 460px at 10% -14%, rgba(93, 135, 255, .16), transparent 62%),
-    radial-gradient(820px 460px at 92% 114%, rgba(124, 77, 255, .12), transparent 62%),
-    var(--g-zemin);
+   Şablonun `.table`'ı `table-layout: auto`, yani tarayıcı sütun genişliğini O AN
+   İÇERİDEKİ VERİYE göre hesaplıyor. Bir yönetim panelinde bunun iki sonucu var:
+
+     1. Tablo "Yukleniyor..." ile açılıyor, veri gelince genişlikler yeniden
+        hesaplanıyor ve bütün sütunlar zıplıyor. Sayfa çevrildiğinde de aynı şey:
+        uzun bir e-posta içeren sayfada sütunlar bir yerde, kısa olanlarda başka
+        yerde duruyor.
+     2. Hücreler sarmadığı için tablonun doğal genişliği kartı aşıyor ve içerik
+        kartın dışına taşıyor.
+
+   Çözüm her tabloya kendi `<colgroup>`'u (toplam %100) + `table-layout: fixed`.
+   Genişlikler tanımdan geliyor, veri hiç etkilemiyor. Sığmayan metin kesilip
+   "..." ile bitiyor; tam değer `title` ile üzerine gelince görünüyor.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.table { table-layout: fixed; }
+.table th, .table td {
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  padding-left: 10px; padding-right: 10px;
 }
-.g-giris-kutu {
-  width: 400px; max-width: 92vw;
-  background: #fff; border: 0;
-  border-radius: 12px; box-shadow: var(--g-golge);
-  padding: 34px 32px 26px; text-align: center;
+.table th:first-child, .table td:first-child { padding-left: 2px; }
+.table th:last-child,  .table td:last-child  { padding-right: 2px; }
+
+/* Sayı sütunları hizalı okunsun. */
+.table td.sayi, .table th.sayi {
+  text-align: right; font-family: 'JetBrains Mono', monospace; font-size: 12px;
+}
+/* Uzun serbest metin (destek mesajı) kesilmek yerine SARSIN. */
+.table td.metin {
+  white-space: normal; overflow: visible; text-overflow: clip;
+  line-height: 1.5; word-break: break-word; vertical-align: top;
+}
+.table td.soluk { color: var(--t-muted); }
+
+/*
+  KAYAN GÖVDE + YAPIŞKAN BAŞLIK.
+
+  Uzun listelerde kaydırma SAYFANIN değil kartın içinde oluyor; aşağı inildiğinde
+  hangi sütunun ne olduğu kaybolmasın diye başlık yapışkan. Çizgi `border-bottom`
+  yerine `box-shadow`: yapışkan hücrelerde kenarlık kaydırma sırasında birlikte
+  kaymıyor ve çizgi kayboluyor.
+*/
+.g-tablo-kutu { overflow-y: auto; overflow-x: hidden; }
+.g-tablo-kutu::-webkit-scrollbar { width: 5px; }
+.g-tablo-kutu::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+.g-tablo-kutu .table thead th {
+  position: sticky; top: 0; z-index: 2;
+  background: var(--bg-card);
+  border-bottom: 0; box-shadow: inset 0 -1px 0 var(--border);
 }
 
-/* ── BOOTSTRAP DOKUNUŞLARI ──────────────────────────────────────────────── */
-/* Vendor `core.css` kendi mavisini ve köşe yarıçapını kullanıyor; şablonun
-   değerlerine hizalanıyor. */
-.btn {
-  font-size: 13px; font-weight: 500; border-radius: var(--g-yuvarlak);
-  padding: 7px 16px; box-shadow: none !important;
-}
-.btn-sm { font-size: 12.5px; padding: 5px 12px; }
-.btn-primary {
-  background-color: var(--g-primary) !important; border-color: var(--g-primary) !important;
-  color: #fff !important;
-}
-.btn-primary:hover {
-  background-color: var(--g-primary-koyu) !important; border-color: var(--g-primary-koyu) !important;
-}
-.btn-outline-secondary {
-  color: var(--g-soluk) !important; border-color: var(--g-cizgi) !important;
-  background: #fff !important;
-}
-.btn-outline-secondary:hover {
-  background: var(--g-primary-acik) !important; color: var(--g-primary) !important;
-  border-color: var(--g-primary-acik) !important;
-}
-.btn:disabled { opacity: .45; }
+/* Kart içindeki tablo kutusu için makul yükseklikler. Sabit piksel yerine
+   `max-height`: 3 satırlık bir tabloda kart boş kalmasın, 200 satırlıkta da
+   sayfayı uzatmasın. */
+.g-tablo-kutu.kisa  { max-height: 240px; }
+.g-tablo-kutu.orta  { max-height: 380px; }
+.g-tablo-kutu.uzun  { max-height: 520px; }
 
-.form-control, .form-control-sm {
-  border-radius: var(--g-yuvarlak); border-color: var(--g-cizgi);
-  font-size: 13px; color: var(--g-metin);
+/* ══════════════════════════════════════════════════════════════════════════
+   5. MODAL PERDESİ
+   ══════════════════════════════════════════════════════════════════════════
+
+   Şablonda `.modal-demo` var ama örnek amaçlı, sayfaya gömülü duruyor; açılıp
+   kapanan bir perdesi yok. Perde burada.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.g-modal-perde {
+  position: fixed; inset: 0; z-index: 200;
+  background: rgba(15, 23, 42, .55);
+  backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+  display: none; place-items: center; padding: 24px;
 }
-.form-control::placeholder { color: var(--g-soluk-2); }
-.form-control:focus {
-  border-color: var(--g-primary); box-shadow: 0 0 0 .2rem rgba(93, 135, 255, .18);
+.g-modal-perde.acik { display: grid; }
+
+/* Şablonun `.modal-demo`'su 480px ile sınırlı — kullanıcı detayı tablo içerdiği
+   için burada genişletiliyor. */
+.g-modal {
+  max-width: min(1120px, 96vw); width: min(1120px, 96vw);
+  max-height: 90vh; display: flex; flex-direction: column;
+  animation: gModalGir .18s cubic-bezier(.2, .7, .2, 1) both;
 }
-.form-label { color: var(--g-soluk); font-weight: 500; font-size: 13px; }
+@keyframes gModalGir {
+  from { opacity: 0; transform: translateY(10px) scale(.99); }
+  to   { opacity: 1; transform: none; }
+}
+.g-modal-govde {
+  overflow-y: auto; min-height: 0;
+  background: var(--bg-body);
+  display: flex; flex-direction: column; gap: 16px;
+}
+.g-modal-govde::-webkit-scrollbar { width: 5px; }
+.g-modal-govde::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+.g-modal-bas .g-modal-kim { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.g-modal-bas .avatar { margin-left: 0; cursor: default; }
 
-/* Uyarı kutuları da yumuşak zemin / doygun yazı kuralına uyuyor. */
-.alert { border: 0; border-radius: var(--g-yuvarlak); font-size: 13px; padding: 11px 14px; }
-.alert-danger  { background: var(--g-kirmizi-acik) !important; color: var(--g-kirmizi-koyu) !important; }
-.alert-warning { background: var(--g-turuncu-acik) !important; color: var(--g-turuncu-koyu) !important; }
-.alert-info    { background: var(--g-info-acik) !important;    color: var(--g-info) !important; }
-.alert-success { background: var(--g-yesil-acik) !important;   color: var(--g-yesil-koyu) !important; }
+/* ══════════════════════════════════════════════════════════════════════════
+   6. KÜÇÜK PARÇALAR
+   ══════════════════════════════════════════════════════════════════════════ */
 
-.text-muted { color: var(--g-soluk-2) !important; }
+/* Anahtar/değer listesi — profil ve sistem bilgileri. */
+.g-kv { padding: 9px 0; border-bottom: 1px solid var(--border-soft); }
+.g-kv:last-child { border-bottom: 0; padding-bottom: 0; }
+.g-kv-satir { display: flex; justify-content: space-between; gap: 14px; align-items: baseline; }
+.g-kv-etiket { color: var(--t-muted); font-size: 12.5px; }
+.g-kv-deger  { color: var(--t-base); font-size: 12.5px; font-weight: 600; text-align: right; }
+.g-kv-not    { color: var(--t-light); font-size: 11px; line-height: 1.5; margin-top: 3px; }
 
-/* ── DAR EKRAN ──────────────────────────────────────────────────────────── */
-/* Panel masaüstü için tasarlandı. Dar ekranda tek ekran kuralı korunamıyor;
-   okunmaz bir sıkıştırma yerine bilinçli olarak kaydırmaya izin veriliyor. */
+/* Boş durum — boş bir grafik yerine açık bir cümle. */
+.g-bos {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 8px; min-height: 120px; height: 100%;
+  color: var(--t-light); font-size: 12.5px; text-align: center;
+}
+.g-bos svg { width: 20px; height: 20px; opacity: .7; }
+
+/* Uyarı kutusu. Şablonun `.badge` ailesiyle aynı renk mantığı: yumuşak zemin,
+   doygun yazı. */
+.g-uyari {
+  display: flex; align-items: flex-start; gap: 10px;
+  border-radius: 10px; padding: 12px 14px; font-size: 12.5px; line-height: 1.55;
+  margin-bottom: 20px;
+}
+.g-uyari svg { width: 16px; height: 16px; flex: 0 0 auto; margin-top: 1px; }
+.g-uyari.danger  { background: var(--danger-soft);  color: var(--danger); }
+.g-uyari.warning { background: var(--warning-soft); color: var(--warning); }
+.g-uyari.info    { background: var(--info-soft);    color: var(--info); }
+
+/* Grafik kabı — ApexCharts yüzde yükseklik için TANIMLI bir yükseklik istiyor;
+   kabın yüksekliği içeriğe bağlı kalsaydı grafik sıfır yükseklikte çizilirdi. */
+.g-grafik { height: 260px; min-height: 260px; }
+.g-grafik.kisa { height: 200px; min-height: 200px; }
+.g-grafik.uzun { height: 320px; min-height: 320px; }
+
+/* Şablonun 12 sütunlu ızgarasında eksik olan genişlikler. */
+.col-3 { grid-column: span 3; }
+.col-4 { grid-column: span 4; }
+.col-5 { grid-column: span 5; }
+.col-7 { grid-column: span 7; }
+.col-8 { grid-column: span 8; }
+.col-9 { grid-column: span 9; }
+
+/* Kart içi araç çubuğu (aralık düğmeleri, arama). */
+.g-arac { display: flex; align-items: center; gap: 6px; }
+.g-arac .input {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+  color: var(--t-base); font-family: inherit; font-size: 12.5px;
+  padding: 7px 11px; width: 220px; outline: 0;
+  transition: border-color .18s, box-shadow .18s;
+}
+.g-arac .input::placeholder { color: var(--t-light); }
+.g-arac .input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-soft); }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   7. GİRİŞ EKRANI
+   ══════════════════════════════════════════════════════════════════════════
+
+   Şablonun `.auth-shell`'i iki sütunlu: solda degradeli tanıtım paneli, sağda
+   form. Aynı yapı kullanılıyor; tanıtım metni panelin ne olduğunu ve güvenliğin
+   nerede durduğunu anlatıyor.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.g-giris-form { display: flex; flex-direction: column; gap: 14px; }
+.g-giris-form label {
+  display: block; font-size: 12px; font-weight: 600;
+  color: var(--t-base); margin-bottom: 6px;
+}
+.g-giris-form input {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+  color: var(--t-base); font-family: inherit; font-size: 13.5px;
+  padding: 11px 13px; width: 100%; outline: 0;
+  transition: border-color .18s, box-shadow .18s;
+}
+.g-giris-form input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-soft); }
+.g-giris-kutu { width: 100%; max-width: 380px; }
+.g-giris-not { color: var(--t-light); font-size: 11.5px; line-height: 1.65; margin-top: 20px; }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   8. DAR EKRAN
+   ══════════════════════════════════════════════════════════════════════════ */
+
 @media (max-width: 1200px) {
-  .g-satir.esit-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .col-3, .col-4, .col-5, .col-7, .col-8, .col-9 { grid-column: span 6; }
 }
-
-/*
-  992px ALTINDA MENÜ ZORLA SİMGE DURUMUNA GEÇİYOR.
-
-  Önceden burada yalnızca sütun genişliği 72 piksele düşürülüyordu ama `.dar`
-  sınıfı eklenmediği için yazılar duruyordu: grup başlıkları ve alt bağlantılar
-  72 piksele sığmadığından ortadan kesiliyordu. Genişlik değişiyorsa içerik de
-  değişmeli — bu yüzden `.dar` kuralları burada birebir tekrarlanıyor.
-*/
 @media (max-width: 992px) {
-  .g-app { grid-template-columns: var(--g-kenar-dar) 1fr; }
-  .g-satir.esit-3 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-
-  .g-marka { padding: 0; justify-content: center; }
-  .g-marka-yazi, .g-metin-gizle { opacity: 0; width: 0; overflow: hidden; }
-  .g-alt { display: none; }
-  .g-grup-bas { justify-content: center; padding: 11px 0; }
-  .g-grup-bas i.ok { display: none; }
+  /* Menü zorla simge durumuna geçiyor: 248 piksel bu genişlikte içerikten çalıyor.
+     `.dar` sınıfının bütün kuralları burada tekrarlanmak yerine sınıf JS'siz de
+     geçerli olsun diye aynı seçiciler yazılıyor. */
+  .shell { --g-kenar: 76px; }
+  .nav-link > span:not(.nav-badge), .nav-label, .sidebar-footer, .g-marka-yazi
+    { opacity: 0; width: 0; overflow: hidden; padding: 0; }
+  .nav-submenu { display: none; }
+  .nav-link { justify-content: center; padding: 10px 0; }
+  .nav-link .chev { display: none; }
+  .g-marka { justify-content: center; }
+  .content { padding: 20px 18px; }
+  .d-topbar { padding: 0 18px; }
 }
-@media (max-width: 760px) {
-  .g-satir.esit-4, .g-satir.esit-3, .g-satir.esit-2 { grid-template-columns: 1fr; }
-  .g-icerik { overflow-y: auto; }
-  .g-saat, .g-kullanici .rol { display: none; }
-}
-
-/*
-  ── ALÇAK EKRAN ─────────────────────────────────────────────────────────────
-
-  "Her şey tek ekranda" kuralı 768 piksel yüksekliğindeki bir dizüstünde
-  tutmuyordu: iki özet şeridi + büyük satır + grafik satırı toplamı ekranı
-  aşıyor ve `overflow: hidden` fazlalığı SESSİZCE kesiyordu — en altta duran
-  kart hiç görünmediği için eksik olduğu da anlaşılmıyordu.
-
-  İki kademeli çözüm: önce her şey küçülüyor, gerçekten sığmayan yükseklikte ise
-  kesmek yerine kaydırmaya izin veriliyor. Görünmeyen bir kart, kaydırma
-  çubuğundan kötüdür.
-*/
-@media (max-height: 860px) {
-  .g-icerik { padding: 11px 13px 13px; gap: 10px; }
-  .g-satir  { gap: 10px; }
-  .g-kart   { padding: 12px 14px; }
-  .g-kart-bas { margin-bottom: 8px; min-height: 22px; font-size: 13px; }
-  .g-kart-bas > i:first-child,
-  .g-kart-bas > span:first-child > i:first-child { width: 23px; height: 23px; font-size: 15px; }
-  .g-ozet-ikon { width: 36px; height: 36px; font-size: 19px; }
-  .g-ozet-sayi { font-size: 19px; }
-  .g-satir.grafik { min-height: 200px; }
-  table.g-tablo td { padding: 8px 10px; }
-}
-@media (max-height: 700px) {
-  .g-icerik { overflow-y: auto; }
+@media (max-width: 720px) {
+  .kpi-grid { grid-template-columns: 1fr; }
+  .grid > * { grid-column: span 12 !important; }
+  .g-saat { display: none; }
 }

@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <!--
   GARANMIN — Gelir Gider / Kredi Ekonomisi.
 
@@ -16,10 +16,10 @@
   webhook'unun bir tabloya yazmasi gerekir; o kurulunca bu sayfa gercek rakamlari
   gosterecek sekilde genisletilebilir.
 
-  HARCANAN KREDI = CIHAZ SAYISI: uygulama cihaz basina 1 kredi dusuyor ve ayri bir
-  defter tutulmuyor. Hesap degisirse buradaki varsayim da degismeli.
+  HARCANAN KREDI = CIHAZ SAYISI: uygulama cihaz basina 1 kredi dusuyor ve ayri
+  bir defter tutulmuyor. Hesap degisirse buradaki varsayim da degismeli.
 -->
-<html lang="tr">
+<html lang="tr" data-theme="light">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -27,90 +27,93 @@
     <title>Garanmin — Kredi Ekonomisi</title>
     <link rel="icon" type="image/x-icon" href="assets/img/favicon/favicon.ico" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="assets/vendor/fonts/iconify-icons.css" />
-    <link rel="stylesheet" href="assets/vendor/css/core.css" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="assets/adminator/adminator.css" />
     <link rel="stylesheet" href="assets/css/garanmin.css" />
   </head>
 
   <body>
-    <div class="g-app" id="g-app">
-      <aside class="g-yan" id="garanmin-menu"></aside>
-      <header class="g-ust" id="garanmin-navbar"></header>
+    <div class="shell" id="g-app">
+      <aside class="d-sidebar" id="garanmin-menu"></aside>
 
-      <main class="g-icerik">
-        <div id="garanmin-error"></div>
+      <div class="main">
+        <header class="d-topbar" id="garanmin-navbar"></header>
 
-        <div class="alert alert-warning py-2 mb-0 small" style="flex:0 0 auto">
-          <i class="bx bx-info-circle me-1"></i>
-          Bu sayfa ciro degil, kredi hareketi gosteriyor.
-          Odemeler RevenueCat tarafinda tutuluyor ve veritabanina akmiyor.
-        </div>
+        <main class="content">
+          <div id="garanmin-error"></div>
 
-        <div class="g-satir esit-4" id="serit"></div>
+          <div class="g-uyari warning" id="uyari"></div>
 
-        <div class="g-satir esit-2 buyuk">
-          <div class="g-kart">
-            <div class="g-kart-bas"><i class="bx bx-bar-chart-alt-2"></i> Kredi dağılımı (kullanıcı başına)</div>
-            <div class="g-kart-govde" id="c-dagilim"></div>
-          </div>
-          <div class="g-kart">
-            <div class="g-kart-bas"><i class="bx bx-trophy"></i> En çok kredisi olan kullanıcılar</div>
-            <div class="g-kart-govde g-scroll">
-              <table class="g-tablo">
-                <!-- Sütun genişlikleri SABİT (gerekçe: garanmin.css). Toplam %100. -->
-                <colgroup><col style="width:50%"><col style="width:22%"><col style="width:28%"></colgroup>
-                <thead><tr><th>E-posta</th><th class="sayi">Kredi</th><th class="sayi">Izlenen reklam</th></tr></thead>
-                <tbody id="top"><tr><td colspan="3" class="text-muted">Yukleniyor...</td></tr></tbody>
-              </table>
-            </div>
-          </div>
-        </div>
+          <div class="kpi-grid" id="serit"></div>
 
-        <!--
-          `grafik` SINIFI ZORUNLU. Bu satır önce sınıfsızdı: yüksekliği içeriğine
-          bağlı olduğu için "Kullanici dagilimi" halkası %100 yüksekliği SIFIR bir
-          kutuya göre hesaplıyor ve grafik hiç görünmüyordu. Yanındaki iki liste de
-          `height:100%` ile kayacağı için aynı şekilde eziliyordu.
-        -->
-        <div class="g-satir esit-3 grafik">
-          <div class="g-kart">
-            <div class="g-kart-bas"><i class="bx bx-wallet"></i> Kredi akisi</div>
-            <div class="g-kart-govde g-scroll" id="akis"></div>
+          <div class="grid">
+            <section class="card col-7">
+              <div class="card-head">
+                <div class="card-title-wrap">
+                  <span class="eyebrow">Kullanici basina</span>
+                  <h2 class="card-title">Kredi dagilimi</h2>
+                </div>
+              </div>
+              <div class="g-grafik uzun" id="c-dagilim"></div>
+            </section>
+
+            <section class="card col-5">
+              <div class="card-head">
+                <div class="card-title-wrap">
+                  <span class="eyebrow">Siralama</span>
+                  <h2 class="card-title">En cok kredisi olanlar</h2>
+                </div>
+              </div>
+              <div class="g-tablo-kutu" style="max-height:320px">
+                <table class="table">
+                  <!-- Sutun genislikleri SABIT (gerekce: garanmin.css). Toplam %100. -->
+                  <colgroup><col style="width:50%"><col style="width:22%"><col style="width:28%"></colgroup>
+                  <thead><tr><th>E-posta</th><th class="sayi">Kredi</th><th class="sayi">Reklam</th></tr></thead>
+                  <tbody id="top"><tr><td colspan="3" class="soluk">Yukleniyor...</td></tr></tbody>
+                </table>
+              </div>
+            </section>
+
+            <section class="card col-4">
+              <div class="card-head">
+                <div class="card-title-wrap">
+                  <span class="eyebrow">Defter</span>
+                  <h2 class="card-title">Kredi akisi</h2>
+                </div>
+              </div>
+              <div id="akis"></div>
+            </section>
+
+            <section class="card col-4">
+              <div class="card-head">
+                <div class="card-title-wrap">
+                  <span class="eyebrow">Dagilim</span>
+                  <h2 class="card-title">Kullanici dagilimi</h2>
+                </div>
+              </div>
+              <div class="g-grafik" id="c-kullanici"></div>
+            </section>
+
+            <section class="card col-4">
+              <div class="card-head">
+                <div class="card-title-wrap">
+                  <span class="eyebrow">Odullu</span>
+                  <h2 class="card-title">Reklam</h2>
+                </div>
+              </div>
+              <div id="reklam"></div>
+            </section>
           </div>
-          <div class="g-kart">
-            <div class="g-kart-bas"><i class="bx bx-user-check"></i> Kullanıcı dağılımı</div>
-            <div class="g-kart-govde" id="c-kullanici"></div>
-          </div>
-          <div class="g-kart">
-            <div class="g-kart-bas"><i class="bx bx-tv"></i> Reklam</div>
-            <div class="g-kart-govde g-scroll" id="reklam"></div>
-          </div>
-        </div>
-      </main>
+        </main>
+      </div>
     </div>
 
     <script src="assets/vendor/libs/apex-charts/apexcharts.js"></script>
     <script src="assets/js/garanmin-api.js"></script>
     <script>
-      function kutu(liste) {
-        document.getElementById('serit').innerHTML = liste.map(function (k) {
-          return '<div class="g-kart"><div class="g-ozet">'
-            + '<div class="g-ozet-ikon ' + k.renk + '"><i class="bx ' + k.ikon + '"></i></div>'
-            + '<div><div class="g-ozet-sayi">' + k.deger + '</div>'
-            + '<div class="g-ozet-etiket">' + k.etiket + '</div></div></div></div>';
-        }).join('');
-      }
-
-      /* Renkler ELLE YAZILMIYOR: `.g-kv` sinifi temadan geliyor. Onceki surumde
-         gri tonlari inline yazilmisti ve tema degistiginde bu iki liste eski
-         paletle kalip geri kalan her seyden ayri dusuyordu. */
-      function satir(etiket, deger, not) {
-        return '<div class="g-kv"><div class="g-kv-satir">'
-          + '<span class="g-kv-etiket">' + etiket + '</span>'
-          + '<span class="g-kv-deger">' + deger + '</span></div>'
-          + (not ? '<div class="g-kv-not">' + not + '</div>' : '') + '</div>';
-      }
+      document.getElementById('uyari').innerHTML = gIkon('info')
+        + '<span>Bu sayfa ciro degil, KREDI HAREKETI gosteriyor. Odemeler RevenueCat '
+        + 'tarafinda tutuluyor ve veritabanina akmiyor.</span>';
 
       async function yukle() {
         try {
@@ -121,20 +124,20 @@
 
           const dagitilan = Number(e.mevcut_kredi) + Number(e.harcanan_kredi);
 
-          kutu([
-            { etiket: 'Dolasimda kredi', deger: gNum(e.mevcut_kredi),    ikon: 'bx-star',    renk: 'turuncu' },
-            { etiket: 'Harcanan kredi',  deger: gNum(e.harcanan_kredi),  ikon: 'bx-minus-circle', renk: 'kirmizi' },
-            { etiket: 'Reklamla kazanilan', deger: gNum(e.reklam_kredi), ikon: 'bx-tv',      renk: 'yesil' },
-            { etiket: 'Kullanıcı başına ort.', deger: gNum(e.ortalama_kredi), ikon: 'bx-calculator', renk: 'mavi' },
+          gKpiYaz('serit', [
+            { etiket: 'Dolasimda kredi',      deger: gNum(e.mevcut_kredi),    ikon: 'star',  renk: 'warning' },
+            { etiket: 'Harcanan kredi',       deger: gNum(e.harcanan_kredi),  ikon: 'minus', renk: 'danger' },
+            { etiket: 'Reklamla kazanilan',   deger: gNum(e.reklam_kredi),    ikon: 'tv',    renk: 'success' },
+            { etiket: 'Kullanici basina ort.',deger: gNum(e.ortalama_kredi),  ikon: 'calc',  renk: 'primary' },
           ]);
 
           if (!gBos('c-dagilim', e.dagilim)) {
             const t = gGrafikTemel(); t.chart.type = 'bar';
-            new ApexCharts(document.getElementById('c-dagilim'), Object.assign(t, {
-              series: [{ name: 'Kullanıcı', data: e.dagilim.map(function (d) { return Number(d.count); }) }],
+            new ApexCharts(gKap('c-dagilim'), Object.assign(t, {
+              series: [{ name: 'Kullanici', data: e.dagilim.map(function (d) { return Number(d.count); }) }],
               xaxis: { categories: e.dagilim.map(function (d) { return d.bucket; }) },
               plotOptions: { bar: { borderRadius: 5, distributed: true, columnWidth: '55%' } },
-              legend: { show: false }, colors: G_RENK,
+              legend: { show: false },
             })).render();
           }
 
@@ -144,39 +147,40 @@
                   + '<td class="sayi">' + gNum(u.credits) + '</td>'
                   + '<td class="sayi">' + gNum(u.ads) + '</td></tr>';
               }).join('')
-            : '<tr><td colspan="3" class="text-muted">Kayit yok</td></tr>';
+            : '<tr><td colspan="3" class="soluk">Kayit yok</td></tr>';
 
           document.getElementById('akis').innerHTML =
-            satir('Dagitilan toplam', gNum(dagitilan), 'dolasimda + harcanan')
-            + satir('Harcanan', gNum(e.harcanan_kredi), 'cihaz basina 1 kredi')
-            + satir('Dolasimda kalan', gNum(e.mevcut_kredi))
-            + satir('Kullanim orani',
+            gKv('Dagitilan toplam', gNum(dagitilan), 'dolasimda + harcanan')
+            + gKv('Harcanan', gNum(e.harcanan_kredi), 'cihaz basina 1 kredi')
+            + gKv('Dolasimda kalan', gNum(e.mevcut_kredi))
+            + gKv('Kullanim orani',
                 dagitilan ? '%' + Math.round(Number(e.harcanan_kredi) / dagitilan * 100) : '-');
 
+          const toplamK = Number(e.kredili_kullanici) + Number(e.kredisiz_kullanici);
+
           document.getElementById('reklam').innerHTML =
-            satir('Toplam izlenme', gNum(e.reklam_izlenme))
-            + satir('Kazandirdigi kredi', gNum(e.reklam_kredi), '5 reklam = 1 kredi')
-            + satir('İzlenme / kullanıcı',
-                gNum((Number(e.reklam_izlenme) / Math.max(1, Number(e.kredili_kullanici) + Number(e.kredisiz_kullanici))).toFixed(1)));
+            gKv('Toplam izlenme', gNum(e.reklam_izlenme))
+            + gKv('Kazandirdigi kredi', gNum(e.reklam_kredi), '5 reklam = 1 kredi')
+            + gKv('Izlenme / kullanici',
+                gNum((Number(e.reklam_izlenme) / Math.max(1, toplamK)).toFixed(1)));
 
           /* Hic kullanici yoksa halka CIZILMIYOR: iki dilimi de sifir olan bir
              halka, "veri gelmedi" ile "deger sifir" arasindaki farki gizliyor. */
-          const kredili = Number(e.kredili_kullanici), kredisiz = Number(e.kredisiz_kullanici);
-          if (kredili + kredisiz === 0) { gBos('c-kullanici', null); return; }
+          if (toplamK === 0) { gBos('c-kullanici', null); return; }
 
           const t2 = gGrafikTemel(); t2.chart.type = 'donut';
           new ApexCharts(gKap('c-kullanici'), Object.assign(t2, {
-            series: [kredili, kredisiz],
+            series: [Number(e.kredili_kullanici), Number(e.kredisiz_kullanici)],
             labels: ['Kredisi olan', 'Kredisi biten'],
             colors: [G_RENK[1], G_RENK[6]],
-            legend: { position: 'bottom', fontSize: '11px' },
-            plotOptions: { pie: { donut: { size: '58%' } } },
+            legend: { position: 'bottom', fontSize: '11.5px' },
+            plotOptions: { pie: { donut: { size: '60%' } } },
           })).render();
         } catch (err) { gError(err.message); }
       }
 
       if (garanminGuardPage()) {
-        garanminShell('garanmin-ekonomi.html', 'Kredi Ekonomisi');
+        garanminShell('garanmin-ekonomi.html', 'Kredi Ekonomisi', 'Gelir Gider');
         yukle();
       }
     </script>
