@@ -1,277 +1,219 @@
-<!doctype html>
-<html lang="tr" data-theme="light">
+<!DOCTYPE html>
+<html lang="tr" data-theme="dark">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>GaranTea Admin</title>
-  <meta name="robots" content="noindex,nofollow">
-  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>GaranTea | Yönetim Kontrol Merkezi</title>
+  
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link rel="stylesheet" href="garanmin.css">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json">
 </head>
 <body>
+  <!-- BACKGROUND BLOBS -->
+  <div class="bg"><span class="blob-1"></span><span class="blob-2"></span></div>
 
-<div class="bg" aria-hidden="true"><span class="blob-r"></span><span class="blob-b"></span></div>
-
-<!-- ══════════ LOGIN ══════════════════════════════════════════ -->
-<div id="login-screen">
-  <div class="lcard">
-    <div class="lbrand">
-      <img src="favicon.svg" alt="GaranTea">
-      <span class="lbrand-name">GaranTea</span>
-    </div>
-    <p class="ltagline">Yönetici Portalı — Kimliğinizi doğrulayın</p>
-    <form id="login-form" autocomplete="off">
-      <div class="field">
-        <label for="inp-user">Kullanıcı Adı</label>
-        <input id="inp-user" type="text" placeholder="Kullanıcı adınız" spellcheck="false" autocomplete="username">
+  <!-- LOGIN SCREEN -->
+  <div id="login-screen">
+    <div class="lcard">
+      <div class="lbrand">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:32px;height:32px;color:var(--blue)">
+          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+        </svg>
+        <span class="lbrand-name">GaranTea</span>
       </div>
-      <div class="field">
-        <label for="inp-pass">Şifre</label>
-        <input id="inp-pass" type="password" placeholder="••••••••••" autocomplete="current-password">
-      </div>
-      <div id="inp-err" class="lerr"></div>
-      <button type="submit" id="login-btn" class="btn-pri">Giriş Yap</button>
-    </form>
-    <div class="lnote">
-      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
-      SHA-256 ile şifrelenerek iletilir. Brute-force koruması aktif.
+      <div class="ltagline">Yönetim Kontrol Merkezi (v3)</div>
+      
+      <form id="login-form">
+        <div class="field">
+          <label for="inp-user">Admin ID</label>
+          <input type="text" id="inp-user" autocomplete="username" autofocus>
+        </div>
+        <div class="field">
+          <label for="inp-pass">Gizli Anahtar</label>
+          <input type="password" id="inp-pass" autocomplete="current-password">
+        </div>
+        <div id="inp-err" class="lerr"></div>
+        <button type="submit" id="login-btn" class="btn-pri">Doğrula ve Giriş Yap</button>
+      </form>
     </div>
   </div>
-</div>
 
-<!-- ══════════ APP ════════════════════════════════════════════ -->
-<div id="app">
-
-  <!-- SIDEBAR -->
-  <nav class="sidebar" id="sidebar">
-    <div class="sb-top">
-      <div class="sb-brand">
-        <div class="sb-brand-left">
-          <img src="favicon.svg" alt="">
-          <div class="sb-brand-text">
-            <div class="sb-name">GaranTea</div>
-            <div class="sb-tag">Admin Panel</div>
-          </div>
-        </div>
-        <button class="sb-toggle" id="sb-toggle" title="Sidebar'ı daralt/genişlet">
-          <svg class="sb-toggle-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
-          </svg>
-        </button>
-      </div>
-
-      <!-- Admin info -->
-      <div class="sb-admin">
-        <div class="sb-admin-role">Aktif Oturum</div>
-        <div class="sb-admin-name" id="sb-uname">—</div>
-        <div class="sb-admin-since" id="sb-since"></div>
-      </div>
-
-      <div class="sb-sec">Genel</div>
-    </div>
-
-    <div class="sb-nav">
-      <div class="nitem on" data-panel="overview" role="button" tabindex="0">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-        <span>Genel Bakış</span>
-      </div>
-
-      <div class="sb-sec">Kullanıcılar</div>
-      <div class="nitem" data-panel="users" role="button" tabindex="0">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-        <span>Kullanıcılar</span>
-      </div>
-      <div class="nitem" data-panel="credits" role="button" tabindex="0">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-        <span>Kredi Analizi</span>
-      </div>
-
-      <div class="sb-sec">Cihazlar</div>
-      <div class="nitem" data-panel="devices" role="button" tabindex="0">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-        <span>Cihaz Analizi</span>
-      </div>
-
-      <div class="sb-sec">Aktivite</div>
-      <div class="nitem" data-panel="activity" role="button" tabindex="0">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
-        <span>Büyüme Trendi</span>
-      </div>
-      <div class="nitem" data-panel="support" role="button" tabindex="0">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
-        <span>Destek Talepleri</span>
-      </div>
-    </div>
-
-    <div class="sb-foot">
-      <button class="btn-out" id="logout-btn">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
-        <span>Çıkış Yap</span>
-      </button>
-    </div>
-  </nav>
-
-  <!-- MAIN -->
-  <main class="main">
-    <header class="topbar">
-      <h1 class="page-title" id="page-title">Genel Bakış</h1>
-      <div class="top-right">
-        <button class="ibtn" id="refresh-btn" title="Yenile">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-        </button>
-        <button class="ibtn" id="theme-btn" title="Tema Değiştir">
-          <!-- Moon (shown in light mode) -->
-          <svg id="icon-moon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
-          <!-- Sun (shown in dark mode) -->
-          <svg id="icon-sun" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="display:none"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
-        </button>
-        <span class="live-dot">Canlı</span>
-        <span class="clock" id="clock"></span>
-      </div>
-    </header>
-
-    <div class="content">
-
-      <!-- OVERVIEW -->
-      <section class="panel on" id="panel-overview">
-        <div class="stat-row" id="ov-stats">
-          <div class="ld" style="grid-column:1/-1"><div class="sp"></div><span>Yükleniyor…</span></div>
-        </div>
-        <div class="g2" style="flex:1;min-height:0">
-          <div class="card">
-            <div class="chead"><span class="clabel">Son 30 Gün — Yeni Kayıt</span></div>
-            <div class="cbody"><div class="cw"><canvas id="ch-trend"></canvas></div></div>
-          </div>
-          <div class="card">
-            <div class="chead"><span class="clabel">Cihaz Kategorileri</span></div>
-            <div class="cbody"><div class="cw"><canvas id="ch-cats"></canvas></div></div>
-          </div>
-        </div>
-      </section>
-
-      <!-- USERS -->
-      <section class="panel" id="panel-users">
-        <div class="card" style="flex:1;min-height:0">
-          <div class="chead">
-            <span class="clabel">Kullanıcı Listesi</span>
-            <div class="bgrp">
-              <button class="bsm" id="uprev">← Önceki</button>
-              <button class="bsm" id="unext">Sonraki →</button>
+  <!-- APP SHELL -->
+  <div id="app">
+    
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sb-top">
+        <div class="sb-brand">
+          <div class="sb-brand-left">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--blue)">
+              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+            </svg>
+            <div class="sb-brand-text">
+              <div class="sb-name">GaranTea</div>
+              <div class="sb-tag">Admin Panel</div>
             </div>
           </div>
-          <div class="srow">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-            <input id="usearch" type="text" placeholder="E-posta ile ara…">
-          </div>
-          <div class="twrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>E-posta</th><th>Kayıt</th><th>Son Giriş</th>
-                  <th>Kredi</th><th>Cihaz</th><th>Destek</th><th></th>
-                </tr>
-              </thead>
-              <tbody id="utbody">
-                <tr><td colspan="7"><div class="ld"><div class="sp"></div></div></td></tr>
-              </tbody>
-            </table>
-          </div>
-          <div class="tbar"><span id="ulabel">—</span></div>
+          <button class="sb-toggle" id="sb-toggle">
+            <svg class="sb-toggle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M15 19l-7-7 7-7"/>
+            </svg>
+          </button>
         </div>
-      </section>
+        <div class="sb-admin">
+          <div class="sb-admin-role">Yönetici Oturumu</div>
+          <div class="sb-admin-name" id="sb-uname">...</div>
+          <div class="sb-admin-since" id="sb-since"></div>
+        </div>
+      </div>
+      
+      <nav class="sb-nav">
+        <div class="sb-sec">Analitik</div>
+        <a class="nitem on" data-panel="overview">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/></svg>
+          <span>Kontrol Merkezi</span>
+        </a>
+        <a class="nitem" data-panel="users">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <span>Kullanıcı Veritabanı</span>
+        </a>
+        <div class="sb-sec">Modüller</div>
+        <a class="nitem" data-panel="devices">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+          <span>Cihaz Envanteri</span>
+        </a>
+        <a class="nitem" data-panel="credits">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v8"/><path d="M8 12h8"/></svg>
+          <span>Kredi Ekonomisi</span>
+        </a>
+        <a class="nitem" data-panel="support">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>
+          <span>Destek Talepleri</span>
+        </a>
+      </nav>
 
-      <!-- CREDITS -->
-      <section class="panel" id="panel-credits">
-        <div class="g2" style="flex:1;min-height:0">
-          <div class="card">
-            <div class="chead"><span class="clabel">Kredi Dağılımı</span></div>
-            <div class="cbody"><div class="cw"><canvas id="ch-crdist"></canvas></div></div>
-          </div>
-          <div class="card">
-            <div class="chead"><span class="clabel">Kredi Özeti</span></div>
-            <div class="cbody" id="cr-sum"><div class="ld"><div class="sp"></div></div></div>
+      <div class="sb-foot">
+        <button class="btn-out" id="logout-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          <span>Oturumu Kapat</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main">
+      <header class="topbar">
+        <div class="page-title" id="page-title">Kontrol Merkezi</div>
+        <div class="top-right">
+          <div class="live-dot">LIVE</div>
+          <div class="clock" id="clock">00:00:00</div>
+          <button class="ibtn" id="theme-btn" title="Tema Değiştir">
+            <svg id="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            <svg id="icon-sun" style="display:none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+          </button>
+          <button class="ibtn" id="refresh-btn" title="Yenile">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/></svg>
+          </button>
+        </div>
+      </header>
+
+      <div class="content">
+        
+        <!-- PANEL: OVERVIEW -->
+        <div id="panel-overview" class="panel on">
+          <div class="bento bento-overview" id="ov-grid">
+            <!-- KPIs (Will be filled by JS) -->
           </div>
         </div>
-      </section>
 
-      <!-- DEVICES -->
-      <section class="panel" id="panel-devices">
-        <div class="g2" style="flex:1;min-height:0">
-          <div class="card">
-            <div class="chead"><span class="clabel">Kategori — Pasta</span></div>
-            <div class="cbody"><div class="cw"><canvas id="ch-dpie"></canvas></div></div>
+        <!-- PANEL: USERS -->
+        <div id="panel-users" class="panel">
+          <div class="card" style="flex:1">
+            <div class="chead">
+              <div class="clabel">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                Kullanıcı Veritabanı
+              </div>
+            </div>
+            <div class="srow">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <input type="text" id="usearch" placeholder="E-posta ile ara...">
+            </div>
+            <div class="twrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Kimlik</th>
+                    <th>Kayıt</th>
+                    <th>Son Giriş</th>
+                    <th>Kredi</th>
+                    <th>Cihaz</th>
+                    <th>Talep</th>
+                    <th>Aksiyon</th>
+                  </tr>
+                </thead>
+                <tbody id="utbody"></tbody>
+              </table>
+            </div>
+            <div class="tbar">
+              <span id="ulabel">0 kayıt</span>
+              <div class="bgrp">
+                <button class="bsm" id="uprev">Geri</button>
+                <button class="bsm" id="unext">İleri</button>
+              </div>
+            </div>
           </div>
-          <div class="card">
-            <div class="chead"><span class="clabel">Kategori — Çubuk</span></div>
-            <div class="cbody"><div class="cw"><canvas id="ch-dbar"></canvas></div></div>
+        </div>
+
+        <!-- PANEL: DEVICES -->
+        <div id="panel-devices" class="panel">
+          <div class="bento bento-2" id="dev-grid">
+            <!-- Filled by JS -->
           </div>
         </div>
-      </section>
 
-      <!-- ACTIVITY -->
-      <section class="panel" id="panel-activity">
-        <div class="card" style="flex:1;min-height:0">
-          <div class="chead"><span class="clabel">Günlük Yeni Kayıt — Son 30 Gün</span></div>
-          <div class="cbody"><div class="cw"><canvas id="ch-act"></canvas></div></div>
+        <!-- PANEL: CREDITS -->
+        <div id="panel-credits" class="panel">
+          <div class="bento bento-3" id="cr-grid">
+            <!-- Filled by JS -->
+          </div>
         </div>
-      </section>
 
-      <!-- SUPPORT -->
-      <section class="panel" id="panel-support">
-        <div class="stat-row" id="sup-stats">
-          <div class="ld" style="grid-column:1/-1"><div class="sp"></div></div>
+        <!-- PANEL: SUPPORT -->
+        <div id="panel-support" class="panel">
+          <div class="bento bento-2" id="sup-grid">
+            <!-- Filled by JS -->
+          </div>
         </div>
-      </section>
 
-    </div><!-- /content -->
-  </main>
+      </div>
+    </main>
 
-  <!-- MOBILE BOTTOM NAV -->
-  <nav class="mobile-nav" id="mobile-nav">
-    <div class="mnitem on" data-panel="overview">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-      <span>Genel</span>
-    </div>
-    <div class="mnitem" data-panel="users">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
-      <span>Kullanıcı</span>
-    </div>
-    <div class="mnitem" data-panel="credits">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-      <span>Kredi</span>
-    </div>
-    <div class="mnitem" data-panel="devices">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-      <span>Cihaz</span>
-    </div>
-    <div class="mnitem" data-panel="activity">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
-      <span>Trend</span>
-    </div>
-    <div class="mnitem" data-panel="support">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
-      <span>Destek</span>
-    </div>
-  </nav>
-
-</div><!-- /app -->
-
-<!-- USER DETAIL DRAWER -->
-<div class="overlay" id="overlay"></div>
-<div class="drawer" id="drawer" role="dialog" aria-modal="true">
-  <div class="dhead">
-    <h2 id="drawer-title">Kullanıcı Detayı</h2>
-    <button class="dclose" id="drawer-x">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
-    </button>
+    <!-- MOBILE NAV -->
+    <nav class="mobile-nav">
+      <div class="mnitem on" data-panel="overview"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Genel</div>
+      <div class="mnitem" data-panel="users"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Kişiler</div>
+      <div class="mnitem" data-panel="devices"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"/></svg>Cihaz</div>
+      <div class="mnitem" data-panel="credits"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v8"/><path d="M8 12h8"/></svg>Kredi</div>
+      <div class="mnitem" data-panel="support"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Destek</div>
+    </nav>
   </div>
-  <div class="dbody" id="drawer-body">
-    <div class="ld"><div class="sp"></div><span>Yükleniyor…</span></div>
-  </div>
-</div>
 
-<script src="garanmin.js"></script>
+  <!-- DRAWER (User Detail) -->
+  <div class="overlay" id="overlay"></div>
+  <div class="drawer" id="drawer">
+    <div class="dhead">
+      <h2 id="drawer-title">...</h2>
+      <button class="dclose" id="drawer-x">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="dbody" id="drawer-body"></div>
+  </div>
+
+  <script src="garanmin.js"></script>
 </body>
 </html>
