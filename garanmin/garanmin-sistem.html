@@ -1,0 +1,139 @@
+<!doctype html>
+<!--
+  GARANMIN — Sistem Durumu.
+
+  Ust cubuktaki canli gostergesi "baglanti var mi" sorusunu tek bakista cevapliyor;
+  bu sayfa AYRINTIYI veriyor: sunucu saati, tarayici saatiyle farki, veritabaninin
+  ne zamandir ayakta oldugu, kaydin buyumesi ve oturum bilgisi.
+
+  ─── SAAT FARKI NEDEN ONEMLI ──────────────────────────────────────────────
+
+  Garanti hesaplarinin tamami tarihe bagli. Tarayicinin saati kaymissa panel yanlis
+  ama TUTARLI gorunen bir tablo gosterir: hicbir yerde hata cikmaz, yalnizca "yakinda
+  bitiyor" sayisi gercegin disinda olur. Bu yuzden fark aciktan yaziliyor.
+-->
+<html lang="tr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Garanmin — Sistem Durumu</title>
+    <link rel="icon" type="image/x-icon" href="assets/img/favicon/favicon.ico" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="assets/vendor/fonts/iconify-icons.css" />
+    <link rel="stylesheet" href="assets/vendor/css/core.css" />
+    <link rel="stylesheet" href="assets/css/garanmin.css" />
+  </head>
+
+  <body>
+    <div class="g-app" id="g-app">
+      <aside class="g-yan" id="garanmin-menu"></aside>
+      <header class="g-ust" id="garanmin-navbar"></header>
+
+      <main class="g-icerik">
+        <div id="garanmin-error"></div>
+
+        <div class="g-satir esit-4" id="serit"></div>
+
+        <div class="g-satir esit-2 buyuk">
+          <div class="g-kart">
+            <div class="g-kart-bas"><i class="bx bx-server"></i> Sunucu</div>
+            <div class="g-kart-govde g-scroll" id="sunucu"></div>
+          </div>
+          <div class="g-kart">
+            <div class="g-kart-bas"><i class="bx bx-shield-quarter"></i> Oturum ve guvenlik</div>
+            <div class="g-kart-govde g-scroll" id="oturum"></div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script src="assets/js/garanmin-api.js"></script>
+    <script>
+      function kutu(liste) {
+        document.getElementById('serit').innerHTML = liste.map(function (k) {
+          return '<div class="g-kart"><div class="g-ozet">'
+            + '<div class="g-ozet-ikon ' + k.renk + '"><i class="bx ' + k.ikon + '"></i></div>'
+            + '<div><div class="g-ozet-sayi" style="font-size:18px">' + k.deger + '</div>'
+            + '<div class="g-ozet-etiket">' + k.etiket + '</div></div></div></div>';
+        }).join('');
+      }
+
+      function satir(etiket, deger, not) {
+        return '<div style="padding:9px 0;border-bottom:1px solid #f1f3f9">'
+          + '<div style="display:flex;justify-content:space-between;gap:12px">'
+          + '<span style="color:#6b7280;font-size:12.5px">' + etiket + '</span>'
+          + '<span style="font-weight:600;font-size:13px;text-align:right">' + deger + '</span></div>'
+          + (not ? '<div style="font-size:11px;color:#9aa1b2;margin-top:2px">' + not + '</div>' : '')
+          + '</div>';
+      }
+
+      function sure(ms) {
+        const dk = Math.floor(ms / 60000);
+        if (dk < 60) return dk + ' dakika';
+        const sa = Math.floor(dk / 60);
+        if (sa < 24) return sa + ' saat ' + (dk % 60) + ' dk';
+        return Math.floor(sa / 24) + ' gun ' + (sa % 24) + ' saat';
+      }
+
+      async function yukle() {
+        try {
+          const [h, t] = await Promise.all([
+            garanminData('garanmin_health'),
+            garanminData('garanmin_db_tables'),
+          ]);
+
+          const sunucuSaat = new Date(h.server_time);
+          const fark = Math.round((sunucuSaat - new Date()) / 1000);
+          const toplamSatir = t.reduce(function (a, x) { return a + Number(x.satir); }, 0);
+          const rlsKapali = t.filter(function (x) { return !x.rls; });
+
+          kutu([
+            { etiket: 'Baglanti', deger: 'CANLI',            ikon: 'bx-broadcast', renk: 'yesil' },
+            { etiket: 'Veritabani boyutu', deger: h.db_size_text, ikon: 'bx-data', renk: 'mor' },
+            { etiket: 'Toplam satir', deger: gNum(toplamSatir), ikon: 'bx-table',  renk: 'mavi' },
+            { etiket: 'RLS acik olmayan tablo', deger: rlsKapali.length,
+              ikon: rlsKapali.length ? 'bx-error' : 'bx-check-shield',
+              renk: rlsKapali.length ? 'kirmizi' : 'yesil' },
+          ]);
+
+          document.getElementById('sunucu').innerHTML =
+            satir('Sunucu saati', sunucuSaat.toLocaleString('tr-TR'))
+            + satir('Tarayici saati', new Date().toLocaleString('tr-TR'))
+            + satir('Fark', Math.abs(fark) + ' saniye',
+                Math.abs(fark) > 120
+                  ? 'DIKKAT: iki saat arasinda 2 dakikadan fazla fark var. Garanti hesaplari tarihe bagli oldugu icin panel yaniltici olabilir.'
+                  : 'Kabul edilebilir araligin icinde.')
+            + satir('Veritabani ayakta', sure(new Date() - new Date(h.started_at)),
+                'Baslangic: ' + gDateTime(h.started_at))
+            + satir('Veritabani boyutu', h.db_size_text + ' (' + gNum(h.db_size) + ' bayt)')
+            + satir('Adres', '<code style="font-size:10.5px">' + gEsc(GARANMIN.supabaseUrl.replace('https://','')) + '</code>');
+
+          const exp = garanminExp();
+          document.getElementById('oturum').innerHTML =
+            satir('Oturum sahibi', gEsc(garanminUser()))
+            + satir('Oturum bitisi', exp ? gDateTime(exp) : '-',
+                'Jeton 8 saat sonra sunucuda gecersiz oluyor.')
+            + satir('Jeton nerede', 'sessionStorage',
+                'Sekme kapaninca siliniyor; ortak bilgisayarda oturum bir sonraki kisiye devrolmuyor.')
+            + satir('Parola saklama', 'bcrypt (maliyet 12)',
+                'Tek bir deneme ~250 ms suruyor; cevrimici kaba kuvvet pratikte imkansiz.')
+            + satir('Basarisiz denemede', 'Kademeli gecikme',
+                'Kilitleme YOK — kilitleme, saldirganin yoneticiyi disarida birakmasina izin verirdi.')
+            + satir('Panel yetkisi', 'Yalnizca okuma',
+                'Hicbir fonksiyon veri yazmiyor ya da silmiyor.')
+            + (rlsKapali.length
+                ? '<div class="alert alert-danger py-2 mt-3 mb-0 small">RLS kapali tablo: '
+                  + rlsKapali.map(function (x) { return gEsc(x.tablo); }).join(', ') + '</div>'
+                : '');
+        } catch (e) { gError(e.message); }
+      }
+
+      if (garanminGuardPage()) {
+        garanminShell('garanmin-sistem.html', 'Sistem Durumu');
+        yukle();
+      }
+    </script>
+  </body>
+</html>

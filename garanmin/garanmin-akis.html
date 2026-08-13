@@ -1,0 +1,162 @@
+<!doctype html>
+<!--
+  GARANMIN — Veri Tabani / Zaman Akisi.
+
+  Kayitlarin gune gore nasil biriktigi: kullanici, cihaz, destek talebi.
+
+  ─── BOS GUNLER SIFIR OLARAK GELIYOR ──────────────────────────────────────
+
+  Sunucudaki `garanmin_akis` butun gunleri `generate_series` ile uretiyor. Yalnizca
+  veri olan gunler donseydi, uc seri farkli gunlerde baslar ve grafikte tarihler
+  birbirinin uzerine kayardi — 3 Agustos'taki cihaz artisi 7 Agustos'taki kullanici
+  artisiyla ayni sutunda gorunurdu. "Veri yok" ile "sifir" ayri seyler.
+-->
+<html lang="tr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Garanmin — Zaman Akisi</title>
+    <link rel="icon" type="image/x-icon" href="assets/img/favicon/favicon.ico" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="assets/vendor/fonts/iconify-icons.css" />
+    <link rel="stylesheet" href="assets/vendor/css/core.css" />
+    <link rel="stylesheet" href="assets/css/garanmin.css" />
+  </head>
+
+  <body>
+    <div class="g-app" id="g-app">
+      <aside class="g-yan" id="garanmin-menu"></aside>
+      <header class="g-ust" id="garanmin-navbar"></header>
+
+      <main class="g-icerik">
+        <div id="garanmin-error"></div>
+
+        <div class="g-satir esit-4" id="serit"></div>
+
+        <div class="g-kart" style="flex:1 1 auto;min-height:0">
+          <div class="g-kart-bas" style="justify-content:space-between">
+            <span><i class="bx bx-line-chart"></i> Gunluk kayit akisi</span>
+            <span style="text-transform:none;letter-spacing:0;display:flex;gap:5px">
+              <button class="btn btn-sm btn-outline-secondary" onclick="setGun(7)"  id="g7">7 gun</button>
+              <button class="btn btn-sm btn-primary"           onclick="setGun(30)" id="g30">30 gun</button>
+              <button class="btn btn-sm btn-outline-secondary" onclick="setGun(90)" id="g90">90 gun</button>
+            </span>
+          </div>
+          <div class="g-kart-govde" id="c-akis"></div>
+        </div>
+
+        <div class="g-satir esit-3" style="height:180px">
+          <div class="g-kart">
+            <div class="g-kart-bas"><i class="bx bx-user-plus"></i> Kullanici</div>
+            <div class="g-kart-govde" id="c-k"></div>
+          </div>
+          <div class="g-kart">
+            <div class="g-kart-bas"><i class="bx bx-devices"></i> Cihaz</div>
+            <div class="g-kart-govde" id="c-c"></div>
+          </div>
+          <div class="g-kart">
+            <div class="g-kart-bas"><i class="bx bx-support"></i> Destek</div>
+            <div class="g-kart-govde" id="c-t"></div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script src="assets/vendor/libs/apex-charts/apexcharts.js"></script>
+    <script src="assets/js/garanmin-api.js"></script>
+    <script>
+      let gun = 30;
+      /* Cizilen grafikler tutuluyor: aralik degistiginde eskisi YOK EDILMELI.
+         Yok edilmezse ApexCharts ayni kapsayiciya ikinci bir grafik cizer ve ustuste
+         binen iki tablo olusur. */
+      let grafikler = [];
+
+      function temizle() {
+        grafikler.forEach(function (g) { try { g.destroy(); } catch (e) {} });
+        grafikler = [];
+      }
+
+      function kutu(liste) {
+        document.getElementById('serit').innerHTML = liste.map(function (k) {
+          return '<div class="g-kart"><div class="g-ozet">'
+            + '<div class="g-ozet-ikon ' + k.renk + '"><i class="bx ' + k.ikon + '"></i></div>'
+            + '<div><div class="g-ozet-sayi">' + k.deger + '</div>'
+            + '<div class="g-ozet-etiket">' + k.etiket + '</div></div></div></div>';
+        }).join('');
+      }
+
+      function setGun(g) {
+        gun = g;
+        [7, 30, 90].forEach(function (x) {
+          const b = document.getElementById('g' + x);
+          b.className = 'btn btn-sm ' + (x === g ? 'btn-primary' : 'btn-outline-secondary');
+        });
+        yukle();
+      }
+
+      function mini(hedef, veri, etiketler, renk) {
+        if (gBos(hedef, veri)) return;
+        const t = gGrafikTemel();
+        t.chart.type = 'bar';
+        t.chart.sparkline = { enabled: false };
+        const g = new ApexCharts(document.getElementById(hedef), Object.assign(t, {
+          series: [{ name: 'Adet', data: veri }],
+          xaxis: { categories: etiketler, labels: { show: false }, axisTicks: { show: false } },
+          yaxis: { labels: { show: false } },
+          plotOptions: { bar: { borderRadius: 3, columnWidth: '70%' } },
+          colors: [renk],
+        }));
+        g.render(); grafikler.push(g);
+      }
+
+      async function yukle() {
+        try {
+          temizle();
+          const v = await garanminData('garanmin_akis', { p_gun: gun });
+          const etiket = v.map(function (d) { return gDate(d.gun); });
+          const k = v.map(function (d) { return Number(d.kullanici); });
+          const c = v.map(function (d) { return Number(d.cihaz); });
+          const t = v.map(function (d) { return Number(d.talep); });
+          const top = function (a) { return a.reduce(function (x, y) { return x + y; }, 0); };
+
+          kutu([
+            { etiket: 'Yeni kullanici (' + gun + ' gun)', deger: gNum(top(k)), ikon: 'bx-user-plus', renk: 'mavi' },
+            { etiket: 'Eklenen cihaz',   deger: gNum(top(c)), ikon: 'bx-devices', renk: 'yesil' },
+            { etiket: 'Destek talebi',   deger: gNum(top(t)), ikon: 'bx-support', renk: 'kirmizi' },
+            { etiket: 'Gunluk ortalama cihaz',
+              deger: gNum((top(c) / Math.max(1, v.length)).toFixed(1)), ikon: 'bx-trending-up', renk: 'turuncu' },
+          ]);
+
+          if (!gBos('c-akis', v)) {
+            const base = gGrafikTemel();
+            base.chart.type = 'line';
+            const g = new ApexCharts(document.getElementById('c-akis'), Object.assign(base, {
+              series: [
+                { name: 'Kullanici', data: k },
+                { name: 'Cihaz',     data: c },
+                { name: 'Destek',    data: t },
+              ],
+              xaxis: { categories: etiket, labels: { rotate: 0, hideOverlappingLabels: true } },
+              stroke: { curve: 'smooth', width: 2.5 },
+              markers: { size: gun <= 7 ? 4 : 0 },
+              colors: [G_RENK[0], G_RENK[1], G_RENK[3]],
+              legend: { position: 'top', horizontalAlign: 'right' },
+            }));
+            g.render(); grafikler.push(g);
+          }
+
+          mini('c-k', k, etiket, G_RENK[0]);
+          mini('c-c', c, etiket, G_RENK[1]);
+          mini('c-t', t, etiket, G_RENK[3]);
+        } catch (e) { gError(e.message); }
+      }
+
+      if (garanminGuardPage()) {
+        garanminShell('garanmin-akis.html', 'Zaman Akisi');
+        yukle();
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,201 @@
+<!doctype html>
+<!--
+  GARANMIN — Kullanici Detayi.
+
+  Kullanicilar listesindeki bir satira tiklaninca acilir; kimlik adreste tasinir
+  (`?id=`), boylece sayfa yenilendiginde ya da adres paylasildiginda ayni kullanici
+  gelir.
+
+  ─── TEK CAGRI, DORT BOLUM ────────────────────────────────────────────────
+
+  Profil, cihazlar, garanti dagilimi ve destek talepleri `garanmin_user_detail`
+  icinden TEK seferde geliyor. Dort ayri cagri olsaydi aralarinda gecen surede
+  kullanici bir cihaz ekledi diye "toplam 13 ama listede 12 satir" gibi bir ekran
+  cikabilir ve bu fark hicbir yerde hata olarak gorunmezdi.
+
+  FATURA GORSELI VE SERI NUMARASI GOSTERILMIYOR — fonksiyon zaten dondurmuyor.
+  Yoneticinin isletmeyi yonetmek icin kullanicinin belgesine bakmasi gerekmiyor ve
+  her gosterilen alan, sizdiginda sorumluluk doguran bir alan.
+-->
+<html lang="tr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Garanmin — Kullanici Detayi</title>
+    <link rel="icon" type="image/x-icon" href="assets/img/favicon/favicon.ico" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="assets/vendor/fonts/iconify-icons.css" />
+    <link rel="stylesheet" href="assets/vendor/css/core.css" />
+    <link rel="stylesheet" href="assets/css/garanmin.css" />
+  </head>
+
+  <body>
+    <div class="g-app" id="g-app">
+      <aside class="g-yan" id="garanmin-menu"></aside>
+      <header class="g-ust" id="garanmin-navbar"></header>
+
+      <main class="g-icerik">
+        <div id="garanmin-error"></div>
+        <div id="govde" style="display:none;flex-direction:column;gap:12px;flex:1 1 auto;min-height:0">
+
+          <div class="g-satir esit-4" id="serit"></div>
+
+          <div class="g-satir esit-3 buyuk">
+            <div class="g-kart">
+              <div class="g-kart-bas"><i class="bx bx-id-card"></i> Profil</div>
+              <div class="g-kart-govde g-scroll" id="profil"></div>
+            </div>
+
+            <div class="g-kart" style="grid-column: span 2">
+              <div class="g-kart-bas" style="justify-content:space-between">
+                <span><i class="bx bx-devices"></i> Cihazlar</span>
+                <span id="cihaz-ozet" style="text-transform:none;letter-spacing:0"></span>
+              </div>
+              <div class="g-kart-govde g-scroll">
+                <table class="g-tablo">
+                  <thead>
+                    <tr><th>Cihaz</th><th>Marka</th><th>Kategori</th><th>Oda</th>
+                        <th>Alim</th><th>Bitis</th><th>Durum</th><th>Fatura</th></tr>
+                  </thead>
+                  <tbody id="cihazlar"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div class="g-kart" style="height:190px">
+            <div class="g-kart-bas"><i class="bx bx-support"></i> Destek talepleri</div>
+            <div class="g-kart-govde g-scroll">
+              <table class="g-tablo">
+                <thead><tr><th>Tarih</th><th>Tur</th><th>Durum</th><th>Mesaj</th></tr></thead>
+                <tbody id="talepler"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div id="secilmedi" class="g-kart" style="display:none;flex:1 1 auto">
+          <div class="g-bos" style="flex-direction:column;gap:12px">
+            <i class="bx bx-user-x" style="font-size:42px;opacity:.35"></i>
+            <div>Kullanici secilmedi.</div>
+            <a class="btn btn-sm btn-primary" href="garanmin-users.html">
+              <i class="bx bx-list-ul me-1"></i> Kullanici listesine git
+            </a>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script src="assets/js/garanmin-api.js"></script>
+    <script>
+      const KIMLIK = new URLSearchParams(location.search).get('id');
+
+      function kutu(liste) {
+        document.getElementById('serit').innerHTML = liste.map(function (k) {
+          return '<div class="g-kart"><div class="g-ozet">'
+            + '<div class="g-ozet-ikon ' + k.renk + '"><i class="bx ' + k.ikon + '"></i></div>'
+            + '<div><div class="g-ozet-sayi">' + k.deger + '</div>'
+            + '<div class="g-ozet-etiket">' + k.etiket + '</div></div></div></div>';
+        }).join('');
+      }
+
+      function satir(etiket, deger) {
+        return '<div style="display:flex;justify-content:space-between;gap:12px;'
+          + 'padding:7px 0;border-bottom:1px solid #f1f3f9">'
+          + '<span style="color:#6b7280;font-size:12.5px">' + etiket + '</span>'
+          + '<span style="font-weight:600;font-size:13px;text-align:right">' + deger + '</span></div>';
+      }
+
+      /**
+       * Bir cihazin durumu — uygulamanin kuralinin AYNISI.
+       *
+       * Esik "%90 tuketildi", "30 gun kaldi" DEGIL. Iki taraf farkli sayarsa panel,
+       * kullanicinin telefonunda gordugunden baska bir tablo gosterir.
+       */
+      function durum(d) {
+        if (!d.bitis) return 'active';
+        const bitis = new Date(d.bitis), bugun = new Date();
+        if (bitis < bugun) return 'expired';
+        if (!d.alim) return 'active';
+        const bas = new Date(d.alim);
+        const toplam = bitis - bas;
+        if (toplam <= 0) return 'active';
+        return ((bugun - bas) / toplam) > 0.9 ? 'expiring_soon' : 'active';
+      }
+
+      async function yukle() {
+        try {
+          const v = await garanminData('garanmin_user_detail', { p_user_id: KIMLIK });
+          const p = v.profil, g = v.garanti || {};
+
+          document.getElementById('govde').style.display = 'flex';
+
+          kutu([
+            { etiket: 'Cihaz',           deger: gNum((v.cihazlar || []).length), ikon: 'bx-devices', renk: 'mavi' },
+            { etiket: 'Kredi',           deger: gNum(p.credits),                 ikon: 'bx-star',    renk: 'turuncu' },
+            { etiket: 'Izlenen reklam',  deger: gNum(p.ads),                     ikon: 'bx-tv',      renk: 'yesil' },
+            { etiket: 'Destek talebi',   deger: gNum((v.talepler || []).length), ikon: 'bx-support', renk: 'kirmizi' },
+          ]);
+
+          document.getElementById('profil').innerHTML =
+            '<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">'
+            + '<span class="g-avatar" style="width:38px;height:38px;font-size:14px">'
+            + gEsc((p.email || '?').slice(0, 2).toUpperCase()) + '</span>'
+            + '<div><div style="font-weight:700">' + gEsc(p.email) + '</div>'
+            + '<div style="font-size:11.5px;color:#6b7280">' + gEsc(p.saglayici) + ' ile giris</div></div></div>'
+            + satir('Kayit tarihi', gDate(p.created_at))
+            + satir('Son giris', gGoreli(p.last_sign_in_at))
+            + satir('Aktif garanti', gNum(g.active || 0))
+            + satir('Yakinda bitiyor', gNum(g.expiring_soon || 0))
+            + satir('Suresi dolmus', gNum(g.expired || 0))
+            + satir('Kullanici kimligi',
+                '<code style="font-size:10.5px">' + gEsc(String(p.id).slice(0, 13)) + '…</code>');
+
+          const c = v.cihazlar || [];
+          const tb = document.getElementById('cihazlar');
+          if (!c.length) {
+            tb.innerHTML = '<tr><td colspan="8" class="text-muted">Bu kullanicinin cihazi yok</td></tr>';
+          } else {
+            tb.innerHTML = c.map(function (d) {
+              const s = gDurum(durum(d));
+              return '<tr>'
+                + '<td><strong>' + gEsc(d.ad) + '</strong></td>'
+                + '<td>' + gEsc(d.marka) + '</td>'
+                + '<td>' + gEsc(gKategori(d.kategori)) + '</td>'
+                + '<td>' + gEsc(d.oda) + '</td>'
+                + '<td>' + gDate(d.alim) + '</td>'
+                + '<td>' + gDate(d.bitis) + '</td>'
+                + '<td><span class="g-rozet ' + s.sinif + '">' + s.ad + '</span></td>'
+                + '<td>' + (d.fatura_var
+                    ? '<i class="bx bx-check text-success"></i>'
+                    : '<span class="text-muted">-</span>') + '</td>'
+                + '</tr>';
+            }).join('');
+          }
+          document.getElementById('cihaz-ozet').innerHTML =
+            '<span class="g-rozet mavi">' + gNum(g.active || 0) + ' aktif</span> '
+            + '<span class="g-rozet turuncu">' + gNum(g.expiring_soon || 0) + ' yakin</span> '
+            + '<span class="g-rozet kirmizi">' + gNum(g.expired || 0) + ' dolmus</span>';
+
+          const t = v.talepler || [];
+          document.getElementById('talepler').innerHTML = t.length
+            ? t.map(function (x) {
+                return '<tr><td>' + gDateTime(x.created_at) + '</td>'
+                  + '<td>' + gEsc(x.kind) + '</td>'
+                  + '<td>' + gEsc(x.status) + '</td>'
+                  + '<td style="white-space:normal">' + gEsc(x.message) + '</td></tr>';
+              }).join('')
+            : '<tr><td colspan="4" class="text-muted">Talep yok</td></tr>';
+        } catch (e) { gError(e.message); }
+      }
+
+      if (garanminGuardPage()) {
+        garanminShell('garanmin-user.html', 'Kullanici Detayi');
+        if (KIMLIK) yukle();
+        else document.getElementById('secilmedi').style.display = 'flex';
+      }
+    </script>
+  </body>
+</html>

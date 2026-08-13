@@ -1,0 +1,152 @@
+<!doctype html>
+<!--
+  GARANMIN — Veri Tabani / Tablolar.
+
+  Uygulamanin kullandigi tablolarin satir sayisi, disk boyutu ve RLS durumu.
+
+  ─── SATIR SAYISI TAHMIN DEGIL ────────────────────────────────────────────
+
+  `pg_class.reltuples` cok daha ucuz olurdu ama VACUUM'a bagli bir TAHMIN; yeni
+  yazilmis satirlar orada gorunmuyor ve panelde "13 cihaz ekledim, 0 yaziyor" gibi
+  bir tabloya yol acardi. Bu boyuttaki bir veritabaninda gercek `count(*)` ihmal
+  edilebilir; dogruluk daha degerli.
+
+  ─── RLS SUTUNU NEDEN VAR ─────────────────────────────────────────────────
+
+  Satir guvenligi kapali kalmis bir tablo HICBIR HATA URETMEZ; yalnizca herkes her
+  satiri gorur. Sessiz kalan bir seyin gorunur oldugu tek yer bu tur bir liste.
+-->
+<html lang="tr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Garanmin — Veri Tabani</title>
+    <link rel="icon" type="image/x-icon" href="assets/img/favicon/favicon.ico" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="assets/vendor/fonts/iconify-icons.css" />
+    <link rel="stylesheet" href="assets/vendor/css/core.css" />
+    <link rel="stylesheet" href="assets/css/garanmin.css" />
+  </head>
+
+  <body>
+    <div class="g-app" id="g-app">
+      <aside class="g-yan" id="garanmin-menu"></aside>
+      <header class="g-ust" id="garanmin-navbar"></header>
+
+      <main class="g-icerik">
+        <div id="garanmin-error"></div>
+
+        <div class="g-satir esit-4" id="serit"></div>
+
+        <div class="g-satir esit-2 buyuk">
+          <div class="g-kart">
+            <div class="g-kart-bas"><i class="bx bx-table"></i> Tablolar</div>
+            <div class="g-kart-govde g-scroll">
+              <table class="g-tablo">
+                <thead>
+                  <tr><th>Tablo</th><th>Satir</th><th>Boyut</th><th>RLS</th><th>Rol</th></tr>
+                </thead>
+                <tbody id="tablolar"><tr><td colspan="5" class="text-muted">Yukleniyor...</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="g-kart">
+            <div class="g-kart-bas"><i class="bx bx-pie-chart-alt-2"></i> Satirlarin dagilimi</div>
+            <div class="g-kart-govde" id="c-dagilim"></div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script src="assets/vendor/libs/apex-charts/apexcharts.js"></script>
+    <script src="assets/js/garanmin-api.js"></script>
+    <script>
+      /* Her tablonun ne ise yaradigi — panelde "bu tablo neydi" sorusu kalmasin. */
+      const ACIKLAMA = {
+        devices:                 'Kullanici cihazlari (JSONB)',
+        user_meta:               'Kredi ve ayarlar',
+        support_tickets:         'Destek talepleri',
+        garanmin_users:          'Panel yoneticileri',
+        garanmin_sessions:       'Acik panel oturumlari',
+        garanmin_login_attempts: 'Giris denemeleri',
+      };
+
+      function kutu(liste) {
+        document.getElementById('serit').innerHTML = liste.map(function (k) {
+          return '<div class="g-kart"><div class="g-ozet">'
+            + '<div class="g-ozet-ikon ' + k.renk + '"><i class="bx ' + k.ikon + '"></i></div>'
+            + '<div><div class="g-ozet-sayi">' + k.deger + '</div>'
+            + '<div class="g-ozet-etiket">' + k.etiket + '</div></div></div></div>';
+        }).join('');
+      }
+
+      async function yukle() {
+        try {
+          const [t, h] = await Promise.all([
+            garanminData('garanmin_db_tables'),
+            garanminData('garanmin_health'),
+          ]);
+
+          const toplamSatir = t.reduce(function (a, x) { return a + Number(x.satir); }, 0);
+          const toplamBayt  = t.reduce(function (a, x) { return a + Number(x.boyut_bayt); }, 0);
+          const rlsKapali   = t.filter(function (x) { return !x.rls; }).length;
+
+          kutu([
+            { etiket: 'Tablo',             deger: t.length,           ikon: 'bx-layer', renk: 'mavi' },
+            { etiket: 'Toplam satir',      deger: gNum(toplamSatir),  ikon: 'bx-list-ul', renk: 'yesil' },
+            { etiket: 'Tablolarin boyutu', deger: gBayt(toplamBayt),  ikon: 'bx-hdd',   renk: 'turuncu' },
+            { etiket: 'Veritabani boyutu', deger: h.db_size_text,     ikon: 'bx-data',  renk: 'mor' },
+          ]);
+
+          document.getElementById('tablolar').innerHTML = t.map(function (x) {
+            /* Panel tablolari `anon`a KAPALI, uygulama tablolari kullaniciya acik ama
+               RLS ile kendi satirlariyla sinirli. Ikisi ayri seyler, sutunda ayriliyor. */
+            const panel = x.tablo.indexOf('garanmin_') === 0;
+            return '<tr>'
+              + '<td><strong>' + gEsc(x.tablo) + '</strong>'
+              + '<div style="font-size:11px;color:#9aa1b2">' + gEsc(ACIKLAMA[x.tablo] || '') + '</div></td>'
+              + '<td><strong>' + gNum(x.satir) + '</strong></td>'
+              + '<td>' + gEsc(x.boyut) + '</td>'
+              + '<td>' + (x.rls
+                  ? '<span class="g-rozet yesil">acik</span>'
+                  : '<span class="g-rozet kirmizi">KAPALI</span>') + '</td>'
+              + '<td>' + (panel
+                  ? '<span class="g-rozet mor">panel</span>'
+                  : '<span class="g-rozet mavi">uygulama</span>') + '</td>'
+              + '</tr>';
+          }).join('');
+
+          if (rlsKapali) {
+            gError(rlsKapali + ' tabloda satir guvenligi (RLS) kapali. Bu tablolarin butun satirlari disaridan okunabilir.');
+          }
+
+          cizDagilim(t.filter(function (x) { return Number(x.satir) > 0; }));
+        } catch (e) { gError(e.message); }
+      }
+
+      function cizDagilim(v) {
+        if (gBos('c-dagilim', v)) return;
+        const t = gGrafikTemel();
+        t.chart.type = 'donut';
+        new ApexCharts(document.getElementById('c-dagilim'), Object.assign(t, {
+          series: v.map(function (x) { return Number(x.satir); }),
+          labels: v.map(function (x) { return x.tablo; }),
+          colors: G_RENK,
+          legend: { position: 'bottom', fontSize: '12px' },
+          plotOptions: { pie: { donut: { size: '60%', labels: {
+            show: true,
+            total: { show: true, label: 'Toplam satir', fontSize: '12px' },
+          } } } },
+        })).render();
+      }
+
+      if (garanminGuardPage()) {
+        garanminShell('garanmin-db.html', 'Veri Tabani');
+        yukle();
+      }
+    </script>
+  </body>
+</html>

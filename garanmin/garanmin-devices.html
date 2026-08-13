@@ -1,181 +1,142 @@
 <!doctype html>
 <!--
-  GARANMIN - Cihaz analizi.
+  GARANMIN — Cihazlar / Kirilimlar.
 
-  Butun kirilimlar devices.data JSONB icinden okunuyor. Onceki panel bunlari duz
-  sutunlardan okuyordu; o sutunlar tabloda var ama uygulama onlara hic yazmadigi icin
-  hepsi NULL idi ve her grafik bos geliyordu.
+  Butun sayilar `devices.data` JSONB'sinden okunuyor. Uygulama cihazin butun
+  alanlarini tek bir JSONB sutununa yaziyor; duz sutunlar (brand, category, room)
+  tabloda hic yok. Onceki panel onlari okudugu icin sayilar dogru ama kirilimlar
+  bombosti — hata vermeyen, tesbisi en zor turden bir yanlislik.
+
+  GARANTI ESIGI "%90 TUKENDI", "30 GUN KALDI" DEGIL: uygulamadaki `lib/warranty.ts`
+  boyle sayiyor. Iki taraf farkli sayarsa panel, kullanicinin telefonunda gordugunden
+  baska bir tablo gosterir ve hangisinin dogru oldugu anlasilmaz.
 -->
-<html lang="tr" class="layout-menu-fixed layout-compact" data-assets-path="assets/" data-template="vertical-menu-template-free">
+<html lang="tr">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="noindex, nofollow" />
-    <title>Garanmin - Cihazlar</title>
+    <title>Garanmin — Cihazlar</title>
     <link rel="icon" type="image/x-icon" href="assets/img/favicon/favicon.ico" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="assets/vendor/fonts/iconify-icons.css" />
     <link rel="stylesheet" href="assets/vendor/css/core.css" />
-    <link rel="stylesheet" href="assets/css/demo.css" />
-    <link rel="stylesheet" href="assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css" />
-    <link rel="stylesheet" href="assets/vendor/libs/apex-charts/apex-charts.css" />
-    <script src="assets/vendor/js/helpers.js"></script>
-    <script src="assets/js/config.js"></script>
+    <link rel="stylesheet" href="assets/css/garanmin.css" />
   </head>
 
   <body>
-    <div class="layout-wrapper layout-content-navbar">
-      <div class="layout-container">
-        <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
-          <div id="garanmin-menu"></div>
-        </aside>
-        <div class="layout-page">
-          <nav class="layout-navbar container-xxl navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme" id="layout-navbar">
-            <div id="garanmin-navbar" class="d-flex w-100 align-items-center"></div>
-          </nav>
-          <div class="content-wrapper">
-            <div class="container-xxl flex-grow-1 container-p-y">
-              <h4 class="fw-bold py-3 mb-4">Cihazlar</h4>
-              <div id="garanmin-error"></div>
-              <div class="row g-4 mb-4">
-                <div class="col-lg-6">
-                  <div class="card h-100">
-                    <div class="card-header"><h5 class="card-title mb-0">Kategoriler</h5></div>
-                    <div class="card-body"><div id="chart-category"></div></div>
-                  </div>
-                </div>
-                <div class="col-lg-6">
-                  <div class="card h-100">
-                    <div class="card-header"><h5 class="card-title mb-0">Garanti durumu</h5></div>
-                    <div class="card-body"><div id="chart-warranty"></div></div>
-                  </div>
-                </div>
-              </div>
+    <div class="g-app" id="g-app">
+      <aside class="g-yan" id="garanmin-menu"></aside>
+      <header class="g-ust" id="garanmin-navbar"></header>
 
-              <div class="row g-4 mb-4">
-                <div class="col-lg-6">
-                  <div class="card h-100">
-                    <div class="card-header"><h5 class="card-title mb-0">Markalar</h5></div>
-                    <div class="card-body"><div id="chart-brand"></div></div>
-                  </div>
-                </div>
-                <div class="col-lg-6">
-                  <div class="card h-100">
-                    <div class="card-header"><h5 class="card-title mb-0">Odalar</h5></div>
-                    <div class="card-body"><div id="chart-room"></div></div>
-                  </div>
-                </div>
-              </div>
+      <main class="g-icerik">
+        <div id="garanmin-error"></div>
 
-              <div class="card">
-                <div class="card-header"><h5 class="card-title mb-0">Son eklenen cihazlar</h5></div>
-                <div class="table-responsive text-nowrap">
-                  <table class="table">
-                    <thead><tr><th>Cihaz</th><th>Marka</th><th>Kategori</th><th>Alim</th><th>Garanti bitisi</th><th>Kullanici</th></tr></thead>
-                    <tbody id="tbody"><tr><td colspan="6" class="text-center text-muted py-4">Yukleniyor...</td></tr></tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-            <div class="content-backdrop fade"></div>
+        <div class="g-satir esit-4" id="serit"></div>
+
+        <div class="g-satir esit-2 buyuk">
+          <div class="g-kart">
+            <div class="g-kart-bas"><i class="bx bx-category"></i> Kategoriler</div>
+            <div class="g-kart-govde" id="c-kategori"></div>
+          </div>
+          <div class="g-kart">
+            <div class="g-kart-bas"><i class="bx bx-purchase-tag"></i> En cok eklenen markalar</div>
+            <div class="g-kart-govde" id="c-marka"></div>
           </div>
         </div>
-      </div>
-      <div class="layout-overlay layout-menu-toggle"></div>
+
+        <div class="g-satir esit-2" style="height:220px">
+          <div class="g-kart">
+            <div class="g-kart-bas"><i class="bx bx-shield-quarter"></i> Garanti durumu</div>
+            <div class="g-kart-govde" id="c-garanti"></div>
+          </div>
+          <div class="g-kart">
+            <div class="g-kart-bas"><i class="bx bx-home"></i> Odalar</div>
+            <div class="g-kart-govde" id="c-oda"></div>
+          </div>
+        </div>
+      </main>
     </div>
 
-    <script src="assets/vendor/libs/jquery/jquery.js"></script>
-    <script src="assets/vendor/libs/popper/popper.js"></script>
-    <script src="assets/vendor/js/bootstrap.js"></script>
-    <script src="assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js"></script>
-    <script src="assets/vendor/js/menu.js"></script>
     <script src="assets/vendor/libs/apex-charts/apexcharts.js"></script>
-    <script src="assets/js/main.js"></script>
     <script src="assets/js/garanmin-api.js"></script>
-
     <script>
-      if (garanminGuardPage()) { garanminShell('garanmin-devices.html'); yukle(); }
-
-      const RENKLER = ['#696cff', '#71dd37', '#ffab00', '#ff3e1d', '#03c3ec', '#8592a3'];
-
-      /*
-        VERI YOKSA GRAFIK CIZILMIYOR, "veri yok" YAZIYOR.
-
-        ApexCharts bos bir dizide de eksenleri ve izgarayi ciziyor; bu, "veri gelmedi" ile
-        "veri sifir" arasindaki farki gorunmez kiliyordu - bu panelde duzeltilen hatanin
-        belirtisi tam olarak buydu.
-      */
-      function bosMu(el, veri) {
-        if (veri && veri.length) return false;
-        document.getElementById(el).innerHTML =
-          '<div class="text-center text-muted py-5">Gosterilecek veri yok</div>';
-        return true;
-      }
-
-      function pasta(el, veri, alan, renkler) {
-        if (bosMu(el, veri)) return;
-        new ApexCharts(document.getElementById(el), {
-          chart: { type: 'donut', height: 300 },
-          series: veri.map(function (d) { return Number(d.count); }),
-          labels: veri.map(function (d) { return String(d[alan]); }),
-          colors: renkler || RENKLER,
-          legend: { position: 'bottom' }
-        }).render();
-      }
-
-      function cubuk(el, veri, alan, yatay, renk) {
-        if (bosMu(el, veri)) return;
-        new ApexCharts(document.getElementById(el), {
-          chart: { type: 'bar', height: 300, toolbar: { show: false } },
-          series: [{ name: 'Cihaz', data: veri.map(function (d) { return Number(d.count); }) }],
-          xaxis: { categories: veri.map(function (d) { return String(d[alan]); }) },
-          plotOptions: { bar: { horizontal: !!yatay, borderRadius: 6 } },
-          colors: [renk || RENKLER[0]],
-          dataLabels: { enabled: false }
-        }).render();
+      function kutu(liste) {
+        document.getElementById('serit').innerHTML = liste.map(function (k) {
+          return '<div class="g-kart"><div class="g-ozet">'
+            + '<div class="g-ozet-ikon ' + k.renk + '"><i class="bx ' + k.ikon + '"></i></div>'
+            + '<div><div class="g-ozet-sayi">' + k.deger + '</div>'
+            + '<div class="g-ozet-etiket">' + k.etiket + '</div></div></div></div>';
+        }).join('');
       }
 
       async function yukle() {
         try {
-          const sonuc = await Promise.all([
+          const [stats, kategori, marka, garanti, oda] = await Promise.all([
+            garanminData('garanmin_stats'),
             garanminData('garanmin_device_categories'),
-            garanminData('garanmin_warranty_stats'),
             garanminData('garanmin_device_brands'),
+            garanminData('garanmin_warranty_stats'),
             garanminData('garanmin_room_stats'),
-            garanminData('garanmin_recent_devices', { p_limit: 30 })
           ]);
-          const kategori = sonuc[0], garanti = sonuc[1], marka = sonuc[2], oda = sonuc[3], son = sonuc[4];
 
-          cubuk('chart-category', kategori.map(function (d) {
-            return { count: d.count, category: gKategori(d.category) };
-          }), 'category');
+          const bul = function (k) {
+            const x = garanti.find(function (d) { return d.status === k; });
+            return x ? Number(x.count) : 0;
+          };
 
-          // Renkler uygulamadaki rozetlerle AYNI anlamda: mavi aktif, turuncu yakin, kirmizi dolmus.
-          const ad = { active: 'Aktif', expiring_soon: 'Yakinda bitiyor', expired: 'Suresi dolmus' };
-          const rnk = { active: '#696cff', expiring_soon: '#ffab00', expired: '#ff3e1d' };
-          pasta('chart-warranty', garanti.map(function (d) {
-            return { count: d.count, status: ad[d.status] || d.status };
-          }), 'status', garanti.map(function (d) { return rnk[d.status] || '#8592a3'; }));
+          kutu([
+            { etiket: 'Toplam cihaz',    deger: gNum(stats.total_devices), ikon: 'bx-devices', renk: 'mavi' },
+            { etiket: 'Aktif garanti',   deger: gNum(bul('active')),        ikon: 'bx-check-shield', renk: 'yesil' },
+            { etiket: 'Yakinda bitiyor', deger: gNum(bul('expiring_soon')), ikon: 'bx-time-five', renk: 'turuncu' },
+            { etiket: 'Suresi dolmus',   deger: gNum(bul('expired')),       ikon: 'bx-x-circle', renk: 'kirmizi' },
+          ]);
 
-          cubuk('chart-brand', marka, 'brand', true, RENKLER[2]);
-          cubuk('chart-room', oda, 'room', true, RENKLER[4]);
+          ciz('c-kategori', 'bar', {
+            series: [{ name: 'Cihaz', data: kategori.map(function (d) { return Number(d.count); }) }],
+            xaxis: { categories: kategori.map(function (d) { return gKategori(d.category); }) },
+            plotOptions: { bar: { borderRadius: 5, distributed: true, columnWidth: '55%' } },
+            legend: { show: false }, colors: G_RENK,
+          }, kategori);
 
-          const tb = document.getElementById('tbody');
-          tb.innerHTML = son.length ? son.map(function (d) {
-            return '<tr>'
-              + '<td><strong>' + gEsc(d.name) + '</strong></td>'
-              + '<td>' + gEsc(d.brand) + '</td>'
-              + '<td><span class="badge bg-label-primary">' + gEsc(gKategori(d.category)) + '</span></td>'
-              + '<td>' + gDate(d.purchase_date) + '</td>'
-              + '<td>' + gDate(d.warranty_end) + '</td>'
-              + '<td class="text-muted small">' + gEsc(d.email || '-') + '</td>'
-              + '</tr>';
-          }).join('') : '<tr><td colspan="6" class="text-center text-muted py-4">Kayit yok</td></tr>';
+          ciz('c-marka', 'bar', {
+            series: [{ name: 'Cihaz', data: marka.map(function (d) { return Number(d.count); }) }],
+            xaxis: { categories: marka.map(function (d) { return d.brand; }) },
+            plotOptions: { bar: { horizontal: true, borderRadius: 5, barHeight: '60%' } },
+            colors: [G_RENK[2]],
+          }, marka);
 
-          garanminStampUpdated();
+          ciz('c-garanti', 'donut', {
+            series: garanti.map(function (d) { return Number(d.count); }),
+            labels: garanti.map(function (d) { return gDurum(d.status).ad; }),
+            colors: garanti.map(function (d) { return gDurum(d.status).renk; }),
+            legend: { position: 'right', fontSize: '12px' },
+            plotOptions: { pie: { donut: { size: '62%' } } },
+          }, garanti);
+
+          ciz('c-oda', 'bar', {
+            series: [{ name: 'Cihaz', data: oda.map(function (d) { return Number(d.count); }) }],
+            xaxis: { categories: oda.map(function (d) { return d.room; }) },
+            plotOptions: { bar: { horizontal: true, borderRadius: 5, barHeight: '60%' } },
+            colors: [G_RENK[4]],
+          }, oda);
         } catch (e) { gError(e.message); }
+      }
+
+      /* Veri yoksa grafik CIZILMIYOR, "veri yok" yaziliyor: ApexCharts bos bir dizide
+         eksenleri ve bos bir izgarayi yine de cizer ve bu, "veri gelmedi" ile "veri
+         sifir" arasindaki farki gorunmez kilar. */
+      function ciz(hedef, tip, ayar, veri) {
+        if (gBos(hedef, veri)) return;
+        const t = gGrafikTemel();
+        t.chart.type = tip;
+        new ApexCharts(document.getElementById(hedef), Object.assign(t, ayar)).render();
+      }
+
+      if (garanminGuardPage()) {
+        garanminShell('garanmin-devices.html', 'Cihaz Kirilimlari');
+        yukle();
       }
     </script>
   </body>

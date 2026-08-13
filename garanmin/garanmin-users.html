@@ -1,144 +1,180 @@
 <!doctype html>
 <!--
-  GARANMIN - Kullanicilar.
+  GARANMIN — Kullanicilar.
 
-  Liste SAYFALANIYOR ve arama SUNUCUDA yapiliyor. Butun kullanicilari cekip tarayicida
-  filtrelemek bugun dort kayitla sorunsuz calisirdi; kullanici sayisi buyudukce once
-  yavaslar, sonra tarayiciyi kilitlerdi - ve bunu fark etmek icin uretimde buyumeyi
-  beklemek gerekirdi.
+  ─── DUZELTILEN HATA ──────────────────────────────────────────────────────
+
+  Onceki surumde sayfa hic acilmiyordu:
+
+      Cannot access 'SAYFA' before initialization
+
+  Sebep: dosyanin ilk satiri `yukle()` cagiriyordu, `const SAYFA = 25` ise iki satir
+  SONRA geliyordu. `const` bildirimi yukari tasinir ama BASLATILANA KADAR erisilemez
+  (temporal dead zone), dolayisiyla `yukle()` icindeki `SAYFA` referansi hemen hata
+  firlatiyor ve sayfa bos kaliyordu.
+
+  Cozum: butun sabitler ve fonksiyonlar once tanimlaniyor, ILK CAGRI en sonda. Bu
+  dosyada bu kural her yerde gecerli.
+
+  Liste SAYFALANIYOR ve arama SUNUCUDA yapiliyor: butun kullanicilari cekip tarayicida
+  suzmek, kullanici sayisi buyudukce hem yavaslar hem de gereksiz yere butun e-posta
+  adreslerini agdan gecirir.
 -->
-<html lang="tr" class="layout-menu-fixed layout-compact" data-assets-path="assets/" data-template="vertical-menu-template-free">
+<html lang="tr">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="noindex, nofollow" />
-    <title>Garanmin - Kullanicilar</title>
+    <title>Garanmin — Kullanicilar</title>
     <link rel="icon" type="image/x-icon" href="assets/img/favicon/favicon.ico" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="assets/vendor/fonts/iconify-icons.css" />
     <link rel="stylesheet" href="assets/vendor/css/core.css" />
-    <link rel="stylesheet" href="assets/css/demo.css" />
-    <link rel="stylesheet" href="assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css" />
-    <link rel="stylesheet" href="assets/vendor/libs/apex-charts/apex-charts.css" />
-    <script src="assets/vendor/js/helpers.js"></script>
-    <script src="assets/js/config.js"></script>
+    <link rel="stylesheet" href="assets/css/garanmin.css" />
   </head>
 
   <body>
-    <div class="layout-wrapper layout-content-navbar">
-      <div class="layout-container">
-        <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
-          <div id="garanmin-menu"></div>
-        </aside>
-        <div class="layout-page">
-          <nav class="layout-navbar container-xxl navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme" id="layout-navbar">
-            <div id="garanmin-navbar" class="d-flex w-100 align-items-center"></div>
-          </nav>
-          <div class="content-wrapper">
-            <div class="container-xxl flex-grow-1 container-p-y">
-              <h4 class="fw-bold py-3 mb-4">Kullanicilar</h4>
-              <div id="garanmin-error"></div>
-              <div class="card mb-4">
-                <div class="card-body">
-                  <div class="row g-3 align-items-end">
-                    <div class="col-md-6">
-                      <label class="form-label" for="search">E-posta ara</label>
-                      <input type="text" id="search" class="form-control" placeholder="ornek@eposta.com" />
-                    </div>
-                    <div class="col-md-3"><button class="btn btn-primary w-100" id="search-btn">Ara</button></div>
-                    <div class="col-md-3"><button class="btn btn-outline-secondary w-100" id="clear-btn">Temizle</button></div>
-                  </div>
-                </div>
-              </div>
+    <div class="g-app" id="g-app">
+      <aside class="g-yan" id="garanmin-menu"></aside>
+      <header class="g-ust" id="garanmin-navbar"></header>
 
-              <div class="card">
-                <div class="table-responsive text-nowrap">
-                  <table class="table">
-                    <thead>
-                      <tr><th>E-posta</th><th>Kayit</th><th>Son giris</th><th>Cihaz</th><th>Kredi</th><th>Reklam</th><th>Talep</th></tr>
-                    </thead>
-                    <tbody id="tbody"><tr><td colspan="7" class="text-center text-muted py-4">Yukleniyor...</td></tr></tbody>
-                  </table>
-                </div>
-                <div class="card-body d-flex justify-content-between align-items-center">
-                  <span class="text-muted small" id="sayfa-bilgi"></span>
-                  <div>
-                    <button class="btn btn-sm btn-outline-secondary me-1" id="prev">Onceki</button>
-                    <button class="btn btn-sm btn-outline-secondary" id="next">Sonraki</button>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="content-backdrop fade"></div>
+      <main class="g-icerik">
+        <div id="garanmin-error"></div>
+
+        <div class="g-satir esit-4" id="serit"></div>
+
+        <div class="g-kart" style="flex:1 1 auto;min-height:0">
+          <div class="g-kart-bas" style="justify-content:space-between">
+            <span><i class="bx bx-group"></i> Kullanici listesi</span>
+            <span style="display:flex;gap:8px;align-items:center;text-transform:none;letter-spacing:0">
+              <input id="arama" class="form-control form-control-sm" style="width:230px"
+                     placeholder="E-posta ara..." />
+              <button class="btn btn-sm btn-primary" id="ara-btn"><i class="bx bx-search"></i></button>
+              <button class="btn btn-sm btn-outline-secondary" id="temizle-btn"><i class="bx bx-x"></i></button>
+            </span>
+          </div>
+
+          <div class="g-kart-govde g-scroll">
+            <table class="g-tablo">
+              <thead>
+                <tr>
+                  <th>E-posta</th><th>Kayit</th><th>Son giris</th>
+                  <th>Cihaz</th><th>Kredi</th><th>Reklam</th><th>Talep</th><th></th>
+                </tr>
+              </thead>
+              <tbody id="tbody">
+                <tr><td colspan="8" class="text-muted">Yukleniyor...</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div style="display:flex;align-items:center;gap:10px;padding-top:10px;flex:0 0 auto">
+            <span class="text-muted small" id="sayfa-bilgi"></span>
+            <span style="margin-left:auto;display:flex;gap:6px">
+              <button class="btn btn-sm btn-outline-secondary" id="onceki"><i class="bx bx-chevron-left"></i></button>
+              <button class="btn btn-sm btn-outline-secondary" id="sonraki"><i class="bx bx-chevron-right"></i></button>
+            </span>
           </div>
         </div>
-      </div>
-      <div class="layout-overlay layout-menu-toggle"></div>
+      </main>
     </div>
 
-    <script src="assets/vendor/libs/jquery/jquery.js"></script>
-    <script src="assets/vendor/libs/popper/popper.js"></script>
-    <script src="assets/vendor/js/bootstrap.js"></script>
-    <script src="assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js"></script>
-    <script src="assets/vendor/js/menu.js"></script>
-    <script src="assets/vendor/libs/apex-charts/apexcharts.js"></script>
-    <script src="assets/js/main.js"></script>
     <script src="assets/js/garanmin-api.js"></script>
-
     <script>
-      if (garanminGuardPage()) { garanminShell('garanmin-users.html'); yukle(); }
+      /* ── TANIMLAR ÖNCE ─────────────────────────────────────────────────── */
 
       const SAYFA = 25;
       let offset = 0, arama = '';
 
-      document.getElementById('search-btn').onclick = function () {
-        arama = document.getElementById('search').value.trim(); offset = 0; yukle();
-      };
-      document.getElementById('clear-btn').onclick = function () {
-        document.getElementById('search').value = ''; arama = ''; offset = 0; yukle();
-      };
-      // Enter da aramayi tetiklesin; kullanici butonu aramak zorunda kalmasin.
-      document.getElementById('search').addEventListener('keydown', function (e) {
-        if (e.key === 'Enter') document.getElementById('search-btn').click();
-      });
-      document.getElementById('prev').onclick = function () {
-        if (offset === 0) return; offset = Math.max(0, offset - SAYFA); yukle();
-      };
-      document.getElementById('next').onclick = function () { offset += SAYFA; yukle(); };
+      function kutu(liste) {
+        document.getElementById('serit').innerHTML = liste.map(function (k) {
+          return '<div class="g-kart"><div class="g-ozet">'
+            + '<div class="g-ozet-ikon ' + k.renk + '"><i class="bx ' + k.ikon + '"></i></div>'
+            + '<div><div class="g-ozet-sayi">' + k.deger + '</div>'
+            + '<div class="g-ozet-etiket">' + k.etiket + '</div></div></div></div>';
+        }).join('');
+      }
+
+      /**
+       * Satira tiklayinca kullanici detayina gidiliyor.
+       *
+       * KIMLIK ADRESTE TASINIYOR (`?id=`): detay sayfasi dogrudan da acilabilsin,
+       * yer imine eklenebilsin ve yenilendiginde bos kalmasin. `sessionStorage`'a
+       * yazilsaydi adresi paylasan kisi bos bir sayfa gorurdu.
+       */
+      function git(id) { location.href = 'garanmin-user.html?id=' + encodeURIComponent(id); }
 
       async function yukle() {
         try {
           const v = await garanminData('garanmin_users_list', {
-            p_limit: SAYFA, p_offset: offset, p_search: arama
+            p_limit: SAYFA, p_offset: offset, p_search: arama,
           });
+
           const tb = document.getElementById('tbody');
           if (!v.length) {
-            tb.innerHTML = '<tr><td colspan="7" class="text-center text-muted py-4">Kayit yok</td></tr>';
+            tb.innerHTML = '<tr><td colspan="8" class="text-muted">Kayit yok</td></tr>';
           } else {
             tb.innerHTML = v.map(function (u) {
-              return '<tr>'
+              return '<tr class="tiklanir" onclick="git(\'' + gEsc(u.id) + '\')">'
                 + '<td><strong>' + gEsc(u.email || '-') + '</strong></td>'
                 + '<td>' + gDate(u.created_at) + '</td>'
-                + '<td>' + gDateTime(u.last_sign_in_at) + '</td>'
-                + '<td><span class="badge bg-label-primary">' + gNum(u.device_count) + '</span></td>'
+                + '<td>' + gGoreli(u.last_sign_in_at) + '</td>'
+                + '<td><span class="g-rozet mavi">' + gNum(u.device_count) + '</span></td>'
                 + '<td>' + gNum(u.credits) + '</td>'
                 + '<td>' + gNum(u.ad_watch_count) + '</td>'
                 + '<td>' + gNum(u.ticket_count) + '</td>'
+                + '<td class="text-muted"><i class="bx bx-chevron-right"></i></td>'
                 + '</tr>';
             }).join('');
           }
+
           document.getElementById('sayfa-bilgi').textContent =
             v.length ? (offset + 1) + '-' + (offset + v.length) + ' arasi gosteriliyor' : 'Kayit yok';
+
           /*
-            "Sonraki" DONEN KAYIT SAYISINA gore kapaniyor. Toplam sayiyi ayrica sormak her
-            sayfa cevirmede fazladan bir sorgu demek olurdu; sayfa dolmadiysa son sayfadayiz.
+            "Sonraki" DONEN KAYIT SAYISINA gore kapaniyor. Toplam sayiyi ayrica sormak
+            her sayfa cevirmede fazladan bir sorgu demek olurdu; sayfa dolmadiysa son
+            sayfadayiz.
           */
-          document.getElementById('next').disabled = v.length < SAYFA;
-          document.getElementById('prev').disabled = offset === 0;
-          garanminStampUpdated();
+          document.getElementById('sonraki').disabled = v.length < SAYFA;
+          document.getElementById('onceki').disabled = offset === 0;
         } catch (e) { gError(e.message); }
+      }
+
+      async function seritYukle() {
+        try {
+          const s = await garanminData('garanmin_stats');
+          kutu([
+            { etiket: 'Toplam kullanici', deger: gNum(s.total_users),        ikon: 'bx-group',      renk: 'mavi' },
+            { etiket: 'Gunluk aktif',     deger: gNum(s.dau),                ikon: 'bx-run',        renk: 'yesil' },
+            { etiket: 'Cihaz ekleyen',    deger: gNum(s.users_with_devices), ikon: 'bx-user-check', renk: 'turuncu' },
+            { etiket: 'Yeni (7 gun)',     deger: gNum(s.new_users_7d),       ikon: 'bx-user-plus',  renk: 'mor' },
+          ]);
+        } catch (e) { gError(e.message); }
+      }
+
+      document.getElementById('ara-btn').onclick = function () {
+        arama = document.getElementById('arama').value.trim(); offset = 0; yukle();
+      };
+      document.getElementById('temizle-btn').onclick = function () {
+        document.getElementById('arama').value = ''; arama = ''; offset = 0; yukle();
+      };
+      // Enter da aramayi tetiklesin; kullanici butonu aramak zorunda kalmasin.
+      document.getElementById('arama').addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') document.getElementById('ara-btn').click();
+      });
+      document.getElementById('onceki').onclick = function () {
+        if (offset === 0) return;
+        offset = Math.max(0, offset - SAYFA); yukle();
+      };
+      document.getElementById('sonraki').onclick = function () { offset += SAYFA; yukle(); };
+
+      /* ── İLK ÇAĞRI EN SONDA (yukarıdaki hata notuna bakın) ─────────────── */
+      if (garanminGuardPage()) {
+        garanminShell('garanmin-users.html', 'Kullanicilar');
+        seritYukle();
+        yukle();
       }
     </script>
   </body>

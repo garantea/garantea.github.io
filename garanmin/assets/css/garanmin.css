@@ -1,0 +1,332 @@
+/* ==========================================================================
+   GARANMIN — panel teması ve düzeni
+   ==========================================================================
+
+   ─── NEDEN SNEAT'IN KENDİ DÜZENİ KULLANILMIYOR ───────────────────────────
+
+   Sneat'in `layout-menu` yapısı sayfanın uzamasına göre kaydırılmak üzere
+   tasarlanmış. Buradaki gereksinim tam tersi: her sayfa TEK EKRANA sığmalı,
+   sayfa kaydırması olmamalı. İkisi aynı anda olamıyor, çünkü Sneat gövdeyi
+   `overflow: visible` bırakıp yüksekliği içeriğe bağlıyor.
+
+   Bu yüzden düzen burada sıfırdan kuruldu: `100dvh` yüksekliğinde bir ızgara,
+   içeride kendi kaydırma alanları olan kartlar. Bootstrap'in bileşenleri
+   (kart, rozet, tablo, buton) olduğu gibi kullanılıyor — değişen yalnızca
+   iskelet.
+
+   `dvh` BİLİNÇLİ (`vh` değil): mobil tarayıcılarda adres çubuğu kayarken `vh`
+   sabit kalıyor ve sayfanın altı ekranın dışında kalıyor. `dvh` görünen alanı
+   ölçüyor.
+   ========================================================================== */
+
+:root {
+  --g-mavi:      #2563eb;
+  --g-mavi-koyu: #1d4ed8;
+  --g-kirmizi:   #dc2626;
+  --g-yesil:     #16a34a;
+  --g-turuncu:   #f59e0b;
+
+  --g-zemin:     #f4f6fb;
+  --g-kart:      #ffffff;
+  --g-cizgi:     #e6e9f2;
+  --g-metin:     #1f2438;
+  --g-soluk:     #6b7280;
+
+  --g-kenar:     264px;   /* kenar menü açık genişliği */
+  --g-kenar-dar: 76px;    /* simge durumundaki genişliği */
+  --g-ust:       60px;    /* üst çubuk yüksekliği */
+
+  --g-golge:     0 1px 2px rgba(16,24,40,.04), 0 4px 16px rgba(16,24,40,.06);
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  height: 100%;
+  margin: 0;
+  /* SAYFA KAYDIRMASI KAPALI — gereksinimin kendisi bu. Kaydırma, ihtiyaç duyan
+     panelin İÇİNDE oluyor (bkz. .g-scroll). */
+  overflow: hidden;
+  font-family: 'Public Sans', -apple-system, 'Segoe UI', Roboto, sans-serif;
+  background: var(--g-zemin);
+  color: var(--g-metin);
+  font-size: 14px;
+}
+
+/* ── IZGARA ─────────────────────────────────────────────────────────────── */
+
+.g-app {
+  display: grid;
+  grid-template-columns: var(--g-kenar) 1fr;
+  grid-template-rows: var(--g-ust) 1fr;
+  grid-template-areas: "yan ust" "yan icerik";
+  height: 100dvh;
+  transition: grid-template-columns .22s ease;
+}
+.g-app.dar { grid-template-columns: var(--g-kenar-dar) 1fr; }
+
+/* ── KENAR MENÜ ─────────────────────────────────────────────────────────── */
+
+.g-yan {
+  grid-area: yan;
+  background: #101528;
+  color: #c9cfe4;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.g-marka {
+  height: var(--g-ust);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 16px;
+  border-bottom: 1px solid rgba(255,255,255,.07);
+  flex: 0 0 auto;
+}
+.g-marka-yazi { font-weight: 800; font-size: 18px; letter-spacing: -.4px; white-space: nowrap; }
+.g-marka-yazi .a { color: #60a5fa; }
+.g-marka-yazi .b { color: #f87171; }
+
+/* Simge durumunda yalnızca logo kalıyor, yazılar kayboluyor. `display:none`
+   yerine genişlik/opaklık kullanılıyor ki geçiş ani olmasın. */
+.g-app.dar .g-marka-yazi,
+.g-app.dar .g-metin-gizle { opacity: 0; width: 0; overflow: hidden; }
+
+.g-menu { flex: 1 1 auto; overflow-y: auto; padding: 10px 0 16px; }
+.g-menu::-webkit-scrollbar { width: 6px; }
+.g-menu::-webkit-scrollbar-thumb { background: rgba(255,255,255,.12); border-radius: 3px; }
+
+.g-grup { margin-bottom: 2px; }
+
+.g-grup-bas {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 18px; cursor: pointer;
+  color: #aab3cc; font-weight: 600; font-size: 13.5px;
+  white-space: nowrap; user-select: none;
+}
+.g-grup-bas:hover { color: #fff; background: rgba(255,255,255,.04); }
+.g-grup-bas i.ok { margin-left: auto; font-size: 16px; transition: transform .2s ease; }
+.g-grup.acik .g-grup-bas i.ok { transform: rotate(90deg); }
+.g-grup.acik .g-grup-bas { color: #fff; }
+.g-grup-bas i:first-child { font-size: 19px; min-width: 20px; text-align: center; }
+
+.g-alt { max-height: 0; overflow: hidden; transition: max-height .22s ease; }
+.g-grup.acik .g-alt { max-height: 320px; }
+
+.g-alt a {
+  display: block;
+  padding: 8px 18px 8px 50px;
+  color: #939fbd; text-decoration: none; font-size: 13px;
+  border-left: 3px solid transparent;
+  white-space: nowrap;
+}
+.g-alt a:hover { color: #fff; background: rgba(255,255,255,.05); }
+.g-alt a.aktif {
+  color: #fff; background: rgba(37,99,235,.22);
+  border-left-color: var(--g-mavi);
+  font-weight: 600;
+}
+
+/* Simge durumunda alt başlıklar tamamen gizleniyor: 76 piksele sığmazlar ve
+   yarısı kesilmiş bir metin, kapalı olduğunu anlatmaktan daha kötüdür. */
+.g-app.dar .g-alt { display: none; }
+.g-app.dar .g-grup-bas { justify-content: center; padding: 12px 0; }
+.g-app.dar .g-grup-bas i.ok { display: none; }
+.g-app.dar .g-grup.aktif-grup .g-grup-bas { background: rgba(37,99,235,.25); color: #fff; }
+
+/* ── ÜST ÇUBUK ──────────────────────────────────────────────────────────── */
+
+.g-ust {
+  grid-area: ust;
+  background: var(--g-kart);
+  border-bottom: 1px solid var(--g-cizgi);
+  display: flex; align-items: center; gap: 14px;
+  padding: 0 18px;
+}
+
+.g-katla {
+  border: 1px solid var(--g-cizgi); background: #fff;
+  width: 34px; height: 34px; border-radius: 9px;
+  display: grid; place-items: center; cursor: pointer; color: var(--g-metin);
+  flex: 0 0 auto;
+}
+.g-katla:hover { background: var(--g-zemin); }
+
+.g-baslik { font-weight: 700; font-size: 16px; margin: 0; }
+.g-sag { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+
+/* Canlı göstergesi: nokta yanıp sönüyor. Yanıp sönmenin kendisi bilgi taşıyor —
+   donmuş bir sayfada nokta da donar. */
+.g-canli {
+  display: flex; align-items: center; gap: 7px;
+  font-size: 12.5px; font-weight: 600;
+  padding: 6px 11px; border-radius: 999px;
+  border: 1px solid var(--g-cizgi); background: #fff;
+}
+.g-nokta { width: 8px; height: 8px; border-radius: 50%; background: var(--g-soluk); }
+.g-canli.ok   .g-nokta { background: var(--g-yesil); animation: nabiz 1.6s infinite; }
+.g-canli.ok   { color: var(--g-yesil); border-color: rgba(22,163,74,.3); background: rgba(22,163,74,.06); }
+.g-canli.hata .g-nokta { background: var(--g-kirmizi); }
+.g-canli.hata { color: var(--g-kirmizi); border-color: rgba(220,38,38,.3); background: rgba(220,38,38,.06); }
+@keyframes nabiz {
+  0%   { box-shadow: 0 0 0 0 rgba(22,163,74,.5); }
+  70%  { box-shadow: 0 0 0 7px rgba(22,163,74,0); }
+  100% { box-shadow: 0 0 0 0 rgba(22,163,74,0); }
+}
+
+.g-saat { text-align: right; line-height: 1.15; }
+.g-saat .s { font-weight: 700; font-size: 15px; font-variant-numeric: tabular-nums; }
+.g-saat .t { font-size: 11.5px; color: var(--g-soluk); }
+
+.g-kullanici {
+  display: flex; align-items: center; gap: 9px;
+  padding: 5px 10px 5px 5px; border-radius: 999px;
+  border: 1px solid var(--g-cizgi); background: #fff;
+}
+.g-avatar {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--g-mavi), var(--g-kirmizi));
+  color: #fff; display: grid; place-items: center;
+  font-weight: 700; font-size: 12px;
+}
+.g-kullanici .ad { font-weight: 600; font-size: 13px; line-height: 1.1; }
+.g-kullanici .rol { font-size: 11px; color: var(--g-soluk); }
+
+/* ── İÇERİK ─────────────────────────────────────────────────────────────── */
+
+.g-icerik {
+  grid-area: icerik;
+  padding: 14px 18px 18px;
+  overflow: hidden;              /* sayfa kaymıyor; kaydırma kartların içinde */
+  display: flex; flex-direction: column; gap: 12px;
+  min-height: 0;                 /* ızgara çocuğunun taşmasını engelliyor */
+}
+
+.g-satir { display: grid; gap: 12px; min-height: 0; }
+.g-satir.esit-4 { grid-template-columns: repeat(4, 1fr); }
+.g-satir.esit-3 { grid-template-columns: repeat(3, 1fr); }
+.g-satir.esit-2 { grid-template-columns: repeat(2, 1fr); }
+.g-satir.buyuk  { flex: 1 1 auto; }
+
+.g-kart {
+  background: var(--g-kart);
+  border: 1px solid var(--g-cizgi);
+  border-radius: 14px;
+  box-shadow: var(--g-golge);
+  padding: 14px 16px;
+  display: flex; flex-direction: column;
+  min-height: 0; min-width: 0;
+}
+.g-kart-bas {
+  font-size: 12px; font-weight: 700; letter-spacing: .4px;
+  text-transform: uppercase; color: var(--g-soluk);
+  margin-bottom: 10px; flex: 0 0 auto;
+  display: flex; align-items: center; gap: 8px;
+}
+.g-kart-govde { flex: 1 1 auto; min-height: 0; }
+
+/* Uzun listeler yalnızca KENDİ kutusunda kayıyor. Böylece sayfa sabit kalırken
+   tablo yine de tamamen okunabiliyor. */
+.g-scroll { overflow-y: auto; height: 100%; }
+.g-scroll::-webkit-scrollbar { width: 7px; }
+.g-scroll::-webkit-scrollbar-thumb { background: #d3d8e6; border-radius: 4px; }
+
+/* Özet kutusu */
+.g-ozet { display: flex; align-items: center; gap: 12px; }
+.g-ozet-ikon {
+  width: 40px; height: 40px; border-radius: 11px;
+  display: grid; place-items: center; font-size: 21px; flex: 0 0 auto;
+}
+.g-ozet-sayi { font-size: 22px; font-weight: 800; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.g-ozet-etiket { font-size: 12px; color: var(--g-soluk); }
+
+.mavi    { background: rgba(37,99,235,.1);  color: var(--g-mavi); }
+.yesil   { background: rgba(22,163,74,.1);  color: var(--g-yesil); }
+.turuncu { background: rgba(245,158,11,.12);color: var(--g-turuncu); }
+.kirmizi { background: rgba(220,38,38,.1);  color: var(--g-kirmizi); }
+.mor     { background: rgba(124,58,237,.1); color: #7c3aed; }
+
+table.g-tablo { width: 100%; border-collapse: collapse; font-size: 13px; }
+table.g-tablo th {
+  text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: .4px;
+  color: var(--g-soluk); font-weight: 700;
+  padding: 7px 8px; border-bottom: 1px solid var(--g-cizgi);
+  position: sticky; top: 0; background: var(--g-kart); z-index: 1;
+}
+table.g-tablo td { padding: 8px; border-bottom: 1px solid #f1f3f9; white-space: nowrap; }
+table.g-tablo tbody tr:hover { background: #f8f9fd; }
+table.g-tablo tr.tiklanir { cursor: pointer; }
+
+.g-rozet {
+  display: inline-block; padding: 2px 9px; border-radius: 999px;
+  font-size: 11.5px; font-weight: 700;
+}
+
+.g-bos { display: grid; place-items: center; height: 100%; color: var(--g-soluk); font-size: 13px; }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   GARANTEA ANİMASYONU — logodaki fincan ve yükselen buhar
+   ══════════════════════════════════════════════════════════════════════════
+
+   Uygulamanın açılış ekranındaki hareketin aynısı. Panelde de bulunmasının
+   sebebi süs değil: panel uygulamanın parçası ve aynı markayı taşımalı.
+
+   `prefers-reduced-motion` UYULUYOR: hareket hassasiyeti olan kullanıcılarda
+   buhar duruyor, logo sabit kalıyor. Bir gösterge panelinde sürekli hareket
+   eden bir öğe, o kullanıcılar için rahatsız edici olabiliyor.
+   ========================================================================= */
+
+.g-logo { width: 34px; height: 34px; flex: 0 0 auto; }
+.g-logo .buhar { opacity: 0; transform-origin: center bottom; }
+.g-logo .b1 { animation: buhar 2.6s ease-in-out infinite; }
+.g-logo .b2 { animation: buhar 2.6s ease-in-out .5s infinite; }
+.g-logo .b3 { animation: buhar 2.6s ease-in-out 1s infinite; }
+
+@keyframes buhar {
+  0%   { opacity: 0;   transform: translateY(2px)  scaleY(.6); }
+  30%  { opacity: .85; }
+  70%  { opacity: .35; }
+  100% { opacity: 0;   transform: translateY(-9px) scaleY(1.25); }
+}
+
+/* Giriş ekranındaki büyük logo */
+.g-giris-logo { width: 96px; height: 96px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .g-logo .buhar { animation: none; opacity: .5; }
+  .g-canli.ok .g-nokta { animation: none; }
+  .g-app, .g-alt, .g-grup-bas i.ok { transition: none; }
+}
+
+/* ── GİRİŞ EKRANI ───────────────────────────────────────────────────────── */
+
+.g-giris {
+  height: 100dvh; display: grid; place-items: center;
+  background:
+    radial-gradient(1000px 500px at 15% -10%, rgba(37,99,235,.14), transparent 60%),
+    radial-gradient(900px 500px at 90% 110%, rgba(220,38,38,.12), transparent 60%),
+    var(--g-zemin);
+}
+.g-giris-kutu {
+  width: 380px; max-width: 92vw;
+  background: #fff; border: 1px solid var(--g-cizgi);
+  border-radius: 18px; box-shadow: 0 10px 40px rgba(16,24,40,.10);
+  padding: 30px 28px 26px; text-align: center;
+}
+
+/* ── DAR EKRAN ──────────────────────────────────────────────────────────── */
+/* Panel masaüstü için tasarlandı. Dar ekranda menü simge durumuna geçiyor ve
+   çok sütunlu ızgaralar tek sütuna iniyor; bu durumda tek ekran kuralı
+   korunamıyor, içerik kaydırılabilir oluyor — okunmaz bir sıkıştırma yerine
+   bilinçli bir taviz. */
+@media (max-width: 1100px) {
+  .g-satir.esit-4 { grid-template-columns: repeat(2, 1fr); }
+  .g-satir.esit-3 { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 820px) {
+  .g-app { grid-template-columns: var(--g-kenar-dar) 1fr; }
+  .g-satir.esit-4, .g-satir.esit-3, .g-satir.esit-2 { grid-template-columns: 1fr; }
+  .g-icerik { overflow-y: auto; }
+}

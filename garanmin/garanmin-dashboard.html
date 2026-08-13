@@ -1,262 +1,206 @@
 <!doctype html>
 <!--
-  GARANMIN — Genel Bakis.
+  GARANMIN — Genel Bakis (Ozet).
 
-  Sayfadaki HER SAYI ve HER GRAFIK sunucudan geliyor; sabit ("mock") veri YOK. Sablonun
-  ornek sayfalarinda gomulu rakamlar vardi ve bunlar birakilsaydi bos bir veritabaninda
-  bile dolu bir panel gorunur, sorun oldugunda kimse fark etmezdi.
+  ─── BU SAYFA NEYE ODAKLI ─────────────────────────────────────────────────
+
+  Agirlik VERITABANINDA. Ustteki serit dogrudan tablo satir sayilarini ve veritabani
+  boyutunu gosteriyor; "kac kullanici" gibi is metrikleri bunun altinda. Sebep: panelin
+  ilk isi sistemin saglikli oldugunu soylemek; is metrikleri ancak veri akiyorsa anlamli.
+
+  HER SAYI SUNUCUDAN. Sabit ("mock") veri YOK — sablonun ornek sayfalarinda gomulu
+  rakamlar vardi ve birakilsaydi bos bir veritabaninda bile dolu bir panel gorunur,
+  sorun oldugunda kimse fark etmezdi.
 -->
-<html lang="tr" class="layout-menu-fixed layout-compact" data-assets-path="assets/" data-template="vertical-menu-template-free">
+<html lang="tr">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="noindex, nofollow" />
     <title>Garanmin — Genel Bakis</title>
     <link rel="icon" type="image/x-icon" href="assets/img/favicon/favicon.ico" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="assets/vendor/fonts/iconify-icons.css" />
     <link rel="stylesheet" href="assets/vendor/css/core.css" />
-    <link rel="stylesheet" href="assets/css/demo.css" />
-    <link rel="stylesheet" href="assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css" />
-    <link rel="stylesheet" href="assets/vendor/libs/apex-charts/apex-charts.css" />
-    <script src="assets/vendor/js/helpers.js"></script>
-    <script src="assets/js/config.js"></script>
+    <link rel="stylesheet" href="assets/css/garanmin.css" />
   </head>
 
   <body>
-    <div class="layout-wrapper layout-content-navbar">
-      <div class="layout-container">
-        <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
-          <div id="garanmin-menu"></div>
-        </aside>
+    <div class="g-app" id="g-app">
+      <aside class="g-yan" id="garanmin-menu"></aside>
+      <header class="g-ust" id="garanmin-navbar"></header>
 
-        <div class="layout-page">
-          <nav class="layout-navbar container-xxl navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme" id="layout-navbar">
-            <div id="garanmin-navbar" class="d-flex w-100 align-items-center"></div>
-          </nav>
+      <main class="g-icerik">
+        <div id="garanmin-error"></div>
 
-          <div class="content-wrapper">
-            <div class="container-xxl flex-grow-1 container-p-y">
-              <h4 class="fw-bold py-3 mb-4">Genel Bakis</h4>
-              <div id="garanmin-error"></div>
+        <!-- VERITABANI SERIDI -->
+        <div class="g-satir esit-4" id="db-serit"></div>
 
-              <!-- ÖZET KARTLARI -->
-              <div class="row g-4 mb-4" id="stat-cards"></div>
+        <!-- IS METRIKLERI -->
+        <div class="g-satir esit-4" id="is-serit"></div>
 
-              <div class="row g-4 mb-4">
-                <div class="col-lg-8">
-                  <div class="card h-100">
-                    <div class="card-header d-flex justify-content-between">
-                      <h5 class="card-title mb-0">Son 30 gunde kayit olan kullanicilar</h5>
-                    </div>
-                    <div class="card-body"><div id="chart-signup"></div></div>
-                  </div>
-                </div>
-                <div class="col-lg-4">
-                  <div class="card h-100">
-                    <div class="card-header"><h5 class="card-title mb-0">Garanti durumu</h5></div>
-                    <div class="card-body"><div id="chart-warranty"></div></div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="row g-4 mb-4">
-                <div class="col-lg-6">
-                  <div class="card h-100">
-                    <div class="card-header"><h5 class="card-title mb-0">Cihaz kategorileri</h5></div>
-                    <div class="card-body"><div id="chart-category"></div></div>
-                  </div>
-                </div>
-                <div class="col-lg-6">
-                  <div class="card h-100">
-                    <div class="card-header"><h5 class="card-title mb-0">En cok eklenen markalar</h5></div>
-                    <div class="card-body"><div id="chart-brand"></div></div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="card">
-                <div class="card-header"><h5 class="card-title mb-0">Son eklenen cihazlar</h5></div>
-                <div class="table-responsive text-nowrap">
-                  <table class="table">
-                    <thead>
-                      <tr>
-                        <th>Cihaz</th><th>Marka</th><th>Kategori</th>
-                        <th>Alim</th><th>Garanti bitisi</th><th>Kullanici</th>
-                      </tr>
-                    </thead>
-                    <tbody id="recent-body">
-                      <tr><td colspan="6" class="text-center text-muted py-4">Yukleniyor...</td></tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-
-            <div class="content-backdrop fade"></div>
+        <div class="g-satir esit-3 buyuk">
+          <div class="g-kart" style="grid-column: span 2">
+            <div class="g-kart-bas"><i class="bx bx-line-chart"></i> Son 30 gun — kullanici, cihaz, destek</div>
+            <div class="g-kart-govde" id="c-akis"></div>
+          </div>
+          <div class="g-kart">
+            <div class="g-kart-bas"><i class="bx bx-shield-quarter"></i> Garanti durumu</div>
+            <div class="g-kart-govde" id="c-garanti"></div>
           </div>
         </div>
-      </div>
-      <div class="layout-overlay layout-menu-toggle"></div>
+
+        <div class="g-satir esit-3" style="height:210px">
+          <div class="g-kart">
+            <div class="g-kart-bas"><i class="bx bx-category"></i> Kategoriler</div>
+            <div class="g-kart-govde" id="c-kategori"></div>
+          </div>
+          <div class="g-kart">
+            <div class="g-kart-bas"><i class="bx bx-purchase-tag"></i> Markalar</div>
+            <div class="g-kart-govde" id="c-marka"></div>
+          </div>
+          <div class="g-kart">
+            <div class="g-kart-bas"><i class="bx bx-time-five"></i> Son eklenen cihazlar</div>
+            <div class="g-kart-govde g-scroll">
+              <table class="g-tablo">
+                <thead><tr><th>Cihaz</th><th>Marka</th><th>Kullanici</th></tr></thead>
+                <tbody id="son-cihaz"><tr><td colspan="3" class="text-muted">Yukleniyor...</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </main>
     </div>
 
-    <script src="assets/vendor/libs/jquery/jquery.js"></script>
-    <script src="assets/vendor/libs/popper/popper.js"></script>
-    <script src="assets/vendor/js/bootstrap.js"></script>
-    <script src="assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js"></script>
-    <script src="assets/vendor/js/menu.js"></script>
     <script src="assets/vendor/libs/apex-charts/apexcharts.js"></script>
-    <script src="assets/js/main.js"></script>
     <script src="assets/js/garanmin-api.js"></script>
-
     <script>
       if (garanminGuardPage()) {
-        garanminShell('garanmin-dashboard.html');
+        garanminShell('garanmin-dashboard.html', 'Genel Bakis');
         yukle();
       }
 
-      /* Özet kartlarının tanımı — etiket, alan adı, simge, renk. Tek yerde durması,
-         kart eklemeyi tek satırlık bir iş yapıyor. */
-      const KARTLAR = [
-        { alan: 'total_users',           etiket: 'Toplam kullanici',   ikon: 'bx-user',        renk: 'primary' },
-        { alan: 'dau',                   etiket: 'Gunluk aktif',       ikon: 'bx-run',         renk: 'success' },
-        { alan: 'mau',                   etiket: 'Aylik aktif',        ikon: 'bx-calendar',    renk: 'info' },
-        { alan: 'total_devices',         etiket: 'Toplam cihaz',       ikon: 'bx-devices',     renk: 'warning' },
-        { alan: 'users_with_devices',    etiket: 'Cihaz ekleyen',      ikon: 'bx-user-check',  renk: 'primary' },
-        { alan: 'new_users_7d',          etiket: 'Yeni (7 gun)',       ikon: 'bx-user-plus',   renk: 'success' },
-        { alan: 'total_credits_sum',     etiket: 'Toplam kredi',       ikon: 'bx-star',        renk: 'warning' },
-        { alan: 'support_tickets_total', etiket: 'Destek talebi',      ikon: 'bx-support',     renk: 'danger' },
-      ];
-
-      function kartCiz(stats) {
-        document.getElementById('stat-cards').innerHTML = KARTLAR.map(k => `
-          <div class="col-sm-6 col-xl-3">
-            <div class="card h-100">
-              <div class="card-body">
-                <div class="d-flex align-items-center mb-2">
-                  <div class="avatar flex-shrink-0 me-3">
-                    <span class="avatar-initial rounded bg-label-${k.renk}"><i class="bx ${k.ikon}"></i></span>
-                  </div>
-                  <span class="text-muted small">${k.etiket}</span>
-                </div>
-                <h4 class="mb-0">${gNum(stats[k.alan])}</h4>
-              </div>
-            </div>
-          </div>`).join('');
-      }
-
-      /*
-        GRAFİKLER VERİ YOKSA ÇİZİLMİYOR, "veri yok" YAZIYOR.
-
-        ApexCharts boş bir dizide eksenleri ve boş bir ızgarayı yine de çiziyor; bu,
-        "veri gelmedi" ile "veri sıfır" arasındaki farkı görünmez kılıyordu — tam da bu
-        panelde düzeltilen hatanın belirtisi buydu.
-      */
-      function bosMu(el, veri) {
-        if (veri && veri.length) return false;
-        document.getElementById(el).innerHTML =
-          '<div class="text-center text-muted py-5">Gosterilecek veri yok</div>';
-        return true;
-      }
-
-      const RENKLER = ['#696cff', '#71dd37', '#ffab00', '#ff3e1d', '#03c3ec', '#8592a3'];
-
-      function cizSignup(veri) {
-        if (bosMu('chart-signup', veri)) return;
-        new ApexCharts(document.getElementById('chart-signup'), {
-          chart: { type: 'area', height: 300, toolbar: { show: false } },
-          series: [{ name: 'Kayit', data: veri.map(d => d.count) }],
-          xaxis: { categories: veri.map(d => gDate(d.date)) },
-          dataLabels: { enabled: false },
-          stroke: { curve: 'smooth', width: 2 },
-          colors: [RENKLER[0]],
-        }).render();
-      }
-
-      function cizWarranty(veri) {
-        if (bosMu('chart-warranty', veri)) return;
-        const ad = { active: 'Aktif', expiring_soon: 'Yakinda bitiyor', expired: 'Suresi dolmus' };
-        // Renkler uygulamadaki rozetlerle AYNI anlamda: mavi aktif, turuncu yakın, kırmızı dolmuş.
-        const renk = { active: '#696cff', expiring_soon: '#ffab00', expired: '#ff3e1d' };
-        new ApexCharts(document.getElementById('chart-warranty'), {
-          chart: { type: 'donut', height: 300 },
-          series: veri.map(d => Number(d.count)),
-          labels: veri.map(d => ad[d.status] || d.status),
-          colors: veri.map(d => renk[d.status] || RENKLER[5]),
-          legend: { position: 'bottom' },
-        }).render();
-      }
-
-      function cizCategory(veri) {
-        if (bosMu('chart-category', veri)) return;
-        new ApexCharts(document.getElementById('chart-category'), {
-          chart: { type: 'bar', height: 300, toolbar: { show: false } },
-          series: [{ name: 'Cihaz', data: veri.map(d => Number(d.count)) }],
-          xaxis: { categories: veri.map(d => gKategori(d.category)) },
-          plotOptions: { bar: { borderRadius: 6, distributed: true } },
-          legend: { show: false },
-          colors: RENKLER,
-          dataLabels: { enabled: false },
-        }).render();
-      }
-
-      function cizBrand(veri) {
-        if (bosMu('chart-brand', veri)) return;
-        new ApexCharts(document.getElementById('chart-brand'), {
-          chart: { type: 'bar', height: 300, toolbar: { show: false } },
-          series: [{ name: 'Cihaz', data: veri.map(d => Number(d.count)) }],
-          xaxis: { categories: veri.map(d => d.brand) },
-          plotOptions: { bar: { horizontal: true, borderRadius: 6 } },
-          colors: [RENKLER[2]],
-          dataLabels: { enabled: false },
-        }).render();
-      }
-
-      function recentCiz(veri) {
-        const tb = document.getElementById('recent-body');
-        if (!veri || !veri.length) {
-          tb.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-4">Kayit yok</td></tr>';
-          return;
-        }
-        // Kullanıcı verisi `gEsc` ile kaçırılıyor (gerekçe: garanmin-api.js).
-        tb.innerHTML = veri.map(d => `
-          <tr>
-            <td><strong>${gEsc(d.name)}</strong></td>
-            <td>${gEsc(d.brand)}</td>
-            <td><span class="badge bg-label-primary">${gEsc(gKategori(d.category))}</span></td>
-            <td>${gDate(d.purchase_date)}</td>
-            <td>${gDate(d.warranty_end)}</td>
-            <td class="text-muted small">${gEsc(d.email || '-')}</td>
-          </tr>`).join('');
+      function kutu(hedef, liste) {
+        document.getElementById(hedef).innerHTML = liste.map(function (k) {
+          return '<div class="g-kart"><div class="g-ozet">'
+            + '<div class="g-ozet-ikon ' + k.renk + '"><i class="bx ' + k.ikon + '"></i></div>'
+            + '<div><div class="g-ozet-sayi">' + k.deger + '</div>'
+            + '<div class="g-ozet-etiket">' + k.etiket + '</div></div>'
+            + '</div></div>';
+        }).join('');
       }
 
       async function yukle() {
         try {
           /*
-            HEPSİ PARALEL. Sıraya dizilseydi sekiz ayrı gidiş-dönüş üst üste binerdi;
-            `Promise.all` ile toplam süre en yavaş çağrı kadar oluyor.
+            HEPSI PARALEL. Siraya dizilseydi alti ayri gidis-donus ust uste binerdi;
+            `Promise.all` ile toplam sure en yavas cagri kadar oluyor.
           */
-          const [stats, signup, warranty, category, brand, recent] = await Promise.all([
+          const [stats, tablolar, saglik, akis, garanti, kategori, marka, son] = await Promise.all([
             garanminData('garanmin_stats'),
-            garanminData('garanmin_signup_trend'),
+            garanminData('garanmin_db_tables'),
+            garanminData('garanmin_health'),
+            garanminData('garanmin_akis', { p_gun: 30 }),
             garanminData('garanmin_warranty_stats'),
             garanminData('garanmin_device_categories'),
             garanminData('garanmin_device_brands'),
-            garanminData('garanmin_recent_devices', { p_limit: 15 }),
+            garanminData('garanmin_recent_devices', { p_limit: 20 }),
           ]);
 
-          kartCiz(stats);
-          cizSignup(signup);
-          cizWarranty(warranty);
-          cizCategory(category);
-          cizBrand(brand);
-          recentCiz(recent);
-          garanminStampUpdated();
-        } catch (e) {
-          gError(e.message);
+          const satir = tablolar.reduce(function (t, x) { return t + Number(x.satir); }, 0);
+
+          kutu('db-serit', [
+            { etiket: 'Veritabani boyutu', deger: saglik.db_size_text, ikon: 'bx-data',     renk: 'mor' },
+            { etiket: 'Toplam satir',      deger: gNum(satir),         ikon: 'bx-table',    renk: 'mavi' },
+            { etiket: 'Tablo',             deger: tablolar.length,     ikon: 'bx-layer',    renk: 'yesil' },
+            { etiket: 'Cihaz kaydi',       deger: gNum(stats.total_devices), ikon: 'bx-devices', renk: 'turuncu' },
+          ]);
+
+          kutu('is-serit', [
+            { etiket: 'Kullanici',        deger: gNum(stats.total_users),          ikon: 'bx-group',      renk: 'mavi' },
+            { etiket: 'Aylik aktif',      deger: gNum(stats.mau),                  ikon: 'bx-pulse',      renk: 'yesil' },
+            { etiket: 'Toplam kredi',     deger: gNum(stats.total_credits_sum),    ikon: 'bx-star',       renk: 'turuncu' },
+            { etiket: 'Destek talebi',    deger: gNum(stats.support_tickets_total),ikon: 'bx-support',    renk: 'kirmizi' },
+          ]);
+
+          cizAkis(akis);
+          cizGaranti(garanti);
+          cizKategori(kategori);
+          cizMarka(marka);
+          sonCihaz(son);
+        } catch (e) { gError(e.message); }
+      }
+
+      function cizAkis(v) {
+        if (gBos('c-akis', v)) return;
+        const t = gGrafikTemel();
+        t.chart.type = 'area';
+        new ApexCharts(document.getElementById('c-akis'), Object.assign(t, {
+          series: [
+            { name: 'Kullanici', data: v.map(function (d) { return Number(d.kullanici); }) },
+            { name: 'Cihaz',     data: v.map(function (d) { return Number(d.cihaz); }) },
+            { name: 'Destek',    data: v.map(function (d) { return Number(d.talep); }) },
+          ],
+          xaxis: { categories: v.map(function (d) { return gDate(d.gun); }),
+                   labels: { rotate: 0, hideOverlappingLabels: true } },
+          stroke: { curve: 'smooth', width: 2 },
+          fill: { type: 'gradient', gradient: { opacityFrom: .35, opacityTo: .02 } },
+          colors: [G_RENK[0], G_RENK[1], G_RENK[3]],
+          legend: { position: 'top', horizontalAlign: 'right' },
+        })).render();
+      }
+
+      function cizGaranti(v) {
+        if (gBos('c-garanti', v)) return;
+        const t = gGrafikTemel();
+        t.chart.type = 'donut';
+        new ApexCharts(document.getElementById('c-garanti'), Object.assign(t, {
+          series: v.map(function (d) { return Number(d.count); }),
+          labels: v.map(function (d) { return gDurum(d.status).ad; }),
+          colors: v.map(function (d) { return gDurum(d.status).renk; }),
+          legend: { position: 'bottom' },
+          plotOptions: { pie: { donut: { size: '62%' } } },
+        })).render();
+      }
+
+      function cizKategori(v) {
+        if (gBos('c-kategori', v)) return;
+        const t = gGrafikTemel();
+        t.chart.type = 'bar';
+        new ApexCharts(document.getElementById('c-kategori'), Object.assign(t, {
+          series: [{ name: 'Cihaz', data: v.map(function (d) { return Number(d.count); }) }],
+          xaxis: { categories: v.map(function (d) { return gKategori(d.category); }) },
+          plotOptions: { bar: { borderRadius: 5, distributed: true, columnWidth: '55%' } },
+          legend: { show: false },
+          colors: G_RENK,
+        })).render();
+      }
+
+      function cizMarka(v) {
+        if (gBos('c-marka', v)) return;
+        const t = gGrafikTemel();
+        t.chart.type = 'bar';
+        new ApexCharts(document.getElementById('c-marka'), Object.assign(t, {
+          series: [{ name: 'Cihaz', data: v.map(function (d) { return Number(d.count); }) }],
+          xaxis: { categories: v.map(function (d) { return d.brand; }) },
+          plotOptions: { bar: { horizontal: true, borderRadius: 5, barHeight: '62%' } },
+          colors: [G_RENK[2]],
+        })).render();
+      }
+
+      function sonCihaz(v) {
+        const tb = document.getElementById('son-cihaz');
+        if (!v || !v.length) {
+          tb.innerHTML = '<tr><td colspan="3" class="text-muted">Kayit yok</td></tr>';
+          return;
         }
+        // Kullanici verisi `gEsc` ile kaciriliyor (gerekce: garanmin-api.js).
+        tb.innerHTML = v.map(function (d) {
+          return '<tr><td><strong>' + gEsc(d.name) + '</strong></td>'
+            + '<td>' + gEsc(d.brand) + '</td>'
+            + '<td class="text-muted">' + gEsc(d.email || '-') + '</td></tr>';
+        }).join('');
       }
     </script>
   </body>

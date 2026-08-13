@@ -1,0 +1,169 @@
+<!doctype html>
+<!--
+  GARANMIN — Gelir Gider / Kredi Ekonomisi.
+
+  ══════════════════════════════════════════════════════════════════════════
+  ⚠️  BU SAYFA CIRO GOSTERMIYOR — GOSTEREMEZ.
+  ══════════════════════════════════════════════════════════════════════════
+
+  Veritabaninda para yok: yalnizca kredi bakiyeleri var. Satin alma kayitlari
+  RevenueCat tarafinda tutuluyor ve buraya akmiyor. Dolayisiyla bu sayfa
+  "ne kadar kazandik" sorusunu DEGIL, "kredi ekonomisi nasil donuyor" sorusunu
+  cevapliyor.
+
+  Bunu acikca yazmak onemli: "Gelir" baslikli bir sayfadaki sayilarin gercek ciro
+  sanilmasi, yanlis bir is kararinin en kolay yolu. Gercek ciro icin RevenueCat
+  webhook'unun bir tabloya yazmasi gerekir; o kurulunca bu sayfa gercek rakamlari
+  gosterecek sekilde genisletilebilir.
+
+  HARCANAN KREDI = CIHAZ SAYISI: uygulama cihaz basina 1 kredi dusuyor ve ayri bir
+  defter tutulmuyor. Hesap degisirse buradaki varsayim da degismeli.
+-->
+<html lang="tr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Garanmin — Kredi Ekonomisi</title>
+    <link rel="icon" type="image/x-icon" href="assets/img/favicon/favicon.ico" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="assets/vendor/fonts/iconify-icons.css" />
+    <link rel="stylesheet" href="assets/vendor/css/core.css" />
+    <link rel="stylesheet" href="assets/css/garanmin.css" />
+  </head>
+
+  <body>
+    <div class="g-app" id="g-app">
+      <aside class="g-yan" id="garanmin-menu"></aside>
+      <header class="g-ust" id="garanmin-navbar"></header>
+
+      <main class="g-icerik">
+        <div id="garanmin-error"></div>
+
+        <div class="alert alert-warning py-2 mb-0 small" style="flex:0 0 auto">
+          <i class="bx bx-info-circle me-1"></i>
+          <strong>Bu sayfa ciro degil, kredi hareketi gosteriyor.</strong>
+          Odemeler RevenueCat tarafinda tutuluyor ve veritabanina akmiyor.
+        </div>
+
+        <div class="g-satir esit-4" id="serit"></div>
+
+        <div class="g-satir esit-2 buyuk">
+          <div class="g-kart">
+            <div class="g-kart-bas"><i class="bx bx-bar-chart-alt-2"></i> Kredi dagilimi (kullanici basina)</div>
+            <div class="g-kart-govde" id="c-dagilim"></div>
+          </div>
+          <div class="g-kart">
+            <div class="g-kart-bas"><i class="bx bx-trophy"></i> En cok kredisi olan kullanicilar</div>
+            <div class="g-kart-govde g-scroll">
+              <table class="g-tablo">
+                <thead><tr><th>E-posta</th><th>Kredi</th><th>Izlenen reklam</th></tr></thead>
+                <tbody id="top"><tr><td colspan="3" class="text-muted">Yukleniyor...</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="g-satir esit-3" style="height:170px">
+          <div class="g-kart">
+            <div class="g-kart-bas"><i class="bx bx-wallet"></i> Kredi akisi</div>
+            <div class="g-kart-govde g-scroll" id="akis"></div>
+          </div>
+          <div class="g-kart">
+            <div class="g-kart-bas"><i class="bx bx-user-check"></i> Kullanici dagilimi</div>
+            <div class="g-kart-govde" id="c-kullanici"></div>
+          </div>
+          <div class="g-kart">
+            <div class="g-kart-bas"><i class="bx bx-tv"></i> Reklam</div>
+            <div class="g-kart-govde g-scroll" id="reklam"></div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script src="assets/vendor/libs/apex-charts/apexcharts.js"></script>
+    <script src="assets/js/garanmin-api.js"></script>
+    <script>
+      function kutu(liste) {
+        document.getElementById('serit').innerHTML = liste.map(function (k) {
+          return '<div class="g-kart"><div class="g-ozet">'
+            + '<div class="g-ozet-ikon ' + k.renk + '"><i class="bx ' + k.ikon + '"></i></div>'
+            + '<div><div class="g-ozet-sayi">' + k.deger + '</div>'
+            + '<div class="g-ozet-etiket">' + k.etiket + '</div></div></div></div>';
+        }).join('');
+      }
+
+      function satir(etiket, deger, not) {
+        return '<div style="padding:7px 0;border-bottom:1px solid #f1f3f9">'
+          + '<div style="display:flex;justify-content:space-between;gap:10px">'
+          + '<span style="color:#6b7280;font-size:12.5px">' + etiket + '</span>'
+          + '<span style="font-weight:700;font-size:13px">' + deger + '</span></div>'
+          + (not ? '<div style="font-size:10.5px;color:#9aa1b2">' + not + '</div>' : '') + '</div>';
+      }
+
+      async function yukle() {
+        try {
+          const [e, top] = await Promise.all([
+            garanminData('garanmin_ekonomi'),
+            garanminData('garanmin_top_credit_users'),
+          ]);
+
+          const dagitilan = Number(e.mevcut_kredi) + Number(e.harcanan_kredi);
+
+          kutu([
+            { etiket: 'Dolasimda kredi', deger: gNum(e.mevcut_kredi),    ikon: 'bx-star',    renk: 'turuncu' },
+            { etiket: 'Harcanan kredi',  deger: gNum(e.harcanan_kredi),  ikon: 'bx-minus-circle', renk: 'kirmizi' },
+            { etiket: 'Reklamla kazanilan', deger: gNum(e.reklam_kredi), ikon: 'bx-tv',      renk: 'yesil' },
+            { etiket: 'Kullanici basina ort.', deger: gNum(e.ortalama_kredi), ikon: 'bx-calculator', renk: 'mavi' },
+          ]);
+
+          if (!gBos('c-dagilim', e.dagilim)) {
+            const t = gGrafikTemel(); t.chart.type = 'bar';
+            new ApexCharts(document.getElementById('c-dagilim'), Object.assign(t, {
+              series: [{ name: 'Kullanici', data: e.dagilim.map(function (d) { return Number(d.count); }) }],
+              xaxis: { categories: e.dagilim.map(function (d) { return d.bucket; }) },
+              plotOptions: { bar: { borderRadius: 5, distributed: true, columnWidth: '55%' } },
+              legend: { show: false }, colors: G_RENK,
+            })).render();
+          }
+
+          document.getElementById('top').innerHTML = (top && top.length)
+            ? top.map(function (u) {
+                return '<tr><td><strong>' + gEsc(u.email) + '</strong></td>'
+                  + '<td>' + gNum(u.credits) + '</td>'
+                  + '<td>' + gNum(u.ads) + '</td></tr>';
+              }).join('')
+            : '<tr><td colspan="3" class="text-muted">Kayit yok</td></tr>';
+
+          document.getElementById('akis').innerHTML =
+            satir('Dagitilan toplam', gNum(dagitilan), 'dolasimda + harcanan')
+            + satir('Harcanan', gNum(e.harcanan_kredi), 'cihaz basina 1 kredi')
+            + satir('Dolasimda kalan', gNum(e.mevcut_kredi))
+            + satir('Kullanim orani',
+                dagitilan ? '%' + Math.round(Number(e.harcanan_kredi) / dagitilan * 100) : '-');
+
+          document.getElementById('reklam').innerHTML =
+            satir('Toplam izlenme', gNum(e.reklam_izlenme))
+            + satir('Kazandirdigi kredi', gNum(e.reklam_kredi), '5 reklam = 1 kredi')
+            + satir('Izlenme / kullanici',
+                gNum((Number(e.reklam_izlenme) / Math.max(1, Number(e.kredili_kullanici) + Number(e.kredisiz_kullanici))).toFixed(1)));
+
+          const t2 = gGrafikTemel(); t2.chart.type = 'donut';
+          new ApexCharts(document.getElementById('c-kullanici'), Object.assign(t2, {
+            series: [Number(e.kredili_kullanici), Number(e.kredisiz_kullanici)],
+            labels: ['Kredisi olan', 'Kredisi biten'],
+            colors: [G_RENK[1], G_RENK[6]],
+            legend: { position: 'bottom', fontSize: '11px' },
+            plotOptions: { pie: { donut: { size: '58%' } } },
+          })).render();
+        } catch (err) { gError(err.message); }
+      }
+
+      if (garanminGuardPage()) {
+        garanminShell('garanmin-ekonomi.html', 'Kredi Ekonomisi');
+        yukle();
+      }
+    </script>
+  </body>
+</html>

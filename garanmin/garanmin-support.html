@@ -1,140 +1,132 @@
 <!doctype html>
 <!--
-  GARANMIN - Destek talepleri.
+  GARANMIN — Destek / Talepler.
 
-  Talep icerigi de support_tickets.data JSONB icinde; mesaj 300 karakterle SINIRLI olarak
-  sunucudan geliyor. Tamamini cekmek, panelde okunmayacak metni ag uzerinden tasimak ve
-  gereginden fazla kisisel veri gostermek demek olurdu.
+  ─── TALEP TURU `kind` SUTUNUNDAN OKUNUYOR ────────────────────────────────
+
+  Uygulama destek kaydini `insert({ user_id, kind, data })` seklinde yaziyor: tur
+  UST DUZEYDE bir sutun, mesaj/durum/puan ise `data` JSONB'sinin icinde. Onceki surum
+  turu `data->>'kind'` diye okuyordu ve orada hicbir zaman bir deger yok — grafik her
+  zaman tek bir "Diger" dilimi gosterirdi. Cihaz tarafinda duzeltilen hatanin destek
+  tarafindaki esi; ikisi de `garantea_kurulum.sql` icinde duzeltildi.
+
+  MESAJLAR KULLANICININ YAZDIGI METIN: hepsi `gEsc` ile kacirilarak basiliyor.
+  Dogrudan basilsaydi, mesajina `<img onerror=...>` yazan bir kullanici yoneticinin
+  tarayicisinda kod calistirabilirdi — ve o tarayicida gecerli bir yonetici oturumu var.
 -->
-<html lang="tr" class="layout-menu-fixed layout-compact" data-assets-path="assets/" data-template="vertical-menu-template-free">
+<html lang="tr">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="noindex, nofollow" />
-    <title>Garanmin - Destek</title>
+    <title>Garanmin — Destek</title>
     <link rel="icon" type="image/x-icon" href="assets/img/favicon/favicon.ico" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="assets/vendor/fonts/iconify-icons.css" />
     <link rel="stylesheet" href="assets/vendor/css/core.css" />
-    <link rel="stylesheet" href="assets/css/demo.css" />
-    <link rel="stylesheet" href="assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css" />
-    <link rel="stylesheet" href="assets/vendor/libs/apex-charts/apex-charts.css" />
-    <script src="assets/vendor/js/helpers.js"></script>
-    <script src="assets/js/config.js"></script>
+    <link rel="stylesheet" href="assets/css/garanmin.css" />
   </head>
 
   <body>
-    <div class="layout-wrapper layout-content-navbar">
-      <div class="layout-container">
-        <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
-          <div id="garanmin-menu"></div>
-        </aside>
-        <div class="layout-page">
-          <nav class="layout-navbar container-xxl navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme" id="layout-navbar">
-            <div id="garanmin-navbar" class="d-flex w-100 align-items-center"></div>
-          </nav>
-          <div class="content-wrapper">
-            <div class="container-xxl flex-grow-1 container-p-y">
-              <h4 class="fw-bold py-3 mb-4">Destek</h4>
-              <div id="garanmin-error"></div>
-              <div class="row g-4 mb-4">
-                <div class="col-lg-5">
-                  <div class="card h-100">
-                    <div class="card-header"><h5 class="card-title mb-0">Talep turleri</h5></div>
-                    <div class="card-body"><div id="chart-kind"></div></div>
-                  </div>
-                </div>
-                <div class="col-lg-7">
-                  <div class="card h-100">
-                    <div class="card-header"><h5 class="card-title mb-0">Kredi dagilimi</h5></div>
-                    <div class="card-body"><div id="chart-credit"></div></div>
-                  </div>
-                </div>
-              </div>
+    <div class="g-app" id="g-app">
+      <aside class="g-yan" id="garanmin-menu"></aside>
+      <header class="g-ust" id="garanmin-navbar"></header>
 
-              <div class="card">
-                <div class="card-header"><h5 class="card-title mb-0">Talepler</h5></div>
-                <div class="table-responsive text-nowrap">
-                  <table class="table">
-                    <thead><tr><th>Tarih</th><th>Kullanici</th><th>Tur</th><th>Durum</th><th>Mesaj</th></tr></thead>
-                    <tbody id="tbody"><tr><td colspan="5" class="text-center text-muted py-4">Yukleniyor...</td></tr></tbody>
-                  </table>
-                </div>
-              </div>
+      <main class="g-icerik">
+        <div id="garanmin-error"></div>
+
+        <div class="g-satir esit-4" id="serit"></div>
+
+        <div class="g-satir esit-3 buyuk">
+          <div class="g-kart" style="grid-column: span 2">
+            <div class="g-kart-bas"><i class="bx bx-message-detail"></i> Talepler</div>
+            <div class="g-kart-govde g-scroll">
+              <table class="g-tablo">
+                <thead>
+                  <tr><th>Tarih</th><th>Kullanici</th><th>Tur</th><th>Durum</th><th>Cihaz</th><th>Mesaj</th></tr>
+                </thead>
+                <tbody id="tbody"><tr><td colspan="6" class="text-muted">Yukleniyor...</td></tr></tbody>
+              </table>
             </div>
-            <div class="content-backdrop fade"></div>
+          </div>
+
+          <div class="g-kart">
+            <div class="g-kart-bas"><i class="bx bx-pie-chart-alt-2"></i> Talep turleri</div>
+            <div class="g-kart-govde" id="c-tur"></div>
           </div>
         </div>
-      </div>
-      <div class="layout-overlay layout-menu-toggle"></div>
+      </main>
     </div>
 
-    <script src="assets/vendor/libs/jquery/jquery.js"></script>
-    <script src="assets/vendor/libs/popper/popper.js"></script>
-    <script src="assets/vendor/js/bootstrap.js"></script>
-    <script src="assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js"></script>
-    <script src="assets/vendor/js/menu.js"></script>
     <script src="assets/vendor/libs/apex-charts/apexcharts.js"></script>
-    <script src="assets/js/main.js"></script>
     <script src="assets/js/garanmin-api.js"></script>
-
     <script>
-      if (garanminGuardPage()) { garanminShell('garanmin-support.html'); yukle(); }
+      /* Uygulamadaki `SupportTicketKind` degerlerinin okunur karsiligi. */
+      const TUR = { device_issue: 'Cihaz sorunu', general: 'Genel', feedback: 'Geri bildirim' };
+      const ROZET = { open: 'turuncu', closed: 'yesil', pending: 'mavi' };
 
-      function bosMu(el, veri) {
-        if (veri && veri.length) return false;
-        document.getElementById(el).innerHTML =
-          '<div class="text-center text-muted py-5">Gosterilecek veri yok</div>';
-        return true;
+      function kutu(liste) {
+        document.getElementById('serit').innerHTML = liste.map(function (k) {
+          return '<div class="g-kart"><div class="g-ozet">'
+            + '<div class="g-ozet-ikon ' + k.renk + '"><i class="bx ' + k.ikon + '"></i></div>'
+            + '<div><div class="g-ozet-sayi">' + k.deger + '</div>'
+            + '<div class="g-ozet-etiket">' + k.etiket + '</div></div></div></div>';
+        }).join('');
       }
 
       async function yukle() {
         try {
-          const sonuc = await Promise.all([
+          const [stats, tur, liste] = await Promise.all([
+            garanminData('garanmin_stats'),
             garanminData('garanmin_ticket_stats'),
-            garanminData('garanmin_credit_distribution'),
-            garanminData('garanmin_tickets_list', { p_limit: 100 })
+            garanminData('garanmin_tickets_list', { p_limit: 200 }),
           ]);
-          const tur = sonuc[0], kredi = sonuc[1], liste = sonuc[2];
 
-          if (!bosMu('chart-kind', tur)) {
-            new ApexCharts(document.getElementById('chart-kind'), {
-              chart: { type: 'donut', height: 300 },
-              series: tur.map(function (d) { return Number(d.count); }),
-              labels: tur.map(function (d) { return String(d.kind); }),
-              colors: ['#696cff', '#71dd37', '#ffab00', '#ff3e1d', '#03c3ec', '#8592a3'],
-              legend: { position: 'bottom' }
-            }).render();
-          }
+          const acik = liste.filter(function (t) { return t.status === 'open'; }).length;
+          const puanli = liste.filter(function (t) { return t.rating != null; });
+          const ortPuan = puanli.length
+            ? (puanli.reduce(function (a, t) { return a + Number(t.rating); }, 0) / puanli.length).toFixed(1)
+            : '-';
 
-          if (!bosMu('chart-credit', kredi)) {
-            new ApexCharts(document.getElementById('chart-credit'), {
-              chart: { type: 'bar', height: 300, toolbar: { show: false } },
-              series: [{ name: 'Kullanici', data: kredi.map(function (d) { return Number(d.count); }) }],
-              xaxis: { categories: kredi.map(function (d) { return String(d.bucket); }) },
-              plotOptions: { bar: { borderRadius: 6, distributed: true } },
-              legend: { show: false },
-              colors: ['#8592a3', '#03c3ec', '#696cff', '#71dd37', '#ffab00', '#ff3e1d'],
-              dataLabels: { enabled: false }
-            }).render();
-          }
+          kutu([
+            { etiket: 'Toplam talep',   deger: gNum(stats.support_tickets_total), ikon: 'bx-support', renk: 'mavi' },
+            { etiket: 'Son 7 gun',      deger: gNum(stats.support_tickets_7d),    ikon: 'bx-calendar', renk: 'mor' },
+            { etiket: 'Acik',           deger: gNum(acik),                        ikon: 'bx-time',    renk: 'turuncu' },
+            { etiket: 'Ortalama puan',  deger: ortPuan,                           ikon: 'bx-star',    renk: 'yesil' },
+          ]);
 
-          const rozet = { open: 'bg-label-warning', closed: 'bg-label-success' };
           const tb = document.getElementById('tbody');
-          tb.innerHTML = liste.length ? liste.map(function (t) {
-            return '<tr>'
-              + '<td>' + gDateTime(t.created_at) + '</td>'
-              + '<td class="text-muted small">' + gEsc(t.email || '-') + '</td>'
-              + '<td>' + gEsc(t.kind) + '</td>'
-              + '<td><span class="badge ' + (rozet[t.status] || 'bg-label-secondary') + '">' + gEsc(t.status) + '</span></td>'
-              + '<td class="text-truncate" style="max-width:340px">' + gEsc(t.message) + '</td>'
-              + '</tr>';
-          }).join('') : '<tr><td colspan="5" class="text-center text-muted py-4">Talep yok</td></tr>';
+          tb.innerHTML = liste.length
+            ? liste.map(function (t) {
+                return '<tr>'
+                  + '<td>' + gDateTime(t.created_at) + '</td>'
+                  + '<td>' + gEsc(t.email || '-') + '</td>'
+                  + '<td>' + gEsc(TUR[t.kind] || t.kind) + '</td>'
+                  + '<td><span class="g-rozet ' + (ROZET[t.status] || 'mavi') + '">'
+                    + gEsc(t.status) + '</span></td>'
+                  + '<td>' + gEsc(t.device_name || '-') + '</td>'
+                  + '<td style="white-space:normal;max-width:420px">' + gEsc(t.message) + '</td>'
+                  + '</tr>';
+              }).join('')
+            : '<tr><td colspan="6" class="text-muted">Talep yok</td></tr>';
 
-          garanminStampUpdated();
+          if (!gBos('c-tur', tur)) {
+            const t2 = gGrafikTemel(); t2.chart.type = 'donut';
+            new ApexCharts(document.getElementById('c-tur'), Object.assign(t2, {
+              series: tur.map(function (d) { return Number(d.count); }),
+              labels: tur.map(function (d) { return TUR[d.kind] || d.kind; }),
+              colors: G_RENK,
+              legend: { position: 'bottom', fontSize: '12px' },
+              plotOptions: { pie: { donut: { size: '60%' } } },
+            })).render();
+          }
         } catch (e) { gError(e.message); }
+      }
+
+      if (garanminGuardPage()) {
+        garanminShell('garanmin-support.html', 'Destek Talepleri');
+        yukle();
       }
     </script>
   </body>
