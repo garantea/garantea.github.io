@@ -57,7 +57,7 @@
                   <thead>
                     <tr><th>Cihaz</th><th>Marka</th><th>Kategori</th>
                         <th>Alim</th><th>Garanti bitisi</th><th>Durum</th>
-                        <th>Kullanici</th><th>Kayit</th></tr>
+                        <th>Kullanıcı</th><th>Kayit</th></tr>
                   </thead>
                   <tbody id="tbody"><tr><td colspan="8" class="soluk">Yukleniyor...</td></tr></tbody>
                 </table>
@@ -101,7 +101,7 @@
             tb.innerHTML = '<tr><td colspan="8" class="soluk">Kayit yok</td></tr>';
             return;
           }
-          /* Kullanici verisi `gEsc` ile kaciriliyor (gerekce: garanmin-api.js).
+          /* Kullanıcı verisi `gEsc` ile kaciriliyor (gerekce: garanmin-api.js).
              `title`: sutunlar sabit genislikte, uzun deger kesiliyor. */
           tb.innerHTML = v.map(function (d) {
             const s = gDurum(gGarantiDurum(d.purchase_date, d.warranty_end));

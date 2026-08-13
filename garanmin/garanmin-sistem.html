@@ -4,7 +4,7 @@
 
   Ust cubuktaki canli gostergesi "baglanti var mi" sorusunu tek bakista
   cevapliyor; bu sayfa AYRINTIYI veriyor: sunucu saati, tarayici saatiyle farki,
-  veritabaninin ne zamandir ayakta oldugu, kaydin buyumesi ve oturum bilgisi.
+  veritabanınin ne zamandir ayakta oldugu, kaydin buyumesi ve oturum bilgisi.
 
   ─── SAAT FARKI NEDEN ONEMLI ──────────────────────────────────────────────
 
@@ -86,7 +86,7 @@
 
           gKpiYaz('serit', [
             { etiket: 'Baglanti',            deger: 'CANLI',            ikon: 'activity', renk: 'success' },
-            { etiket: 'Veritabani boyutu',   deger: h.db_size_text,     ikon: 'database', renk: 'purple' },
+            { etiket: 'Veritabanı boyutu',   deger: h.db_size_text,     ikon: 'database', renk: 'purple' },
             { etiket: 'Toplam satir',        deger: gNum(toplamSatir),  ikon: 'list',     renk: 'primary' },
             { etiket: 'RLS acik olmayan tablo', deger: rlsKapali.length,
               ikon: rlsKapali.length ? 'alert' : 'shield',
@@ -100,9 +100,9 @@
                 Math.abs(fark) > 120
                   ? 'DIKKAT: iki saat arasinda 2 dakikadan fazla fark var. Garanti hesaplari tarihe bagli oldugu icin panel yaniltici olabilir.'
                   : 'Kabul edilebilir araligin icinde.')
-            + gKv('Veritabani ayakta', sure(new Date() - new Date(h.started_at)),
+            + gKv('Veritabanı ayakta', sure(new Date() - new Date(h.started_at)),
                 'Baslangic: ' + gDateTime(h.started_at))
-            + gKv('Veritabani boyutu', h.db_size_text + ' (' + gNum(h.db_size) + ' bayt)')
+            + gKv('Veritabanı boyutu', h.db_size_text + ' (' + gNum(h.db_size) + ' bayt)')
             + gKv('Adres', '<span style="font-family:\'JetBrains Mono\',monospace;font-size:11px">'
                 + gEsc(GARANMIN.supabaseUrl.replace('https://', '')) + '</span>');
 
@@ -112,11 +112,11 @@
             + gKv('Oturum bitisi', exp ? gDateTime(exp) : '-',
                 'Jeton 8 saat sonra sunucuda gecersiz oluyor.')
             + gKv('Jeton nerede', 'sessionStorage',
-                'Sekme kapaninca siliniyor; ortak bilgisayarda oturum bir sonraki kisiye devrolmuyor.')
+                'Sekme kapanınca siliniyor; ortak bilgisayarda oturum bir sonraki kisiye devrolmuyor.')
             + gKv('Parola saklama', 'bcrypt (maliyet 12)',
                 'Tek bir deneme ~250 ms suruyor; cevrimici kaba kuvvet pratikte imkansiz.')
-            + gKv('Basarisiz denemede', 'Kademeli gecikme',
-                'Kilitleme YOK — kilitleme, saldirganin yoneticiyi disarida birakmasina izin verirdi.')
+            + gKv('Başarısız denemede', 'Kademeli gecikme',
+                'Kilitleme YOK — kilitleme, saldirganin yöneticiyi disarida birakmasina izin verirdi.')
             + gKv('Panel yetkisi', 'Yalnizca okuma',
                 'Hicbir fonksiyon veri yazmiyor ya da silmiyor.')
             + (rlsKapali.length

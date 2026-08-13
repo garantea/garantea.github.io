@@ -1,16 +1,16 @@
 <!doctype html>
 <!--
-  GARANMIN — Genel Bakis (Ozet).
+  GARANMIN — Genel Bakis (Özet).
 
   ─── BU SAYFA NEYE ODAKLI ─────────────────────────────────────────────────
 
   Agirlik VERITABANINDA. Ustteki serit dogrudan tablo satir sayilarini ve
-  veritabani boyutunu gosteriyor; "kac kullanici" gibi is metrikleri bunun
+  veritabanı boyutunu gosteriyor; "kac kullanici" gibi is metrikleri bunun
   altinda. Sebep: panelin ilk isi sistemin saglikli oldugunu soylemek; is
   metrikleri ancak veri akiyorsa anlamli.
 
   HER SAYI SUNUCUDAN. Sabit ("mock") veri YOK — sablonun ornek sayfalarinda
-  gomulu rakamlar vardi ve birakilsaydi bos bir veritabaninda bile dolu bir panel
+  gomulu rakamlar vardi ve birakilsaydi bos bir veritabanında bile dolu bir panel
   gorunur, sorun oldugunda kimse fark etmezdi.
 
   ARAYUZ: puikinsh/Adminator sablonu (assets/adminator/adminator.css, MIT).
@@ -49,8 +49,8 @@
             <section class="card col-8">
               <div class="card-head">
                 <div class="card-title-wrap">
-                  <span class="eyebrow">Son 30 gun</span>
-                  <h2 class="card-title">Kayit akisi</h2>
+                  <span class="eyebrow">Son 30 gün</span>
+                  <h2 class="card-title">Kayıt akışı</h2>
                 </div>
                 <span class="badge">kullanici · cihaz · destek</span>
               </div>
@@ -98,7 +98,7 @@
                 <table class="table">
                   <!-- Sutun genislikleri SABIT (gerekce: garanmin.css). Toplam %100. -->
                   <colgroup><col style="width:40%"><col style="width:24%"><col style="width:36%"></colgroup>
-                  <thead><tr><th>Cihaz</th><th>Marka</th><th>Kullanici</th></tr></thead>
+                  <thead><tr><th>Cihaz</th><th>Marka</th><th>Kullanıcı</th></tr></thead>
                   <tbody id="son-cihaz"><tr><td colspan="3" class="soluk">Yukleniyor...</td></tr></tbody>
                 </table>
               </div>
@@ -131,15 +131,15 @@
           const satir = tablolar.reduce(function (t, x) { return t + Number(x.satir); }, 0);
 
           gKpiYaz('db-serit', [
-            { etiket: 'Veritabani boyutu', deger: saglik.db_size_text, ikon: 'database', renk: 'purple' },
+            { etiket: 'Veritabanı boyutu', deger: saglik.db_size_text, ikon: 'database', renk: 'purple' },
             { etiket: 'Toplam satir',      deger: gNum(satir),         ikon: 'list',     renk: 'primary' },
             { etiket: 'Tablo',             deger: tablolar.length,     ikon: 'layers',   renk: 'info' },
             { etiket: 'Cihaz kaydi',       deger: gNum(stats.total_devices), ikon: 'monitor', renk: 'success' },
           ]);
 
           gKpiYaz('is-serit', [
-            { etiket: 'Kullanici',     deger: gNum(stats.total_users),           ikon: 'users',   renk: 'primary' },
-            { etiket: 'Aylik aktif',   deger: gNum(stats.mau),                   ikon: 'activity',renk: 'success' },
+            { etiket: 'Kullanıcı',     deger: gNum(stats.total_users),           ikon: 'users',   renk: 'primary' },
+            { etiket: 'Aylık aktif',   deger: gNum(stats.mau),                   ikon: 'activity',renk: 'success' },
             { etiket: 'Toplam kredi',  deger: gNum(stats.total_credits_sum),     ikon: 'star',    renk: 'warning' },
             { etiket: 'Destek talebi', deger: gNum(stats.support_tickets_total), ikon: 'support', renk: 'danger' },
           ]);
@@ -158,7 +158,7 @@
         t.chart.type = 'area';
         new ApexCharts(gKap('c-akis'), Object.assign(t, {
           series: [
-            { name: 'Kullanici', data: v.map(function (d) { return Number(d.kullanici); }) },
+            { name: 'Kullanıcı', data: v.map(function (d) { return Number(d.kullanici); }) },
             { name: 'Cihaz',     data: v.map(function (d) { return Number(d.cihaz); }) },
             { name: 'Destek',    data: v.map(function (d) { return Number(d.talep); }) },
           ],
@@ -214,7 +214,7 @@
           tb.innerHTML = '<tr><td colspan="3" class="soluk">Kayit yok</td></tr>';
           return;
         }
-        /* Kullanici verisi `gEsc` ile kaciriliyor (gerekce: garanmin-api.js).
+        /* Kullanıcı verisi `gEsc` ile kaciriliyor (gerekce: garanmin-api.js).
            `title`: sutunlar sabit genislikte, uzun deger kesiliyor. */
         tb.innerHTML = v.map(function (d) {
           return '<tr>'

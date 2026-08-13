@@ -60,7 +60,7 @@ const GARANMIN = {
    ══════════════════════════════════════════════════════════════════════════ */
 
 function garanminToken() { return sessionStorage.getItem(GARANMIN.tokenKey); }
-function garanminUser()  { return sessionStorage.getItem(GARANMIN.userKey) || 'yonetici'; }
+function garanminUser()  { return sessionStorage.getItem(GARANMIN.userKey) || 'yönetici'; }
 function garanminExp()   { return sessionStorage.getItem(GARANMIN.expKey); }
 
 /**
@@ -232,22 +232,22 @@ function gIkon(ad, sinif) {
 
 const GARANMIN_MENU = [
   { ad: 'Genel', ikon: 'grid', alt: [
-    { href: 'garanmin-dashboard.html', ad: 'Ozet' },
+    { href: 'garanmin-dashboard.html', ad: 'Özet' },
     { href: 'garanmin-sistem.html',    ad: 'Sistem Durumu' },
   ]},
-  { ad: 'Veri Tabani', ikon: 'database', alt: [
+  { ad: 'Veri Tabanı', ikon: 'database', alt: [
     { href: 'garanmin-db.html',   ad: 'Tablolar' },
-    { href: 'garanmin-akis.html', ad: 'Zaman Akisi' },
+    { href: 'garanmin-akis.html', ad: 'Zaman Akışı' },
   ]},
-  /* Kullanici detayi MENUDE YOK: listeden bir satira tiklaninca MODAL olarak
+  /* Kullanıcı detayi MENUDE YOK: listeden bir satira tiklaninca MODAL olarak
      aciliyor. Ayri bir sayfa olsaydi geri donuldugunde arama kutusu bosalir,
      sayfa numarasi sifirlanir ve kullanici aradigi satiri yeniden bulmak
      zorunda kalirdi. */
-  { ad: 'Kullanicilar', ikon: 'users', alt: [
+  { ad: 'Kullanıcılar', ikon: 'users', alt: [
     { href: 'garanmin-users.html', ad: 'Liste' },
   ]},
   { ad: 'Cihazlar', ikon: 'monitor', alt: [
-    { href: 'garanmin-devices.html',     ad: 'Kirilimlar' },
+    { href: 'garanmin-devices.html',     ad: 'Kırılımlar' },
     { href: 'garanmin-devices-son.html', ad: 'Son Eklenenler' },
   ]},
   { ad: 'Gelir Gider', ikon: 'wallet', alt: [
@@ -440,7 +440,7 @@ function garanminShell(aktif, baslik, ustBil) {
       </div>
     </div>
     <div class="topbar-actions">
-      <span class="badge dot" id="g-canli" title="Veritabani baglantisi">
+      <span class="badge dot" id="g-canli" title="Veritabanı baglantisi">
         <span id="g-canli-yazi">baglaniyor</span>
       </span>
       <div class="g-saat">
@@ -449,8 +449,8 @@ function garanminShell(aktif, baslik, ustBil) {
       </div>
       <button class="icon-btn" onclick="location.reload()" title="Yenile"
               aria-label="Yenile">${gIkon('refresh')}</button>
-      <button class="icon-btn" onclick="garanminLogout()" title="Cikis"
-              aria-label="Cikis">${gIkon('logout')}</button>
+      <button class="icon-btn" onclick="garanminLogout()" title="Çıkış"
+              aria-label="Çıkış">${gIkon('logout')}</button>
       <span class="avatar" title="Oturum: ${gEsc(garanminUser())}">${gEsc(bas)}</span>
     </div>`;
 

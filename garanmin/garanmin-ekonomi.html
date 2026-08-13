@@ -6,7 +6,7 @@
   ⚠️  BU SAYFA CIRO GOSTERMIYOR — GOSTEREMEZ.
   ══════════════════════════════════════════════════════════════════════════
 
-  Veritabaninda para yok: yalnizca kredi bakiyeleri var. Satin alma kayitlari
+  Veritabanında para yok: yalnizca kredi bakiyeleri var. Satin alma kayitlari
   RevenueCat tarafinda tutuluyor ve buraya akmiyor. Dolayisiyla bu sayfa
   "ne kadar kazandik" sorusunu DEGIL, "kredi ekonomisi nasil donuyor" sorusunu
   cevapliyor.
@@ -50,7 +50,7 @@
             <section class="card col-7">
               <div class="card-head">
                 <div class="card-title-wrap">
-                  <span class="eyebrow">Kullanici basina</span>
+                  <span class="eyebrow">Kullanıcı basina</span>
                   <h2 class="card-title">Kredi dagilimi</h2>
                 </div>
               </div>
@@ -61,7 +61,7 @@
               <div class="card-head">
                 <div class="card-title-wrap">
                   <span class="eyebrow">Siralama</span>
-                  <h2 class="card-title">En cok kredisi olanlar</h2>
+                  <h2 class="card-title">En çok kredisi olanlar</h2>
                 </div>
               </div>
               <div class="g-tablo-kutu" style="max-height:270px">
@@ -88,7 +88,7 @@
               <div class="card-head">
                 <div class="card-title-wrap">
                   <span class="eyebrow">Dagilim</span>
-                  <h2 class="card-title">Kullanici dagilimi</h2>
+                  <h2 class="card-title">Kullanıcı dagilimi</h2>
                 </div>
               </div>
               <div class="g-grafik" id="c-kullanici"></div>
@@ -113,7 +113,7 @@
     <script>
       document.getElementById('uyari').innerHTML = gIkon('info')
         + '<span>Bu sayfa ciro degil, KREDI HAREKETI gosteriyor. Odemeler RevenueCat '
-        + 'tarafinda tutuluyor ve veritabanina akmiyor.</span>';
+        + 'tarafinda tutuluyor ve veritabanına akmiyor.</span>';
 
       async function yukle() {
         try {
@@ -128,13 +128,13 @@
             { etiket: 'Dolasimda kredi',      deger: gNum(e.mevcut_kredi),    ikon: 'star',  renk: 'warning' },
             { etiket: 'Harcanan kredi',       deger: gNum(e.harcanan_kredi),  ikon: 'minus', renk: 'danger' },
             { etiket: 'Reklamla kazanilan',   deger: gNum(e.reklam_kredi),    ikon: 'tv',    renk: 'success' },
-            { etiket: 'Kullanici basina ort.',deger: gNum(e.ortalama_kredi),  ikon: 'calc',  renk: 'primary' },
+            { etiket: 'Kullanıcı basina ort.',deger: gNum(e.ortalama_kredi),  ikon: 'calc',  renk: 'primary' },
           ]);
 
           if (!gBos('c-dagilim', e.dagilim)) {
             const t = gGrafikTemel(); t.chart.type = 'bar';
             new ApexCharts(gKap('c-dagilim'), Object.assign(t, {
-              series: [{ name: 'Kullanici', data: e.dagilim.map(function (d) { return Number(d.count); }) }],
+              series: [{ name: 'Kullanıcı', data: e.dagilim.map(function (d) { return Number(d.count); }) }],
               xaxis: { categories: e.dagilim.map(function (d) { return d.bucket; }) },
               plotOptions: { bar: { borderRadius: 5, distributed: true, columnWidth: '55%' } },
               legend: { show: false },

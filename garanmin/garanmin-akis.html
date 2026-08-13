@@ -1,6 +1,6 @@
 <!doctype html>
 <!--
-  GARANMIN — Veri Tabani / Zaman Akisi.
+  GARANMIN — Veri Tabanı / Zaman Akışı.
 
   Kayitlarin gune gore nasil biriktigi: kullanici, cihaz, destek talebi.
 
@@ -16,7 +16,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="noindex, nofollow" />
-    <title>Garanmin — Zaman Akisi</title>
+    <title>Garanmin — Zaman Akışı</title>
     <link rel="icon" type="image/x-icon" href="assets/img/favicon/favicon.ico" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -40,7 +40,7 @@
               <div class="card-head">
                 <div class="card-title-wrap">
                   <span class="eyebrow">Gunluk</span>
-                  <h2 class="card-title">Kayit akisi</h2>
+                  <h2 class="card-title">Kayıt akışı</h2>
                 </div>
                 <div class="g-arac">
                   <button class="btn btn--ghost btn--sm"   onclick="setGun(7)"  id="g7">7 gun</button>
@@ -55,7 +55,7 @@
               <div class="card-head">
                 <div class="card-title-wrap">
                   <span class="eyebrow">Gunluk</span>
-                  <h2 class="card-title">Kullanici</h2>
+                  <h2 class="card-title">Kullanıcı</h2>
                 </div>
               </div>
               <div class="g-grafik kisa" id="c-k"></div>
@@ -145,7 +145,7 @@
             base.chart.type = 'line';
             const g = new ApexCharts(gKap('c-akis'), Object.assign(base, {
               series: [
-                { name: 'Kullanici', data: k },
+                { name: 'Kullanıcı', data: k },
                 { name: 'Cihaz',     data: c },
                 { name: 'Destek',    data: t },
               ],
@@ -165,7 +165,7 @@
       }
 
       if (garanminGuardPage()) {
-        garanminShell('garanmin-akis.html', 'Zaman Akisi', 'Veri Tabani');
+        garanminShell('garanmin-akis.html', 'Zaman Akışı', 'Veri Tabanı');
         yukle();
       }
     </script>

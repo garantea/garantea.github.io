@@ -1,6 +1,6 @@
 <!doctype html>
 <!--
-  GARANMIN — Kullanicilar.
+  GARANMIN — Kullanıcılar.
 
   ─── DETAY MODAL OLARAK ACILIYOR ──────────────────────────────────────────
 
@@ -24,7 +24,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="noindex, nofollow" />
-    <title>Garanmin — Kullanicilar</title>
+    <title>Garanmin — Kullanıcılar</title>
     <link rel="icon" type="image/x-icon" href="assets/img/favicon/favicon.ico" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -48,7 +48,7 @@
               <div class="card-head">
                 <div class="card-title-wrap">
                   <span class="eyebrow">Kayitli hesaplar</span>
-                  <h2 class="card-title">Kullanici listesi</h2>
+                  <h2 class="card-title">Kullanıcı listesi</h2>
                 </div>
                 <div class="g-arac">
                   <input id="arama" class="input" placeholder="E-posta ara..." />
@@ -96,7 +96,7 @@
       let offset = 0, arama = '';
 
       /**
-       * Kullanici detayini modal olarak acar.
+       * Kullanıcı detayini modal olarak acar.
        *
        * TEK CAGRI: profil, cihazlar, garanti dagilimi ve talepler
        * `garanmin_user_detail` icinden birlikte geliyor. Dort ayri cagri olsaydi
@@ -108,7 +108,7 @@
         garanminModalAc(
           '<div class="g-modal-kim">'
           + '<span class="avatar">' + gEsc((email || '?').slice(0, 2).toUpperCase()) + '</span>'
-          + '<div><span class="eyebrow">Kullanici detayi</span>'
+          + '<div><span class="eyebrow">Kullanıcı detayi</span>'
           + '<div class="modal-title">' + gEsc(email) + '</div></div></div>',
           '<div class="g-bos">' + gIkon('refresh') + '<span>Yukleniyor...</span></div>'
         );
@@ -288,7 +288,7 @@
 
       /* ── İLK ÇAĞRI EN SONDA (yukarıdaki nota bakın) ────────────────────── */
       if (garanminGuardPage()) {
-        garanminShell('garanmin-users.html', 'Kullanicilar', 'Kullanicilar');
+        garanminShell('garanmin-users.html', 'Kullanıcılar', 'Kullanıcılar');
         seritYukle();
         yukle();
       }

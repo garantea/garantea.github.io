@@ -1,6 +1,6 @@
 <!doctype html>
 <!--
-  GARANMIN — Veri Tabani / Tablolar.
+  GARANMIN — Veri Tabanı / Tablolar.
 
   Uygulamanin kullandigi tablolarin satir sayisi, disk boyutu ve RLS durumu.
 
@@ -8,7 +8,7 @@
 
   `pg_class.reltuples` cok daha ucuz olurdu ama VACUUM'a bagli bir TAHMIN; yeni
   yazilmis satirlar orada gorunmuyor ve panelde "13 cihaz ekledim, 0 yaziyor"
-  gibi bir tabloya yol acardi. Bu boyuttaki bir veritabaninda gercek `count(*)`
+  gibi bir tabloya yol acardi. Bu boyuttaki bir veritabanında gercek `count(*)`
   ihmal edilebilir; dogruluk daha degerli.
 
   ─── RLS SUTUNU NEDEN VAR ─────────────────────────────────────────────────
@@ -21,7 +21,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="noindex, nofollow" />
-    <title>Garanmin — Veri Tabani</title>
+    <title>Garanmin — Veri Tabanı</title>
     <link rel="icon" type="image/x-icon" href="assets/img/favicon/favicon.ico" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -82,10 +82,10 @@
     <script>
       /* Her tablonun ne ise yaradigi — panelde "bu tablo neydi" sorusu kalmasin. */
       const ACIKLAMA = {
-        devices:                 'Kullanici cihazlari (JSONB)',
+        devices:                 'Kullanıcı cihazlari (JSONB)',
         user_meta:               'Kredi ve ayarlar',
         support_tickets:         'Destek talepleri',
-        garanmin_users:          'Panel yoneticileri',
+        garanmin_users:          'Panel yöneticileri',
         garanmin_sessions:       'Acik panel oturumlari',
         garanmin_login_attempts: 'Giris denemeleri',
       };
@@ -105,7 +105,7 @@
             { etiket: 'Tablo',             deger: t.length,          ikon: 'layers',   renk: 'primary' },
             { etiket: 'Toplam satir',      deger: gNum(toplamSatir), ikon: 'list',     renk: 'success' },
             { etiket: 'Tablolarin boyutu', deger: gBayt(toplamBayt), ikon: 'hdd',      renk: 'warning' },
-            { etiket: 'Veritabani boyutu', deger: h.db_size_text,    ikon: 'database', renk: 'purple' },
+            { etiket: 'Veritabanı boyutu', deger: h.db_size_text,    ikon: 'database', renk: 'purple' },
           ]);
 
           document.getElementById('tablolar').innerHTML = t.map(function (x) {
@@ -151,7 +151,7 @@
       }
 
       if (garanminGuardPage()) {
-        garanminShell('garanmin-db.html', 'Veri Tabani', 'Tablolar');
+        garanminShell('garanmin-db.html', 'Veri Tabanı', 'Tablolar');
         yukle();
       }
     </script>
