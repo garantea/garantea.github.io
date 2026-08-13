@@ -402,6 +402,7 @@ function garanminShell(aktif, baslik, ustBil) {
   garanminKatlaUygula(localStorage.getItem('garanmin_dar') === '1');
   garanminSaatBaslat();
   garanminNabizBaslat();
+  garanminGrafikGozlemci();
 }
 
 /**
@@ -750,8 +751,24 @@ const G_RENK = ['#2563eb', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#0ea5e9'
   grafiğe DERİN birleştirdiği için biçim burada güvende.
 */
 window.Apex = {
-  chart: { fontFamily: 'inherit', toolbar: { show: false },
-           animations: { easing: 'easeout', speed: 500 } },
+  chart: {
+    fontFamily: 'inherit', toolbar: { show: false },
+    animations: { easing: 'easeout', speed: 500 },
+    /*
+      `parentHeightOffset` VARSAYILAN 15 — SIFIRLANMASI ŞART.
+
+      ApexCharts, yüksekliği `'100%'` verilen bir grafiği kabın yüksekliğine 15
+      piksel EKLEYEREK çiziyor. Kabın (`.g-grafik`) yüksekliği sabit olduğu için
+      bu 15 piksel kabın dışına, oradan da kartın beyaz alanının dışına taşıyordu:
+      grafik "kartından büyük" görünüyordu. Sıfırlanınca grafik tam kabına oturuyor.
+
+      `redrawOnParentResize` de açık tutuluyor: kenar çubuğu katlanınca kart
+      genişliyor ve grafik kendini yeniden ölçmek zorunda.
+    */
+    parentHeightOffset: 0,
+    redrawOnParentResize: true,
+    redrawOnWindowResize: true,
+  },
   dataLabels: { enabled: false },
   stroke: { lineCap: 'round' },
   grid: { borderColor: '#eef1f5', strokeDashArray: 4, padding: { left: 6, right: 6 } },
@@ -768,5 +785,34 @@ window.Apex = {
 };
 
 function gGrafikTemel(yukseklik) {
-  return { chart: { height: yukseklik || '100%' }, colors: G_RENK };
+  return { chart: { height: yukseklik || '100%', width: '100%' }, colors: G_RENK };
+}
+
+/*
+  ══════════════════════════════════════════════════════════════════════════
+  GRAFİKLERİ KABINA ZORLA OTURTAN GÖZLEMCİ
+  ══════════════════════════════════════════════════════════════════════════
+
+  ApexCharts kendi genişliğini ÇİZİM ANINDA bir kez ölçüyor ve sonuç piksel
+  olarak sabitleniyor. Ölçüm sırasında düzen henüz oturmamışsa (yazı tipi geç
+  geliyor, kenar çubuğu geçişi sürüyor, kart animasyonu bitmemiş) grafik yanlış
+  bir genişlikte kalıyor ve kartın dışına taşıyor. Pencere boyutu değişmediği
+  için de kendiliğinden hiç düzelmiyor.
+
+  `ResizeObserver` içerik alanını izliyor: genişlik her değiştiğinde bir `resize`
+  olayı üretiliyor ve ApexCharts bütün grafikleri yeniden ölçüyor. Gecikme
+  (120 ms) art arda gelen ölçümleri tek bir yeniden çizime indiriyor — geçiş
+  sırasında her karede yeniden çizmek gözle görülür şekilde takılıyordu.
+*/
+function garanminGrafikGozlemci() {
+  const hedef = document.querySelector('.content');
+  if (!hedef || typeof ResizeObserver === 'undefined') return;
+  let zaman = null, sonGenislik = 0;
+  new ResizeObserver(function (kayitlar) {
+    const g = Math.round(kayitlar[0].contentRect.width);
+    if (g === sonGenislik) return;   // yalnızca GENİŞLİK önemli; yükseklik değişimi
+    sonGenislik = g;                 // grafiği ilgilendirmiyor ve döngü yaratırdı
+    clearTimeout(zaman);
+    zaman = setTimeout(function () { window.dispatchEvent(new Event('resize')); }, 120);
+  }).observe(hedef);
 }

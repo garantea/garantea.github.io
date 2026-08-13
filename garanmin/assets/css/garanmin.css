@@ -319,9 +319,34 @@ html, body { margin: 0; min-height: 100%; }
 .g-uyari.warning { background: var(--warning-soft); color: var(--warning); }
 .g-uyari.info    { background: var(--info-soft);    color: var(--info); }
 
+/*
+  ══════════════════════════════════════════════════════════════════════════
+  BEYAZ ALANIN DIŞINA HİÇBİR ŞEY ÇIKAMAZ
+  ══════════════════════════════════════════════════════════════════════════
+
+  Şablonun `.card`'ı taşmayı kırpmıyor — örnek sayfalarında kartların içinde
+  yalnızca kendi boyutunu bilen öğeler olduğu için gerek de yok. Burada içeriği
+  SUNUCUDAN gelen veri belirliyor: uzun bir marka listesi, kendi genişliğini
+  yanlış ölçmüş bir grafik ya da beklenenden geniş bir tablo kartın dışına
+  taşabiliyor ve taşınca beyaz zeminin üstünde değil, sayfanın üstünde duruyor.
+
+  `overflow: hidden` bunu yapısal olarak imkânsız kılıyor: kartın dışı diye bir
+  yer kalmıyor. Bedeli, kartın kenarına denk gelen grafik ipuçlarının kırpılması;
+  taşan bir grafiğin yanında bu küçük bir bedel.
+*/
+.card { overflow: hidden; }
+.card > * { min-width: 0; max-width: 100%; }
+.g-tablo-kutu { max-width: 100%; }
+
+/* ApexCharts kendi SVG'sine piksel genişlik yazıyor; yanlış ölçtüğü durumda bu
+   genişlik kabı aşıyordu. Şablonun genel `svg { max-width: 100% }` kuralı
+   ApexCharts'ın satır içi genişliğini yenemediği için burada tekrarlanıyor. */
+.apexcharts-canvas { max-width: 100% !important; }
+.apexcharts-canvas svg { max-width: 100%; }
+
 /* Grafik kabı — ApexCharts yüzde yükseklik için TANIMLI bir yükseklik istiyor;
    kabın yüksekliği içeriğe bağlı kalsaydı grafik sıfır yükseklikte çizilirdi. */
-.g-grafik { height: 260px; min-height: 260px; }
+.g-grafik { height: 260px; min-height: 260px; width: 100%; overflow: hidden; position: relative; }
 .g-grafik.kisa { height: 200px; min-height: 200px; }
 .g-grafik.uzun { height: 320px; min-height: 320px; }
 
