@@ -355,11 +355,11 @@ html, body { margin: 0; height: 100%; overflow: hidden; }
   cimrilik etmenin bir kazancı yok.
 */
 .g-grafik {
-  height: 245px; min-height: 245px; width: 100%;
-  overflow: hidden; position: relative;
+  flex: 1; min-height: 0; width: 100%;
+  position: relative;
 }
-.g-grafik.kisa { height: 183px; min-height: 183px; }
-.g-grafik.uzun { height: 293px; min-height: 293px; }
+.g-grafik.kisa { flex: 1; }
+.g-grafik.uzun { flex: 1; }
 
 /* Şablonun 12 sütunlu ızgarasında eksik olan genişlikler. */
 .col-3 { grid-column: span 3; }
