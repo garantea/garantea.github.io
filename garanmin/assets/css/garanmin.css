@@ -149,6 +149,10 @@ html, body {
   border-bottom: 1px solid var(--g-cizgi);
   display: flex; align-items: center; gap: 12px;
   padding: 0 16px;
+  /* Üst çubuk TAŞMIYOR. Sağdaki grup (canlı + saat + kullanıcı + çıkış) sabit
+     genişlikte; dar bir pencerede taşan tek şey başlık olmalı ve o da kesilip
+     "..." ile bitmeli. Aksi halde çıkış düğmesi ekranın dışına itiliyordu. */
+  overflow: hidden;
 }
 
 .g-katla {
@@ -159,8 +163,12 @@ html, body {
 }
 .g-katla:hover { background: var(--g-cizgi-acik); }
 
-.g-baslik { font-weight: 500; font-size: 15px; margin: 0; white-space: nowrap; }
-.g-sag { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+.g-baslik {
+  font-weight: 500; font-size: 15px; margin: 0;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  min-width: 0; flex: 0 1 auto;
+}
+.g-sag { margin-left: auto; display: flex; align-items: center; gap: 10px; flex: 0 0 auto; }
 
 /* Canlı göstergesi: nokta yanıp sönüyor. Yanıp sönmenin kendisi bilgi taşıyor —
    donmuş bir sayfada nokta da donar. */
@@ -466,12 +474,52 @@ table.g-tablo td.metin { white-space: normal; min-width: 240px; max-width: 480px
 @media (max-width: 1200px) {
   .g-satir.esit-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
+/*
+  992px ALTINDA MENÜ ZORLA SİMGE DURUMUNA GEÇİYOR.
+
+  Önceden burada yalnızca sütun genişliği 72 piksele düşürülüyordu ama `.dar`
+  sınıfı eklenmediği için yazılar duruyordu: grup başlıkları ve alt bağlantılar
+  72 piksele sığmadığından ortadan kesiliyor, alt menüdeki 22 piksellik girinti
+  metni büsbütün dışarı taşıyordu. Genişlik değişiyorsa içerik de değişmeli —
+  bu yüzden `.dar` kuralları burada birebir tekrarlanıyor.
+*/
 @media (max-width: 992px) {
   .g-app { grid-template-columns: var(--g-kenar-dar) 1fr; }
   .g-satir.esit-3 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+  .g-marka { padding: 0; justify-content: center; }
+  .g-marka-yazi, .g-metin-gizle { opacity: 0; width: 0; overflow: hidden; }
+  .g-alt { display: none; }
+  .g-grup-bas { justify-content: center; padding: 11px 0; }
+  .g-grup-bas i.ok { display: none; }
 }
 @media (max-width: 760px) {
   .g-satir.esit-4, .g-satir.esit-3, .g-satir.esit-2 { grid-template-columns: 1fr; }
   .g-icerik { overflow-y: auto; }
   .g-saat, .g-kullanici .rol { display: none; }
+}
+
+/*
+  ── ALÇAK EKRAN ─────────────────────────────────────────────────────────────
+
+  "Her şey tek ekranda" kuralı 768 piksel yüksekliğindeki bir dizüstünde
+  tutmuyordu: iki özet şeridi + büyük satır + grafik satırı toplamı ekranı
+  aşıyor ve `overflow: hidden` fazlalığı SESSİZCE kesiyordu — en altta duran
+  kart hiç görünmediği için eksik olduğu da anlaşılmıyordu.
+
+  İki kademeli çözüm: önce her şey küçülüyor (şerit kartları alçalıyor), gerçekten
+  sığmayan yükseklikte ise kesmek yerine kaydırmaya izin veriliyor. Görünmeyen
+  bir kart, kaydırma çubuğundan kötüdür.
+*/
+@media (max-height: 860px) {
+  .g-icerik { padding: 9px 11px 11px; gap: 8px; }
+  .g-satir  { gap: 8px; }
+  .g-kart   { padding: 9px 11px; }
+  .g-kart-bas { margin-bottom: 5px; min-height: 20px; font-size: 11px; }
+  .g-ozet-ikon { width: 32px; height: 32px; font-size: 17px; border-radius: 9px; }
+  .g-ozet-sayi { font-size: 18px; }
+  .g-satir.grafik { min-height: 200px; }
+}
+@media (max-height: 700px) {
+  .g-icerik { overflow-y: auto; }
 }

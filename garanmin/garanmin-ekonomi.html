@@ -65,7 +65,13 @@
           </div>
         </div>
 
-        <div class="g-satir esit-3">
+        <!--
+          `grafik` SINIFI ZORUNLU. Bu satır önce sınıfsızdı: yüksekliği içeriğine
+          bağlı olduğu için "Kullanici dagilimi" halkası %100 yüksekliği SIFIR bir
+          kutuya göre hesaplıyor ve grafik hiç görünmüyordu. Yanındaki iki liste de
+          `height:100%` ile kayacağı için aynı şekilde eziliyordu.
+        -->
+        <div class="g-satir esit-3 grafik">
           <div class="g-kart">
             <div class="g-kart-bas"><i class="bx bx-wallet"></i> Kredi akisi</div>
             <div class="g-kart-govde g-scroll" id="akis"></div>
@@ -149,9 +155,14 @@
             + satir('Izlenme / kullanici',
                 gNum((Number(e.reklam_izlenme) / Math.max(1, Number(e.kredili_kullanici) + Number(e.kredisiz_kullanici))).toFixed(1)));
 
+          /* Hic kullanici yoksa halka CIZILMIYOR: iki dilimi de sifir olan bir
+             halka, "veri gelmedi" ile "deger sifir" arasindaki farki gizliyor. */
+          const kredili = Number(e.kredili_kullanici), kredisiz = Number(e.kredisiz_kullanici);
+          if (kredili + kredisiz === 0) { gBos('c-kullanici', null); return; }
+
           const t2 = gGrafikTemel(); t2.chart.type = 'donut';
-          new ApexCharts(document.getElementById('c-kullanici'), Object.assign(t2, {
-            series: [Number(e.kredili_kullanici), Number(e.kredisiz_kullanici)],
+          new ApexCharts(gKap('c-kullanici'), Object.assign(t2, {
+            series: [kredili, kredisiz],
             labels: ['Kredisi olan', 'Kredisi biten'],
             colors: [G_RENK[1], G_RENK[6]],
             legend: { position: 'bottom', fontSize: '11px' },

@@ -101,7 +101,7 @@
         const t = gGrafikTemel();
         t.chart.type = 'bar';
         t.chart.sparkline = { enabled: false };
-        const g = new ApexCharts(document.getElementById(hedef), Object.assign(t, {
+        const g = new ApexCharts(gKap(hedef), Object.assign(t, {
           series: [{ name: 'Adet', data: veri }],
           xaxis: { categories: etiketler, labels: { show: false }, axisTicks: { show: false } },
           yaxis: { labels: { show: false } },
@@ -132,7 +132,7 @@
           if (!gBos('c-akis', v)) {
             const base = gGrafikTemel();
             base.chart.type = 'line';
-            const g = new ApexCharts(document.getElementById('c-akis'), Object.assign(base, {
+            const g = new ApexCharts(gKap('c-akis'), Object.assign(base, {
               series: [
                 { name: 'Kullanici', data: k },
                 { name: 'Cihaz',     data: c },

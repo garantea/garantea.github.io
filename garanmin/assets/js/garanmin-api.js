@@ -343,10 +343,24 @@ function garanminKatla() {
   garanminKatlaUygula(dar);
 }
 
-/** Menü durumunu uygular ve HATIRLAR — her sayfada yeniden açmak gerekmesin. */
+/**
+ * Menü durumunu uygular ve HATIRLAR — her sayfada yeniden açmak gerekmesin.
+ *
+ * ─── SONDAKİ `resize` NEDEN GEREKLİ ───────────────────────────────────────
+ *
+ * Menü katlanınca içerik alanı ~176 piksel genişliyor. ApexCharts kendi boyutunu
+ * yalnızca PENCERE yeniden boyutlandığında hesaplıyor; pencere değişmediği için
+ * grafikler eski genişlikte kalıyor ve kartın sağında boş bir şerit bırakıyordu
+ * (açarken de tersi: grafik kartın dışına taşıyordu). Geçiş bittikten sonra
+ * yapay bir `resize` olayı, grafiklerin kendi kendini yeniden ölçmesini sağlıyor.
+ *
+ * 240 ms, CSS'teki .2s geçişten biraz uzun: geçiş sırasında ölçüm alınırsa
+ * grafik ARADAKİ genişliğe göre çizilir ve sorun aynen kalır.
+ */
 function garanminKatlaUygula(dar) {
   document.getElementById('g-app').classList.toggle('dar', !!dar);
   localStorage.setItem('garanmin_dar', dar ? '1' : '0');
+  setTimeout(function () { window.dispatchEvent(new Event('resize')); }, 240);
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
@@ -547,6 +561,20 @@ const GARANMIN_DURUM = {
   expired:       { ad: 'Suresi dolmus',    renk: '#dc2626', sinif: 'kirmizi' },
 };
 function gDurum(k) { return GARANMIN_DURUM[k] || { ad: k, renk: '#6b7280', sinif: '' }; }
+
+/**
+ * Grafik kabını çizimden ÖNCE boşaltır ve döndürür.
+ *
+ * Aralık düğmesiyle yeniden yüklenen sayfalarda (Zaman Akışı) kap daha önce
+ * `gBos` tarafından "Gosterilecek veri yok" yazısıyla doldurulmuş olabiliyor.
+ * ApexCharts kabı temizlemeden kendi öğesini EKLİYOR; sonuç, grafiğin üstünde
+ * asılı kalmış eski bir "veri yok" satırı oluyordu.
+ */
+function gKap(id) {
+  const d = document.getElementById(id);
+  if (d) d.innerHTML = '';
+  return d;
+}
 
 /** ApexCharts için ortak ayarlar — grafikler birbirine benzesin diye tek yerde. */
 const G_RENK = ['#2563eb', '#16a34a', '#f59e0b', '#dc2626', '#7c3aed', '#0891b2', '#64748b'];
