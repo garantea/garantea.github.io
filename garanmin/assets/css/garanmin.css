@@ -33,7 +33,7 @@
    1. İSKELET — katlanabilir kenar çubuğu
    ══════════════════════════════════════════════════════════════════════════ */
 
-html, body { margin: 0; min-height: 100%; }
+html, body { margin: 0; height: 100%; overflow: hidden; }
 
 /* Şablonun `.shell`'i 248px sabit. Katlanabilmesi için genişlik değişkene
    bağlandı; şablonun kendi kuralı ezilmiyor, üzerine yazılıyor. */
@@ -96,7 +96,7 @@ html, body { margin: 0; min-height: 100%; }
   Boyut ekrana göre esniyor, sığmayan durumda kesiliyor.
 */
 .kpi-value {
-  font-size: clamp(26px, 2.4vw, 40px);
+  font-size: clamp(22px, 2vw, 34px);
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
 
@@ -246,9 +246,9 @@ html, body { margin: 0; min-height: 100%; }
 /* Kart içindeki tablo kutusu için makul yükseklikler. Sabit piksel yerine
    `max-height`: 3 satırlık bir tabloda kart boş kalmasın, 200 satırlıkta da
    sayfayı uzatmasın. */
-.g-tablo-kutu.kisa  { max-height: 240px; }
-.g-tablo-kutu.orta  { max-height: 380px; }
-.g-tablo-kutu.uzun  { max-height: 520px; }
+.g-tablo-kutu.kisa  { max-height: 200px; }
+.g-tablo-kutu.orta  { max-height: 320px; }
+.g-tablo-kutu.uzun  { max-height: 440px; }
 
 /* ══════════════════════════════════════════════════════════════════════════
    5. MODAL PERDESİ
@@ -355,11 +355,11 @@ html, body { margin: 0; min-height: 100%; }
   cimrilik etmenin bir kazancı yok.
 */
 .g-grafik {
-  height: 290px; min-height: 290px; width: 100%;
+  height: 245px; min-height: 245px; width: 100%;
   overflow: hidden; position: relative;
 }
-.g-grafik.kisa { height: 215px; min-height: 215px; }
-.g-grafik.uzun { height: 345px; min-height: 345px; }
+.g-grafik.kisa { height: 183px; min-height: 183px; }
+.g-grafik.uzun { height: 293px; min-height: 293px; }
 
 /* Şablonun 12 sütunlu ızgarasında eksik olan genişlikler. */
 .col-3 { grid-column: span 3; }
@@ -408,6 +408,24 @@ html, body { margin: 0; min-height: 100%; }
    8. DAR EKRAN
    ══════════════════════════════════════════════════════════════════════════ */
 
+/*
+  TEK EKRANA SIĞDIRMA.
+
+  `.main` taşmayı kırpıyor ve `.content` alanı esnek olarak kalan yüksekliği
+  dolduruyor. İçerideki `.grid` kendi yüksekliğini aşan içeriği kaydırmak yerine
+  kırpıyor: her sayfa viewport'un içinde kalıyor, sayfa seviyesinde hiçbir
+  kaydırma çubuğu çıkmıyor.
+*/
+.shell { min-height: 0; height: 100vh; overflow: hidden; }
+.main  { height: 100vh; overflow: hidden; }
+.d-topbar { height: 50px; }
+.content { padding: 18px 24px 14px; flex: 1; min-height: 0; display: flex; flex-direction: column; overflow: hidden; }
+.grid { flex: 1; min-height: 0; gap: 14px; overflow: hidden; }
+.card { padding: 16px; }
+.card-head { margin-bottom: 14px; padding: 0 0 10px; }
+.kpi-grid { margin-bottom: 14px; gap: 14px; }
+.kpi-card { padding: 14px 16px; }
+
 @media (max-width: 1200px) {
   .kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .col-3, .col-4, .col-5, .col-7, .col-8, .col-9 { grid-column: span 6; }
@@ -423,7 +441,7 @@ html, body { margin: 0; min-height: 100%; }
   .nav-link { justify-content: center; padding: 10px 0; }
   .nav-link .chev { display: none; }
   .g-marka { justify-content: center; }
-  .content { padding: 20px 18px; }
+  .content { padding: 14px 14px; }
   .d-topbar { padding: 0 18px; }
 }
 @media (max-width: 720px) {
@@ -431,71 +449,3 @@ html, body { margin: 0; min-height: 100%; }
   .grid > * { grid-column: span 12 !important; }
   .g-saat { display: none; }
 }
-
-/* ══════════════════════════════════════════════════════════════════════════
-   9. KOMPAKT DÜZEN — %15 KÜÇÜLTME + TEK EKRANA SIĞDIRMA
-   ══════════════════════════════════════════════════════════════════════════
-
-   Tablolar, kartlar, KPI şeritleri ve grafiklerin boyutunu yaklaşık %15
-   küçültüyor. `.main` alanı görünüm yüksekliğine sığdırılıyor; içerik
-   taşarsa kartların İÇİNDE kayıyor, sayfa kendisi kaymıyor.
-
-   Şablonun orijinal kuralları EZİLMİYOR, yalnızca GEÇERSİZ KILINACAK
-   kadar özel seçicilerle daraltılıyor. Sebebi: aynı seçici ağırlığında
-   olsaydı dosya sırası değişince bozulabilirdi.
-   ══════════════════════════════════════════════════════════════════════════ */
-
-/* Ana içerik alanı — sayfa kaymaz, taşma kartların içinde kalır. */
-.main > .content {
-  padding: 18px 24px 14px;
-  overflow-y: auto;
-  height: calc(100vh - 60px); /* 60px = üst çubuğun yüksekliği */
-}
-
-/* KPI şeridi — satırlar arası ve altındaki boşluk daralıyor. */
-.kpi-grid { gap: 14px; margin-bottom: 14px; }
-.kpi-value { font-size: clamp(22px, 2vw, 34px); }
-
-/* Kartlar — iç dolgu ve başlık boşluğu azaltıldı. */
-.card { padding: 16px; }
-.card-head { margin-bottom: 14px; padding-bottom: 12px; }
-.card-title { font-size: 14px; }
-
-/* Izgara — kartlar arası boşluk daraltıldı. */
-.grid { gap: 14px; }
-
-/* Tablolar — hücre dolgusu ve yazı boyutu küçültüldü (%15). */
-.table thead th {
-  font-size: 9px;
-  padding: 7px 8px 9px;
-}
-.table tbody td {
-  font-size: 11.5px;
-  padding: 8px 8px;
-}
-.table th:first-child, .table td:first-child { padding-left: 2px; }
-.table th:last-child,  .table td:last-child  { padding-right: 2px; }
-.table td.sayi, .table th.sayi { font-size: 11px; }
-
-/* Tablo kayan kutuları — maksimum yükseklikler %15 düşürüldü. */
-.g-tablo-kutu.kisa  { max-height: 204px; }
-.g-tablo-kutu.orta  { max-height: 323px; }
-.g-tablo-kutu.uzun  { max-height: 442px; }
-
-/* Grafik kapları — yükseklikler %15 düşürüldü. */
-.g-grafik {
-  height: 246px; min-height: 246px;
-}
-.g-grafik.kisa { height: 183px; min-height: 183px; }
-.g-grafik.uzun { height: 293px; min-height: 293px; }
-
-/* Anahtar/değer satırları — dikey dolgu sıkıştırıldı. */
-.g-kv { padding: 7px 0; }
-.g-kv-etiket { font-size: 11.5px; }
-.g-kv-deger  { font-size: 11.5px; }
-
-/* Boş durum — minimum yükseklik azaltıldı. */
-.g-bos { min-height: 100px; font-size: 11.5px; }
-
-/* Dashboard'daki satır içi max-height'lar (HTML'de style ile yazılanlar için
-   ek bir sınıfla değil, genel `.g-tablo-kutu` ile zaten sınırlı). */
