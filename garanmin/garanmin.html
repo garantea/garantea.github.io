@@ -78,8 +78,20 @@
         flex-direction: column;
         justify-content: center;
         padding: 60px 48px;
-        box-shadow: -10px 0 30px rgba(0,0,0,0.03);
+        position: relative;
         z-index: 3;
+      }
+
+      .login-form-area::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: -150px;
+        width: 150px;
+        background: linear-gradient(to right, transparent, #ffffff);
+        z-index: -1;
+        pointer-events: none;
       }
 
       .login-header {
@@ -131,17 +143,16 @@
 
       .login-input {
         padding: 14px 16px;
-        border: 1px solid #cbd5e1;
+        border: none;
         border-radius: 12px;
         font-size: 15px;
         color: #0f172a;
-        background: #f8fafc;
+        background: #f1f5f9;
         transition: all 0.2s ease;
         outline: none;
       }
 
       .login-input:focus {
-        border-color: #3b82f6;
         background: #ffffff;
         box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
       }
