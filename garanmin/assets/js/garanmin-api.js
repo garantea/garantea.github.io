@@ -794,28 +794,44 @@ function gGarantiDurum(alim, bitis) {
    GRAFİKLER
    ══════════════════════════════════════════════════════════════════════════ */
 
-/** Yeni modern ve uyumlu grafik renk paleti (derin mavi, lila, canlı pembe, vb.) */
-const G_RENK = ['#4f46e5', '#db2777', '#0ea5e9', '#8b5cf6', '#f43f5e', '#059669', '#f59e0b'];
+/** Şablonun vurgu renkleri — CSS değişkenleriyle aynı değerler. */
+const G_RENK = ['#2563eb', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#0ea5e9', '#14b8a6'];
 
 /*
   EKSEN/IZGARA BİÇİMİ `window.Apex` İLE VERİLİYOR.
+
+  Sayfalar seçenekleri `Object.assign(temel, ayar)` ile birleştiriyor ve bu SIĞ
+  bir birleştirme: bir sayfa kendi `xaxis: { categories: [...] }` nesnesini
+  verdiğinde temeldeki `xaxis` tamamen SİLİNİYOR. ApexCharts `window.Apex`'i her
+  grafiğe DERİN birleştirdiği için biçim burada güvende.
 */
 window.Apex = {
   chart: {
     fontFamily: 'inherit', toolbar: { show: false },
-    animations: { enabled: true, easing: 'easeinout', speed: 800, animateGradually: { enabled: true, delay: 150 }, dynamicAnimation: { enabled: true, speed: 350 } },
+    animations: { easing: 'easeout', speed: 500 },
+    /*
+      `parentHeightOffset` VARSAYILAN 15 — SIFIRLANMASI ŞART.
+
+      ApexCharts, yüksekliği `'100%'` verilen bir grafiği kabın yüksekliğine 15
+      piksel EKLEYEREK çiziyor. Kabın (`.g-grafik`) yüksekliği sabit olduğu için
+      bu 15 piksel kabın dışına, oradan da kartın beyaz alanının dışına taşıyordu:
+      grafik "kartından büyük" görünüyordu. Sıfırlanınca grafik tam kabına oturuyor.
+
+      `redrawOnParentResize` de açık tutuluyor: kenar çubuğu katlanınca kart
+      genişliyor ve grafik kendini yeniden ölçmek zorunda.
+    */
     parentHeightOffset: 0,
     redrawOnParentResize: true,
     redrawOnWindowResize: true,
   },
   dataLabels: { enabled: false },
   stroke: { lineCap: 'round' },
-  grid: { borderColor: 'rgba(0,0,0,0.06)', strokeDashArray: 5, padding: { left: 6, right: 6 } },
+  grid: { borderColor: '#eef1f5', strokeDashArray: 4, padding: { left: 6, right: 6 } },
   xaxis: {
     axisBorder: { show: false }, axisTicks: { show: false },
-    labels: { style: { colors: '#64748b', fontSize: '11px', fontWeight: 500 } },
+    labels: { style: { colors: '#94a3b8', fontSize: '11px' } },
   },
-  yaxis: { labels: { style: { colors: '#64748b', fontSize: '11px', fontWeight: 500 } } },
+  yaxis: { labels: { style: { colors: '#94a3b8', fontSize: '11px' } } },
   legend: {
     fontSize: '12px', fontWeight: 500, labels: { colors: '#64748b' },
     markers: { radius: 12, width: 9, height: 9 }, itemMargin: { horizontal: 7, vertical: 2 },

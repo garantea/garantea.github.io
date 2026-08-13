@@ -33,62 +33,7 @@
    1. İSKELET — katlanabilir kenar çubuğu
    ══════════════════════════════════════════════════════════════════════════ */
 
-html, body { 
-  margin: 0; height: 100%; overflow: hidden; 
-  font-family: 'Inter', sans-serif;
-  background: linear-gradient(270deg, #dbeafe, #bfdbfe, #93c5fd, #a5b4fc, #fecdd3, #fda4af); 
-  background-size: 400% 400%; 
-  animation: GaranminGradient 15s ease infinite;
-}
-
-/* --- GLASSMORPHISM EFEKTLERİ --- */
-.card, .kpi-card, .g-arac .input {
-  background: rgba(255, 255, 255, 0.65) !important;
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.6) !important;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05) !important;
-  border-radius: 16px !important;
-  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.3s ease;
-}
-
-.card:hover, .kpi-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1) !important;
-}
-
-.d-sidebar {
-  background: rgba(255, 255, 255, 0.4) !important;
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-right: 1px solid rgba(255, 255, 255, 0.4) !important;
-  box-shadow: 4px 0 24px rgba(0,0,0,0.03);
-}
-
-.d-topbar {
-  background: transparent !important;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.3) !important;
-}
-
-.nav-link {
-  transition: all 0.2s ease !important;
-}
-.nav-link:hover {
-  background: rgba(255, 255, 255, 0.5) !important;
-  transform: translateX(4px);
-  border-radius: 8px;
-}
-.g-tablo-kutu .table thead th {
-  background: rgba(255, 255, 255, 0.6) !important;
-  backdrop-filter: blur(8px);
-}
-.apexcharts-tooltip {
-  background: rgba(255, 255, 255, 0.85) !important;
-  backdrop-filter: blur(12px) !important;
-  border: 1px solid rgba(255, 255, 255, 0.6) !important;
-  border-radius: 12px !important;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1) !important;
-}
+html, body { margin: 0; height: 100%; overflow: hidden; }
 
 /* Şablonun `.shell`'i 248px sabit. Katlanabilmesi için genişlik değişkene
    bağlandı; şablonun kendi kuralı ezilmiyor, üzerine yazılıyor. */
@@ -482,7 +427,7 @@ html, body {
 .d-topbar { height: 50px; flex-shrink: 0; }
 .content { padding: 16px 20px; flex: 1; min-height: 0; display: flex; flex-direction: column; overflow: hidden; }
 .grid { flex: 1; min-height: 0; gap: 14px; overflow: hidden; display: grid; grid-auto-rows: minmax(0, 1fr); }
-.card { padding: 14px 16px; display: flex; flex-direction: column; }
+.card { padding: 14px 16px; display: flex; flex-direction: column; min-height: 0; }
 .card-head { margin-bottom: 10px; padding: 0 0 6px; flex-shrink: 0; }
 .kpi-grid { margin-bottom: 14px; gap: 14px; flex-shrink: 0; }
 .kpi-card { padding: 12px 14px; }

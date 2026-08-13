@@ -1,70 +1,273 @@
 <!doctype html>
 <!--
-  GARANMIN — giris.
-
-  Bu sayfa herkese acik bir adreste duruyor ve bunu gizlemeye calismiyor. Kapi
-  istemcide degil SUNUCUDA: `garanmin_login` parolayi bcrypt ile dogruluyor,
-  basarisiz denemeler arttikca cevabi geciktiriyor ve basarili giriste 8 saat
-  omurlu bir jeton donuyor. Sayfanin kaynagini gormek hicbir sey kazandirmiyor.
-
-  ARAYUZ: puikinsh/Adminator sablonunun `.auth-shell` duzeni — solda degradeli
-  tanitim paneli, sagda form.
+  GARANMIN — Giris
 -->
 <html lang="tr" data-theme="light">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="noindex, nofollow" />
-    <title>Garanmin — Giris</title>
+    <title>Garanmin — Giriş</title>
     <link rel="icon" type="image/x-icon" href="assets/img/favicon/favicon.ico" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/adminator/adminator.css" />
     <link rel="stylesheet" href="assets/css/garanmin.css" />
+    <style>
+      /* --- PREMIUM LOGIN LAYOUT --- */
+      body, html {
+        margin: 0;
+        padding: 0;
+        height: 100vh;
+        width: 100vw;
+        overflow: hidden;
+        font-family: 'Inter', sans-serif;
+        background-color: #f8fafc;
+      }
+      
+      .login-container {
+        display: flex;
+        height: 100vh;
+        width: 100vw;
+      }
+
+      /* Sol Taraf: Görsel ve Animasyon */
+      .login-visual {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(270deg, #dbeafe, #bfdbfe, #93c5fd, #a5b4fc, #fecdd3, #fda4af);
+        background-size: 400% 400%;
+        animation: GaranminGradient 15s ease infinite;
+        position: relative;
+        overflow: hidden;
+      }
+
+      /* Cam efekti (Glassmorphism) kaplama */
+      .login-visual::before {
+        content: "";
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(8px);
+        z-index: 1;
+      }
+
+      .login-logo-wrapper {
+        z-index: 2;
+        width: 540px;
+        height: 540px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        filter: drop-shadow(0 20px 40px rgba(0,0,0,0.15));
+        transition: transform 0.3s ease;
+      }
+      
+      .login-logo-wrapper:hover {
+        transform: scale(1.02);
+      }
+
+      /* Sağ Taraf: Form */
+      .login-form-area {
+        width: 480px;
+        background-color: #ffffff;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 60px 48px;
+        box-shadow: -10px 0 30px rgba(0,0,0,0.03);
+        z-index: 3;
+      }
+
+      .login-header {
+        margin-bottom: 40px;
+      }
+
+      .login-eyebrow {
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        font-size: 12px;
+        font-weight: 600;
+        color: #94a3b8;
+        display: block;
+        margin-bottom: 12px;
+      }
+
+      .login-title {
+        font-size: 36px;
+        font-weight: 700;
+        letter-spacing: -0.04em;
+        margin: 0 0 8px;
+        color: #0f172a;
+      }
+
+      .login-subtitle {
+        font-size: 15px;
+        color: #64748b;
+        margin: 0;
+        line-height: 1.5;
+      }
+
+      .login-form {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+
+      .input-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .input-group label {
+        font-size: 13px;
+        font-weight: 500;
+        color: #334155;
+      }
+
+      .login-input {
+        padding: 14px 16px;
+        border: 1px solid #cbd5e1;
+        border-radius: 12px;
+        font-size: 15px;
+        color: #0f172a;
+        background: #f8fafc;
+        transition: all 0.2s ease;
+        outline: none;
+      }
+
+      .login-input:focus {
+        border-color: #3b82f6;
+        background: #ffffff;
+        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+      }
+
+      .login-btn {
+        margin-top: 10px;
+        padding: 14px;
+        border: none;
+        border-radius: 12px;
+        background: #0B57D0;
+        color: #ffffff;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        box-shadow: 0 4px 12px rgba(11, 87, 208, 0.25);
+      }
+
+      .login-btn:hover {
+        background: #053582;
+        transform: translateY(-1px);
+        box-shadow: 0 6px 16px rgba(11, 87, 208, 0.3);
+      }
+      
+      .login-btn:active {
+        transform: translateY(1px);
+        box-shadow: 0 2px 8px rgba(11, 87, 208, 0.2);
+      }
+
+      .login-btn:disabled {
+        background: #94a3b8;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+      }
+
+      .login-footer {
+        margin-top: 40px;
+        font-size: 12px;
+        color: #94a3b8;
+        line-height: 1.6;
+        border-top: 1px solid #f1f5f9;
+        padding-top: 20px;
+      }
+
+      #hata {
+        display: none;
+        margin-bottom: 20px;
+        padding: 12px 16px;
+        background: #fef2f2;
+        border-left: 4px solid #ef4444;
+        border-radius: 8px;
+        color: #991b1b;
+        font-size: 13.5px;
+        font-weight: 500;
+        animation: fadeIn 0.3s ease;
+      }
+
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-5px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+
+      /* Responsive Adjustments */
+      @media (max-width: 1024px) {
+        .login-visual { display: none; }
+        .login-container { justify-content: center; background: linear-gradient(270deg, #dbeafe, #bfdbfe, #93c5fd, #a5b4fc, #fecdd3, #fda4af); background-size: 400% 400%; animation: GaranminGradient 15s ease infinite; }
+        .login-form-area { width: 100%; max-width: 440px; border-radius: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); margin: 20px; }
+      }
+    </style>
   </head>
 
-  <body style="margin: 0; height: 100vh; width: 100vw; overflow: hidden; display: flex; align-items: center; justify-content: space-evenly; flex-wrap: wrap; background: linear-gradient(270deg, #dbeafe, #bfdbfe, #93c5fd, #a5b4fc, #fecdd3, #fda4af); background-size: 400% 400%; animation: GaranminGradient 15s ease infinite;">
-    
-    <!-- SOL: KOCAMAN BÜYÜK LOGO -->
-    <div id="logo-yuva" style="width: 540px; height: 540px; display: flex; justify-content: center; align-items: center; flex-shrink: 0; margin: 20px;"></div>
-    
-    <!-- SAĞ: Giriş Kutusu (Glassmorphism efekti) -->
-    <div class="g-giris-kutu" style="background: rgba(255, 255, 255, 0.75); backdrop-filter: blur(16px); border-radius: 20px; padding: 40px 32px; box-shadow: 0 8px 32px rgba(0,0,0,0.08); text-align: center; border: 1px solid rgba(255,255,255,0.5); width: 100%; max-width: 380px; flex-shrink: 0; margin: 20px;">
+  <body>
+    <div class="login-container">
       
-          <h1 style="font-family:'Inter Tight',sans-serif;font-size:32px;font-weight:700;letter-spacing:-.025em;margin:0 0 6px">
-            <span style="color:var(--primary)">Garan</span><span style="color:var(--danger)">min</span>
-          </h1>
-          <p style="color:var(--t-muted);font-size:14px;margin:0 0 32px">
-            Yönetim paneline giriş yapın
-          </p>
-
-          <div id="hata" style="display:none; text-align: left;"></div>
-
-          <form id="form" class="g-giris-form" autocomplete="off" style="text-align: left;">
-            <div>
-              <label for="kullanici">Kullanıcı adı</label>
-              <input id="kullanici" autocomplete="username" required autofocus style="background: rgba(255,255,255,0.8);" />
-            </div>
-            <div>
-              <label for="parola">Parola</label>
-              <input id="parola" type="password" autocomplete="current-password" required style="background: rgba(255,255,255,0.8);" />
-            </div>
-            <button class="btn btn--primary" id="btn" type="submit"
-                    style="justify-content:center;margin-top:12px;padding:12px 14px; font-weight: 600;">
-              <span id="btn-yazi">Giriş yap</span>
-            </button>
-          </form>
-
-          <div class="g-giris-not" style="margin-top: 24px;">
-            Oturum sekme kapanınca sona erer.<br>
-            Başarısız denemeler kademeli olarak yavaşlatılır.
-          </div>
+      <!-- Sol Taraf: Görsel ve Devasa Logo -->
+      <div class="login-visual">
+        <div class="login-logo-wrapper" id="logo-yuva">
+          <!-- Logo will be injected here via JS -->
         </div>
+      </div>
+
+      <!-- Sağ Taraf: Yönetim Paneli Formu -->
+      <div class="login-form-area">
+        
+        <div class="login-header">
+          <span class="login-eyebrow">Yönetim Paneli</span>
+          <h1 class="login-title">
+            <span style="color: #0B57D0;">Garan</span><span style="color: #EA4335;">min</span>
+          </h1>
+          <p class="login-subtitle">
+            GaranTea sistemine güvenli giriş yapın. Lütfen yetkili bilgilerinizi giriniz.
+          </p>
+        </div>
+
+        <div id="hata"></div>
+
+        <form id="form" class="login-form" autocomplete="off">
+          <div class="input-group">
+            <label for="kullanici">Kullanıcı adı</label>
+            <input id="kullanici" class="login-input" autocomplete="username" required autofocus placeholder="Kullanıcı adınızı girin" />
+          </div>
+          <div class="input-group">
+            <label for="parola">Parola</label>
+            <input id="parola" type="password" class="login-input" autocomplete="current-password" required placeholder="••••••••" />
+          </div>
+          <button class="login-btn" id="btn" type="submit">
+            <span id="btn-yazi">Giriş yap</span>
+          </button>
+        </form>
+
+        <div class="login-footer">
+          Güvenlik Bildirimi: Oturum sekme kapanınca otomatik olarak sona erer. Çoklu başarısız giriş denemeleri güvenlik sebebiyle kademeli olarak yavaşlatılır.
+        </div>
+        
+      </div>
+    </div>
 
     <script src="assets/js/garanmin-api.js"></script>
     <script>
+      // Logoyu sayfaya enjekte et (Animasyonlu SVG)
       document.getElementById('logo-yuva').innerHTML =
-        GARANMIN_LOGO.replace('class="g-logo"', 'class="g-logo g-giris-logo"');
+        GARANMIN_LOGO.replace('class="g-logo"', 'class="g-logo g-giris-logo" style="width:100%; height:100%;"');
 
       // Oturum zaten acıksa girişi tekrar sormanın anlamı yok.
       if (garanminToken()) location.href = 'garanmin-dashboard.html';
@@ -93,8 +296,7 @@
           garanminSetSession(s);
           location.href = 'garanmin-dashboard.html';
         } catch (err) {
-          hata.innerHTML = '<div class="g-uyari danger" style="margin-bottom:0">'
-            + gIkon('alert') + '<span>' + gEsc(err.message) + '</span></div>';
+          hata.innerHTML = '<span>' + gEsc(err.message) + '</span>';
           hata.style.display = 'block';
           document.getElementById('parola').value = '';
           btn.disabled = false;
