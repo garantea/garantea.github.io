@@ -1,21 +1,5 @@
 /**
  * GaranTea — Admin Panel v2 (garanmin.js)
- *
- * GÜVENLİK MODELİ:
- * ─────────────────
- * Q: "Supabase'e doğrudan nasıl bağlanabiliyoruz?"
- * A: Kullandığımız `publishable` (anon) anahtar GIZLI DEĞİL —
- *    mobil uygulamanın içinde de zaten var, herkese açık.
- *    Gizli olan ŞİFRE değil, anahtarın kendisi.
- *
- *    Asıl koruma katmanları:
- *    1) RLS (Row Level Security): anon key ile hiçbir tablo
- *       doğrudan okunamaz.
- *    2) SECURITY DEFINER fonksiyonlar: yalnızca geçerli
- *       admin_token_hash ile veri döner.
- *    3) Rate limiting: 5 dk içinde 10+ başarısız giriş → engelle.
- *    4) SHA-256: şifre hiçbir zaman düz metin iletilmez.
- *    5) sessionStorage: token hash yalnızca sekme açık olduğu sürece.
  */
 
 'use strict';
@@ -78,10 +62,10 @@ async function rpc(fn, extra = {}) {
 // ─── LOGIN ────────────────────────────────────────────────────────
 document.getElementById('login-form').addEventListener('submit', async e => {
   e.preventDefault();
-  const errEl = document.getElementById('login-error');
+  const errEl = document.getElementById('inp-err');
   const btn   = document.getElementById('login-btn');
-  const u     = document.getElementById('u-user').value.trim();
-  const p     = document.getElementById('u-pass').value.trim();
+  const u     = document.getElementById('inp-user').value.trim();
+  const p     = document.getElementById('inp-pass').value.trim();
 
   if (!u || !p) return;
   errEl.style.display = 'none';
@@ -90,7 +74,6 @@ document.getElementById('login-form').addEventListener('submit', async e => {
 
   try {
     const hash = await sha256(u + ':' + p);
-    // Token doğrulaması: admin_get_stats başarılı dönerse geçerli
     const { error } = await db.rpc('admin_get_stats', { p_token_hash: hash });
     if (error) throw new Error('Geçersiz kullanıcı adı veya şifre.');
 
@@ -125,11 +108,10 @@ document.getElementById('login-form').addEventListener('submit', async e => {
 // ─── ENTER DASHBOARD ─────────────────────────────────────────────
 function enterDashboard() {
   document.getElementById('login-screen').style.display = 'none';
-  document.getElementById('app').classList.add('visible');
+  document.getElementById('app').classList.add('show');
 
-  // Admin card in sidebar
-  document.getElementById('sidebar-admin-name').textContent = ADMIN_U || 'Admin';
-  document.getElementById('sidebar-login-time').textContent =
+  document.getElementById('sb-uname').textContent = ADMIN_U || 'Admin';
+  document.getElementById('sb-since').textContent =
     'Giriş: ' + new Date().toLocaleTimeString('tr-TR', { hour:'2-digit', minute:'2-digit' });
 
   startClock();
@@ -143,14 +125,14 @@ document.getElementById('logout-btn').addEventListener('click', () => {
   sessionStorage.removeItem('gt_adm_u');
   Object.keys(chartRefs).forEach(k => destroyChart(k));
   if (clockTick) clearInterval(clockTick);
-  document.getElementById('app').classList.remove('visible');
+  document.getElementById('app').classList.remove('show');
   document.getElementById('login-screen').style.display = 'flex';
-  document.getElementById('u-pass').value = '';
+  document.getElementById('inp-pass').value = '';
 });
 
 // ─── CLOCK ────────────────────────────────────────────────────────
 function startClock() {
-  const el = document.getElementById('topbar-time');
+  const el = document.getElementById('clock');
   const tick = () => {
     el.textContent = new Date().toLocaleTimeString('tr-TR',
       { hour:'2-digit', minute:'2-digit', second:'2-digit' });
@@ -159,27 +141,83 @@ function startClock() {
   clockTick = setInterval(tick, 1000);
 }
 
+// ─── THEME TOGGLE ─────────────────────────────────────────────────
+const htmlEl = document.documentElement;
+const themeBtn = document.getElementById('theme-btn');
+const iconMoon = document.getElementById('icon-moon');
+const iconSun = document.getElementById('icon-sun');
+
+function toggleTheme() {
+  const isDark = htmlEl.getAttribute('data-theme') === 'dark';
+  const newTheme = isDark ? 'light' : 'dark';
+  htmlEl.setAttribute('data-theme', newTheme);
+  localStorage.setItem('gt_theme', newTheme);
+  
+  if (newTheme === 'dark') {
+    iconMoon.style.display = 'none';
+    iconSun.style.display = 'block';
+  } else {
+    iconMoon.style.display = 'block';
+    iconSun.style.display = 'none';
+  }
+
+  // Update chart text color
+  Chart.defaults.color = newTheme === 'dark' ? '#94a3b8' : '#64748b';
+  Object.keys(chartRefs).forEach(k => { if(chartRefs[k]) chartRefs[k].update(); });
+}
+
+themeBtn.addEventListener('click', toggleTheme);
+
+// Restore theme
+const savedTheme = localStorage.getItem('gt_theme');
+if (savedTheme === 'dark') {
+  toggleTheme(); // it's light by default, this toggles to dark
+}
+
+// ─── SIDEBAR TOGGLE ───────────────────────────────────────────────
+const sidebar = document.getElementById('sidebar');
+const sbToggleBtn = document.getElementById('sb-toggle');
+
+sbToggleBtn.addEventListener('click', () => {
+  sidebar.classList.toggle('collapsed');
+  localStorage.setItem('gt_sb_collapsed', sidebar.classList.contains('collapsed'));
+});
+
+// Restore sidebar state
+if (localStorage.getItem('gt_sb_collapsed') === 'true') {
+  sidebar.classList.add('collapsed');
+}
+
 // ─── NAVIGATION ──────────────────────────────────────────────────
-document.querySelectorAll('.nav-item').forEach(item => {
-  item.addEventListener('click', () => {
-    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-    item.classList.add('active');
-    document.getElementById('topbar-title').textContent =
-      PANEL_TITLES[item.dataset.panel] || item.dataset.panel;
-    loadPanel(item.dataset.panel);
-  });
-  item.addEventListener('keydown', e => { if (e.key === 'Enter') item.click(); });
+function handleNav(panelId) {
+  // Update desktop nav
+  document.querySelectorAll('.nitem').forEach(n => n.classList.remove('on'));
+  const desktopItem = document.querySelector(`.nitem[data-panel="${panelId}"]`);
+  if (desktopItem) desktopItem.classList.add('on');
+
+  // Update mobile nav
+  document.querySelectorAll('.mnitem').forEach(n => n.classList.remove('on'));
+  const mobileItem = document.querySelector(`.mnitem[data-panel="${panelId}"]`);
+  if (mobileItem) mobileItem.classList.add('on');
+
+  document.getElementById('page-title').textContent = PANEL_TITLES[panelId] || panelId;
+  loadPanel(panelId);
+}
+
+document.querySelectorAll('.nitem, .mnitem').forEach(item => {
+  item.addEventListener('click', () => handleNav(item.dataset.panel));
+  item.addEventListener('keydown', e => { if (e.key === 'Enter') handleNav(item.dataset.panel); });
 });
 
 document.getElementById('refresh-btn').addEventListener('click', () => {
-  const active = document.querySelector('.nav-item.active');
+  const active = document.querySelector('.nitem.on');
   if (active) loadPanel(active.dataset.panel);
 });
 
 function showPanel(id) {
-  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('on'));
   const t = document.getElementById('panel-' + id);
-  if (t) t.classList.add('active');
+  if (t) t.classList.add('on');
 }
 
 async function loadPanel(name) {
@@ -198,7 +236,7 @@ async function loadPanel(name) {
 //  OVERVIEW
 // ═══════════════════════════════════════════════════════════════════
 async function loadOverview() {
-  const el = document.getElementById('overview-stats');
+  const el = document.getElementById('ov-stats');
   el.innerHTML = spin('grid-column:1/-1');
   try {
     const [stats, trend, cats] = await Promise.all([
@@ -208,17 +246,15 @@ async function loadOverview() {
     ]);
 
     el.innerHTML = [
-      statCard('Toplam Kullanıcı',     fmt(stats.total_users),                  'icon-blue',   icoUsers(),  `Son 7 günde +${fmt(stats.new_users_7d)} · Son 30 günde +${fmt(stats.new_users_30d)}`),
-      statCard('Toplam Cihaz',         fmt(stats.total_devices),                 'icon-amber',  icoDevice(), `${fmt(stats.users_with_devices)} kullanıcı cihaz ekledi`),
-      statCard('Toplam Kredi',         fmt(Math.round(stats.total_credits_sum)), 'icon-green',  icoCredit(), `Ort. ${fmt(Math.round(stats.avg_credits_per_user))} / kullanıcı`),
-      statCard('Destek Talebi',        fmt(stats.support_tickets_total),         'icon-red',    icoSupport(),'Son 7 günde ' + fmt(stats.support_tickets_7d) + ' yeni'),
-      statCard('Cihazı Olan Kullanıcı',fmt(stats.users_with_devices),            'icon-purple', icoDevice(), fmt(stats.users_no_device) + ' kullanıcının henüz cihazı yok'),
-      statCard('Kredisi Olan Kullanıcı',fmt(stats.users_with_credits),           'icon-green',  icoCredit(), 'Sıfırın üzerinde bakiye'),
+      statCard('Toplam Kullanıcı',     fmt(stats.total_users),                  'si-b', icoUsers(),  `Son 7 günde +${fmt(stats.new_users_7d)}`),
+      statCard('Toplam Cihaz',         fmt(stats.total_devices),                'si-a', icoDevice(), `${fmt(stats.users_with_devices)} kullanıcı cihaz ekledi`),
+      statCard('Toplam Kredi',         fmt(Math.round(stats.total_credits_sum)),'si-g', icoCredit(), `Ort. ${fmt(Math.round(stats.avg_credits_per_user))} / kullanıcı`),
+      statCard('Destek Talebi',        fmt(stats.support_tickets_total),        'si-r', icoSupport(),'Son 7 günde ' + fmt(stats.support_tickets_7d) + ' yeni'),
     ].join('');
 
     // Trend chart
     destroyChart('ovTrend');
-    const tc = document.getElementById('chart-signup-trend').getContext('2d');
+    const tc = document.getElementById('ch-trend').getContext('2d');
     chartRefs.ovTrend = new Chart(tc, {
       type: 'line',
       data: {
@@ -226,9 +262,8 @@ async function loadOverview() {
         datasets: [{
           label: 'Yeni Kullanıcı',
           data: (trend||[]).map(r => r.count),
-          borderColor: '#2563eb', backgroundColor: 'rgba(37,99,235,.07)',
-          fill: true, tension: .42,
-          pointRadius: 3, pointBackgroundColor: '#2563eb',
+          borderColor: '#2563eb', backgroundColor: 'rgba(37,99,235,.1)',
+          fill: true, tension: .4, pointRadius: 2,
         }]
       },
       options: lineOpts('Yeni Kullanıcı'),
@@ -238,36 +273,34 @@ async function loadOverview() {
     destroyChart('ovCats');
     const cd = cats || [];
     chartRefs.ovCats = new Chart(
-      document.getElementById('chart-categories-overview').getContext('2d'), {
+      document.getElementById('ch-cats').getContext('2d'), {
       type: 'doughnut',
       data: {
         labels: cd.map(r => catLabel(r.category)),
         datasets: [{ data: cd.map(r => r.count), backgroundColor: CHART_COLORS, borderWidth: 0, hoverOffset: 4 }]
       },
-      options: { responsive:true, maintainAspectRatio:false, cutout:'70%',
-        plugins: { legend: { position:'right', labels:{ boxWidth:10, font:{size:11} } } } }
+      options: { responsive:true, maintainAspectRatio:false, cutout:'70%', plugins: { legend: { position:'right', labels:{ boxWidth:10, font:{size:11} } } } }
     });
 
   } catch(err) {
-    el.innerHTML = `<div class="error-state" style="grid-column:1/-1">Hata: ${err.message}</div>`;
+    el.innerHTML = `<div class="ebox" style="grid-column:1/-1">Hata: ${err.message}</div>`;
   }
 }
 
 function statCard(label, value, iconCls, iconSvg, sub) {
-  return `<div class="stat-card">
-    <div class="stat-icon ${iconCls}">${iconSvg}</div>
-    <div class="stat-label">${label}</div>
-    <div class="stat-value">${value}</div>
-    <div class="stat-sub">${sub}</div>
+  return `<div class="scard">
+    <div class="sico ${iconCls}">${iconSvg}</div>
+    <div class="slbl">${label}</div>
+    <div class="sval">${value}</div>
+    <div class="ssub">${sub}</div>
   </div>`;
 }
 
 // ═══════════════════════════════════════════════════════════════════
 //  USERS
 // ═══════════════════════════════════════════════════════════════════
-// Search
 let searchTimer = null;
-document.getElementById('users-search').addEventListener('input', e => {
+document.getElementById('usearch').addEventListener('input', e => {
   clearTimeout(searchTimer);
   searchTimer = setTimeout(() => {
     searchQuery = e.target.value.trim();
@@ -275,17 +308,17 @@ document.getElementById('users-search').addEventListener('input', e => {
   }, 400);
 });
 
-document.getElementById('users-prev').addEventListener('click', () => {
+document.getElementById('uprev').addEventListener('click', () => {
   if (usersPage >= PAGE_SIZE) loadUsers(usersPage - PAGE_SIZE);
 });
-document.getElementById('users-next').addEventListener('click', () => {
+document.getElementById('unext').addEventListener('click', () => {
   loadUsers(usersPage + PAGE_SIZE);
 });
 
 async function loadUsers(offset = 0) {
   usersPage = offset;
-  const tbody = document.getElementById('users-tbody');
-  const label = document.getElementById('users-count-label');
+  const tbody = document.getElementById('utbody');
+  const label = document.getElementById('ulabel');
   tbody.innerHTML = `<tr><td colspan="7">${spinHtml()}</td></tr>`;
 
   try {
@@ -303,51 +336,50 @@ async function loadUsers(offset = 0) {
       <tr data-uid="${u.id}" data-email="${esc(u.email || '')}">
         <td>
           <div style="font-weight:600;font-size:.82rem">${esc(u.email || '—')}</div>
-          <div style="font-size:.72rem;color:var(--muted);font-variant-numeric:tabular-nums">${u.id.slice(0,8)}…</div>
+          <div style="font-size:.7rem;color:var(--muted);font-variant-numeric:tabular-nums">${u.id.slice(0,8)}…</div>
         </td>
         <td>${fmtDate(u.created_at)}</td>
         <td>${fmtDatetime(u.last_sign_in_at)}</td>
-        <td><span class="badge ${u.credits > 0 ? 'badge-blue' : 'badge-muted'}">${fmt(u.credits)}</span></td>
-        <td><span class="badge ${u.device_count > 0 ? 'badge-green' : 'badge-muted'}">${fmt(u.device_count)}</span></td>
-        <td><span class="badge ${u.ticket_count > 0 ? 'badge-amber' : 'badge-muted'}">${fmt(u.ticket_count)}</span></td>
-        <td><span class="row-view-btn">Detay →</span></td>
+        <td><span class="badge ${u.credits > 0 ? 'bd-b' : 'bd-mu'}">${fmt(u.credits)}</span></td>
+        <td><span class="badge ${u.device_count > 0 ? 'bd-g' : 'bd-mu'}">${fmt(u.device_count)}</span></td>
+        <td><span class="badge ${u.ticket_count > 0 ? 'bd-a' : 'bd-mu'}">${fmt(u.ticket_count)}</span></td>
+        <td><span class="peek">Detay →</span></td>
       </tr>
     `).join('');
 
-    // Row click → drawer
     tbody.querySelectorAll('tr[data-uid]').forEach(tr => {
       tr.addEventListener('click', () => openDrawer(tr.dataset.uid, tr.dataset.email));
     });
 
     label.textContent = `${offset + 1}–${offset + rows.length} arası gösteriliyor`;
-    document.getElementById('users-prev').disabled = offset === 0;
-    document.getElementById('users-next').disabled = rows.length < PAGE_SIZE;
+    document.getElementById('uprev').disabled = offset === 0;
+    document.getElementById('unext').disabled = rows.length < PAGE_SIZE;
 
   } catch(err) {
-    tbody.innerHTML = `<tr><td colspan="7"><div class="error-state">Hata: ${err.message}</div></td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="7"><div class="ebox">Hata: ${err.message}</div></td></tr>`;
   }
 }
 
 // ═══════════════════════════════════════════════════════════════════
 //  USER DETAIL DRAWER
 // ═══════════════════════════════════════════════════════════════════
-const overlay = document.getElementById('drawer-overlay');
-const drawer  = document.getElementById('user-drawer');
+const overlay = document.getElementById('overlay');
+const drawer  = document.getElementById('drawer');
 
 function openDrawer(uid, email) {
   document.getElementById('drawer-title').textContent = email || 'Kullanıcı Detayı';
   document.getElementById('drawer-body').innerHTML = spinHtml();
-  overlay.classList.add('open');
-  drawer.classList.add('open');
+  overlay.classList.add('on');
+  drawer.classList.add('on');
   fetchUserDetail(uid);
 }
 
 function closeDrawer() {
-  overlay.classList.remove('open');
-  drawer.classList.remove('open');
+  overlay.classList.remove('on');
+  drawer.classList.remove('on');
 }
 
-document.getElementById('drawer-close').addEventListener('click', closeDrawer);
+document.getElementById('drawer-x').addEventListener('click', closeDrawer);
 overlay.addEventListener('click', closeDrawer);
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDrawer(); });
 
@@ -360,86 +392,82 @@ async function fetchUserDetail(uid) {
     const tickets = detail.tickets || [];
 
     body.innerHTML = `
-      <!-- Kimlik -->
-      <div class="detail-section">
-        <div class="detail-section-title">Kimlik Bilgileri</div>
+      <div class="dsec">
+        <div class="dstitle">Kimlik Bilgileri</div>
         ${drow('E-posta',    esc(u.email || '—'))}
         ${drow('Kullanıcı ID', `<code style="font-size:.72rem">${u.id}</code>`)}
         ${drow('Kayıt Tarihi', fmtDatetime(u.created_at))}
         ${drow('Son Giriş',   fmtDatetime(u.last_sign_in_at))}
       </div>
 
-      <!-- Kredi -->
-      <div class="detail-section">
-        <div class="detail-section-title">Kredi Bilgileri</div>
-        ${drow('Mevcut Kredi', `<span class="badge badge-blue">${fmt(u.credits)}</span>`)}
+      <div class="dsec">
+        <div class="dstitle">Kredi Bilgileri</div>
+        ${drow('Mevcut Kredi', `<span class="badge bd-b">${fmt(u.credits)}</span>`)}
         ${drow('Reklam İzleme', fmt(u.ad_watch_count))}
         ${drow('Son Kazanma',  fmtDate(u.last_credit_earn_date))}
         ${drow('Destek Talebi', fmt(u.ticket_count))}
       </div>
 
-      <!-- Cihazlar -->
-      <div class="detail-section">
-        <div class="detail-section-title">Cihazlar (${devs.length})</div>
+      <div class="dsec">
+        <div class="dstitle">Cihazlar (${devs.length})</div>
         ${devs.length === 0
-          ? '<p style="color:var(--muted);font-size:.82rem;text-align:center;padding:1rem 0">Cihaz yok</p>'
+          ? '<p style="color:var(--muted);font-size:.8rem;text-align:center;padding:1rem 0">Cihaz yok</p>'
           : devs.map(d => `
-            <div class="device-card">
-              <div class="device-card-header">
+            <div class="dvc">
+              <div class="dvc-h">
                 <div>
-                  <div class="device-card-name">${esc(d.name || '—')}</div>
-                  <div class="device-card-brand">${esc(d.brand || '')} · <span class="badge badge-muted" style="font-size:.65rem">${catLabel(d.category)}</span></div>
+                  <div class="dvc-n">${esc(d.name || '—')}</div>
+                  <div class="dvc-b">${esc(d.brand || '')} · <span class="badge bd-mu" style="font-size:.65rem;padding:.1rem .4rem">${catLabel(d.category)}</span></div>
                 </div>
                 ${warrantyBadge(d.warranty_end)}
               </div>
-              ${d.purchase_date ? `<div class="device-card-row"><span>Satın Alma</span><span>${fmtDate(d.purchase_date)}</span></div>` : ''}
-              ${d.warranty_end  ? `<div class="device-card-row"><span>Garanti Bitiş</span><span>${fmtDate(d.warranty_end)}</span></div>` : ''}
-              ${d.price         ? `<div class="device-card-row"><span>Fiyat</span><span>${fmt(d.price)} ${d.currency || ''}</span></div>` : ''}
-              ${d.seller_name   ? `<div class="device-card-row"><span>Satıcı</span><span>${esc(d.seller_name)}</span></div>` : ''}
-              ${d.serial_number ? `<div class="device-card-row"><span>Seri No</span><span>${esc(d.serial_number)}</span></div>` : ''}
-              ${d.room          ? `<div class="device-card-row"><span>Oda</span><span>${esc(d.room)}</span></div>` : ''}
+              ${d.purchase_date ? `<div class="dvc-r"><span>Satın Alma</span><span>${fmtDate(d.purchase_date)}</span></div>` : ''}
+              ${d.warranty_end  ? `<div class="dvc-r"><span>Garanti Bitiş</span><span>${fmtDate(d.warranty_end)}</span></div>` : ''}
+              ${d.price         ? `<div class="dvc-r"><span>Fiyat</span><span>${fmt(d.price)} ${d.currency || ''}</span></div>` : ''}
+              ${d.seller_name   ? `<div class="dvc-r"><span>Satıcı</span><span>${esc(d.seller_name)}</span></div>` : ''}
+              ${d.serial_number ? `<div class="dvc-r"><span>Seri No</span><span>${esc(d.serial_number)}</span></div>` : ''}
+              ${d.room          ? `<div class="dvc-r"><span>Oda</span><span>${esc(d.room)}</span></div>` : ''}
             </div>
           `).join('')
         }
       </div>
 
-      <!-- Destek Talepleri -->
-      <div class="detail-section">
-        <div class="detail-section-title">Destek Talepleri (${tickets.length})</div>
+      <div class="dsec">
+        <div class="dstitle">Destek Talepleri (${tickets.length})</div>
         ${tickets.length === 0
-          ? '<p style="color:var(--muted);font-size:.82rem;text-align:center;padding:1rem 0">Talep yok</p>'
+          ? '<p style="color:var(--muted);font-size:.8rem;text-align:center;padding:1rem 0">Talep yok</p>'
           : tickets.map(t => `
-            <div class="ticket-item">
-              <div class="ticket-kind">${esc(t.kind || '—')}</div>
-              <div class="ticket-date">${fmtDatetime(t.created_at)}</div>
+            <div class="tkt">
+              <div class="tkt-k">${esc(t.kind || '—')}</div>
+              <div class="tkt-d">${fmtDatetime(t.created_at)}</div>
             </div>
           `).join('')
         }
       </div>
     `;
   } catch(err) {
-    body.innerHTML = `<div class="error-state">Hata: ${err.message}</div>`;
+    body.innerHTML = `<div class="ebox">Hata: ${err.message}</div>`;
   }
 }
 
 function warrantyBadge(endIso) {
   if (!endIso) return '';
   const days = Math.round((new Date(endIso) - new Date()) / 86400000);
-  if (days < 0)   return '<span class="badge badge-red">Süresi Dolmuş</span>';
-  if (days < 30)  return `<span class="badge badge-amber">${days}g kaldı</span>`;
-  if (days < 90)  return `<span class="badge badge-blue">${days}g kaldı</span>`;
-  return `<span class="badge badge-green">${days}g kaldı</span>`;
+  if (days < 0)   return '<span class="badge bd-r">Süresi Dolmuş</span>';
+  if (days < 30)  return `<span class="badge bd-a">${days}g kaldı</span>`;
+  if (days < 90)  return `<span class="badge bd-b">${days}g kaldı</span>`;
+  return `<span class="badge bd-g">${days}g kaldı</span>`;
 }
 
 function drow(k, v) {
-  return `<div class="detail-row"><span class="dk">${k}</span><span class="dv">${v}</span></div>`;
+  return `<div class="dr"><span class="dk">${k}</span><span class="dv">${v}</span></div>`;
 }
 
 // ═══════════════════════════════════════════════════════════════════
 //  CREDITS
 // ═══════════════════════════════════════════════════════════════════
 async function loadCredits() {
-  const sumEl = document.getElementById('credit-summary-body');
+  const sumEl = document.getElementById('cr-sum');
   sumEl.innerHTML = spinHtml();
   try {
     const [stats, dist] = await Promise.all([
@@ -452,12 +480,12 @@ async function loadCredits() {
       ['Kullanıcı Başına Ortalama',   fmt(Math.round(stats.avg_credits_per_user || 0))],
       ['Kredisi Olan Kullanıcı',      fmt(stats.users_with_credits)],
       ['Toplam Kullanıcı',            fmt(stats.total_users)],
-    ].map(([k,v]) => `<div class="summary-row"><span class="sk">${k}</span><span class="sv">${v}</span></div>`).join('')}</div>`;
+    ].map(([k,v]) => `<div class="sumr"><span class="sumk">${k}</span><span class="sumv">${v}</span></div>`).join('')}</div>`;
 
     destroyChart('crDist');
     const distData = dist || [];
     chartRefs.crDist = new Chart(
-      document.getElementById('chart-credit-dist').getContext('2d'), {
+      document.getElementById('ch-crdist').getContext('2d'), {
       type: 'bar',
       data: {
         labels: distData.map(r => r.bucket + ' Kredi'),
@@ -471,14 +499,11 @@ async function loadCredits() {
       options: {
         responsive:true, maintainAspectRatio:false, indexAxis:'y',
         plugins: { legend: { display:false } },
-        scales: {
-          x: { grid:{ color:'#f1f5f9' } },
-          y: { grid:{ display:false } }
-        }
+        scales: { x: { grid:{ color:getGridColor() } }, y: { grid:{ display:false } } }
       }
     });
   } catch(err) {
-    sumEl.innerHTML = `<div class="error-state">Hata: ${err.message}</div>`;
+    sumEl.innerHTML = `<div class="ebox">Hata: ${err.message}</div>`;
   }
 }
 
@@ -491,19 +516,18 @@ async function loadDevices() {
 
     destroyChart('devPie');
     chartRefs.devPie = new Chart(
-      document.getElementById('chart-devices-pie').getContext('2d'), {
+      document.getElementById('ch-dpie').getContext('2d'), {
       type: 'doughnut',
       data: {
         labels: cats.map(r => catLabel(r.category)),
         datasets: [{ data: cats.map(r => r.count), backgroundColor: CHART_COLORS, borderWidth:0, hoverOffset:6 }]
       },
-      options: { responsive:true, maintainAspectRatio:false, cutout:'65%',
-        plugins: { legend: { position:'bottom', labels:{ boxWidth:10, font:{size:11}, padding:12 } } } }
+      options: { responsive:true, maintainAspectRatio:false, cutout:'65%', plugins: { legend: { position:'bottom', labels:{ boxWidth:10, font:{size:11}, padding:12 } } } }
     });
 
     destroyChart('devBar');
     chartRefs.devBar = new Chart(
-      document.getElementById('chart-devices-bar').getContext('2d'), {
+      document.getElementById('ch-dbar').getContext('2d'), {
       type: 'bar',
       data: {
         labels: cats.map(r => catLabel(r.category)),
@@ -517,7 +541,7 @@ async function loadDevices() {
       options: {
         responsive:true, maintainAspectRatio:false,
         plugins: { legend: { display:false } },
-        scales: { y: { grid: { color:'#f1f5f9' }, beginAtZero:true }, x: { grid: { display:false } } }
+        scales: { y: { grid: { color:getGridColor() }, beginAtZero:true }, x: { grid: { display:false } } }
       }
     });
   } catch(err) { console.error(err); }
@@ -531,16 +555,15 @@ async function loadActivity() {
     const trend = await rpc('admin_get_signup_trend') || [];
     destroyChart('actTrend');
     chartRefs.actTrend = new Chart(
-      document.getElementById('chart-activity-trend').getContext('2d'), {
+      document.getElementById('ch-act').getContext('2d'), {
       type: 'line',
       data: {
         labels: trend.map(r => r.date),
         datasets: [{
           label: 'Yeni Kayıt',
           data: trend.map(r => r.count),
-          borderColor: '#2563eb', backgroundColor: 'rgba(37,99,235,.06)',
-          fill: true, tension: .42,
-          pointRadius: 4, pointBackgroundColor: '#2563eb',
+          borderColor: '#2563eb', backgroundColor: 'rgba(37,99,235,.1)',
+          fill: true, tension: .4, pointRadius: 3,
         }]
       },
       options: lineOpts('Yeni Kayıt'),
@@ -552,16 +575,16 @@ async function loadActivity() {
 //  SUPPORT
 // ═══════════════════════════════════════════════════════════════════
 async function loadSupport() {
-  const el = document.getElementById('support-stats');
+  const el = document.getElementById('sup-stats');
   el.innerHTML = spin('grid-column:1/-1');
   try {
     const stats = await rpc('admin_get_stats');
     el.innerHTML = [
-      statCard('Toplam Destek Talebi', fmt(stats.support_tickets_total), 'icon-blue',  icoSupport(), 'Tüm zamanlar'),
-      statCard('Son 7 Gün',            fmt(stats.support_tickets_7d),    'icon-amber', icoSupport(), 'Bu haftaki yeni talepler'),
+      statCard('Toplam Destek Talebi', fmt(stats.support_tickets_total), 'si-b', icoSupport(), 'Tüm zamanlar'),
+      statCard('Son 7 Gün',            fmt(stats.support_tickets_7d),    'si-a', icoSupport(), 'Bu haftaki yeni talepler'),
     ].join('');
   } catch(err) {
-    el.innerHTML = `<div class="error-state" style="grid-column:1/-1">Hata: ${err.message}</div>`;
+    el.innerHTML = `<div class="ebox" style="grid-column:1/-1">Hata: ${err.message}</div>`;
   }
 }
 
@@ -569,14 +592,17 @@ async function loadSupport() {
 Chart.defaults.font.family = "'Inter', sans-serif";
 Chart.defaults.color = '#64748b';
 
+function getGridColor() {
+  return htmlEl.getAttribute('data-theme') === 'dark' ? '#334155' : '#e2e8f0';
+}
+
 function lineOpts(label) {
   return {
     responsive: true, maintainAspectRatio: false,
-    plugins: { legend: { display:false },
-      tooltip: { callbacks: { label: ctx => ` ${ctx.parsed.y} ${label}` } } },
+    plugins: { legend: { display:false }, tooltip: { callbacks: { label: ctx => ` ${ctx.parsed.y} ${label}` } } },
     scales: {
       x: { grid: { display:false }, ticks: { font:{size:10}, maxRotation:0, maxTicksLimit:10 } },
-      y: { grid: { color:'#f1f5f9' }, beginAtZero:true, ticks: { font:{size:11} } }
+      y: { grid: { color:getGridColor() }, beginAtZero:true, ticks: { font:{size:11} } }
     }
   };
 }
@@ -593,15 +619,9 @@ function catLabel(cat) {
 }
 
 // ─── UTILS ───────────────────────────────────────────────────────
-function esc(s) {
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-function spin(style='') {
-  return `<div class="loading-state"${style ? ` style="${style}"` : ''}><div class="spinner"></div><span>Yükleniyor…</span></div>`;
-}
-function spinHtml() {
-  return `<div class="loading-state"><div class="spinner"></div><span>Yükleniyor…</span></div>`;
-}
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function spin(style='') { return `<div class="ld"${style ? ` style="${style}"` : ''}><div class="sp"></div><span>Yükleniyor…</span></div>`; }
+function spinHtml() { return `<div class="ld"><div class="sp"></div><span>Yükleniyor…</span></div>`; }
 
 // ─── SVG ICONS ───────────────────────────────────────────────────
 const iSvg = (path) => `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">${path}</svg>`;
