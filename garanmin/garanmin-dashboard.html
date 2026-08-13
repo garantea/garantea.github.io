@@ -1,0 +1,263 @@
+<!doctype html>
+<!--
+  GARANMIN — Genel Bakis.
+
+  Sayfadaki HER SAYI ve HER GRAFIK sunucudan geliyor; sabit ("mock") veri YOK. Sablonun
+  ornek sayfalarinda gomulu rakamlar vardi ve bunlar birakilsaydi bos bir veritabaninda
+  bile dolu bir panel gorunur, sorun oldugunda kimse fark etmezdi.
+-->
+<html lang="tr" class="layout-menu-fixed layout-compact" data-assets-path="assets/" data-template="vertical-menu-template-free">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Garanmin — Genel Bakis</title>
+    <link rel="icon" type="image/x-icon" href="assets/img/favicon/favicon.ico" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="assets/vendor/fonts/iconify-icons.css" />
+    <link rel="stylesheet" href="assets/vendor/css/core.css" />
+    <link rel="stylesheet" href="assets/css/demo.css" />
+    <link rel="stylesheet" href="assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css" />
+    <link rel="stylesheet" href="assets/vendor/libs/apex-charts/apex-charts.css" />
+    <script src="assets/vendor/js/helpers.js"></script>
+    <script src="assets/js/config.js"></script>
+  </head>
+
+  <body>
+    <div class="layout-wrapper layout-content-navbar">
+      <div class="layout-container">
+        <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
+          <div id="garanmin-menu"></div>
+        </aside>
+
+        <div class="layout-page">
+          <nav class="layout-navbar container-xxl navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme" id="layout-navbar">
+            <div id="garanmin-navbar" class="d-flex w-100 align-items-center"></div>
+          </nav>
+
+          <div class="content-wrapper">
+            <div class="container-xxl flex-grow-1 container-p-y">
+              <h4 class="fw-bold py-3 mb-4">Genel Bakis</h4>
+              <div id="garanmin-error"></div>
+
+              <!-- ÖZET KARTLARI -->
+              <div class="row g-4 mb-4" id="stat-cards"></div>
+
+              <div class="row g-4 mb-4">
+                <div class="col-lg-8">
+                  <div class="card h-100">
+                    <div class="card-header d-flex justify-content-between">
+                      <h5 class="card-title mb-0">Son 30 gunde kayit olan kullanicilar</h5>
+                    </div>
+                    <div class="card-body"><div id="chart-signup"></div></div>
+                  </div>
+                </div>
+                <div class="col-lg-4">
+                  <div class="card h-100">
+                    <div class="card-header"><h5 class="card-title mb-0">Garanti durumu</h5></div>
+                    <div class="card-body"><div id="chart-warranty"></div></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row g-4 mb-4">
+                <div class="col-lg-6">
+                  <div class="card h-100">
+                    <div class="card-header"><h5 class="card-title mb-0">Cihaz kategorileri</h5></div>
+                    <div class="card-body"><div id="chart-category"></div></div>
+                  </div>
+                </div>
+                <div class="col-lg-6">
+                  <div class="card h-100">
+                    <div class="card-header"><h5 class="card-title mb-0">En cok eklenen markalar</h5></div>
+                    <div class="card-body"><div id="chart-brand"></div></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="card-header"><h5 class="card-title mb-0">Son eklenen cihazlar</h5></div>
+                <div class="table-responsive text-nowrap">
+                  <table class="table">
+                    <thead>
+                      <tr>
+                        <th>Cihaz</th><th>Marka</th><th>Kategori</th>
+                        <th>Alim</th><th>Garanti bitisi</th><th>Kullanici</th>
+                      </tr>
+                    </thead>
+                    <tbody id="recent-body">
+                      <tr><td colspan="6" class="text-center text-muted py-4">Yukleniyor...</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <div class="content-backdrop fade"></div>
+          </div>
+        </div>
+      </div>
+      <div class="layout-overlay layout-menu-toggle"></div>
+    </div>
+
+    <script src="assets/vendor/libs/jquery/jquery.js"></script>
+    <script src="assets/vendor/libs/popper/popper.js"></script>
+    <script src="assets/vendor/js/bootstrap.js"></script>
+    <script src="assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js"></script>
+    <script src="assets/vendor/js/menu.js"></script>
+    <script src="assets/vendor/libs/apex-charts/apexcharts.js"></script>
+    <script src="assets/js/main.js"></script>
+    <script src="assets/js/garanmin-api.js"></script>
+
+    <script>
+      if (garanminGuardPage()) {
+        garanminShell('garanmin-dashboard.html');
+        yukle();
+      }
+
+      /* Özet kartlarının tanımı — etiket, alan adı, simge, renk. Tek yerde durması,
+         kart eklemeyi tek satırlık bir iş yapıyor. */
+      const KARTLAR = [
+        { alan: 'total_users',           etiket: 'Toplam kullanici',   ikon: 'bx-user',        renk: 'primary' },
+        { alan: 'dau',                   etiket: 'Gunluk aktif',       ikon: 'bx-run',         renk: 'success' },
+        { alan: 'mau',                   etiket: 'Aylik aktif',        ikon: 'bx-calendar',    renk: 'info' },
+        { alan: 'total_devices',         etiket: 'Toplam cihaz',       ikon: 'bx-devices',     renk: 'warning' },
+        { alan: 'users_with_devices',    etiket: 'Cihaz ekleyen',      ikon: 'bx-user-check',  renk: 'primary' },
+        { alan: 'new_users_7d',          etiket: 'Yeni (7 gun)',       ikon: 'bx-user-plus',   renk: 'success' },
+        { alan: 'total_credits_sum',     etiket: 'Toplam kredi',       ikon: 'bx-star',        renk: 'warning' },
+        { alan: 'support_tickets_total', etiket: 'Destek talebi',      ikon: 'bx-support',     renk: 'danger' },
+      ];
+
+      function kartCiz(stats) {
+        document.getElementById('stat-cards').innerHTML = KARTLAR.map(k => `
+          <div class="col-sm-6 col-xl-3">
+            <div class="card h-100">
+              <div class="card-body">
+                <div class="d-flex align-items-center mb-2">
+                  <div class="avatar flex-shrink-0 me-3">
+                    <span class="avatar-initial rounded bg-label-${k.renk}"><i class="bx ${k.ikon}"></i></span>
+                  </div>
+                  <span class="text-muted small">${k.etiket}</span>
+                </div>
+                <h4 class="mb-0">${gNum(stats[k.alan])}</h4>
+              </div>
+            </div>
+          </div>`).join('');
+      }
+
+      /*
+        GRAFİKLER VERİ YOKSA ÇİZİLMİYOR, "veri yok" YAZIYOR.
+
+        ApexCharts boş bir dizide eksenleri ve boş bir ızgarayı yine de çiziyor; bu,
+        "veri gelmedi" ile "veri sıfır" arasındaki farkı görünmez kılıyordu — tam da bu
+        panelde düzeltilen hatanın belirtisi buydu.
+      */
+      function bosMu(el, veri) {
+        if (veri && veri.length) return false;
+        document.getElementById(el).innerHTML =
+          '<div class="text-center text-muted py-5">Gosterilecek veri yok</div>';
+        return true;
+      }
+
+      const RENKLER = ['#696cff', '#71dd37', '#ffab00', '#ff3e1d', '#03c3ec', '#8592a3'];
+
+      function cizSignup(veri) {
+        if (bosMu('chart-signup', veri)) return;
+        new ApexCharts(document.getElementById('chart-signup'), {
+          chart: { type: 'area', height: 300, toolbar: { show: false } },
+          series: [{ name: 'Kayit', data: veri.map(d => d.count) }],
+          xaxis: { categories: veri.map(d => gDate(d.date)) },
+          dataLabels: { enabled: false },
+          stroke: { curve: 'smooth', width: 2 },
+          colors: [RENKLER[0]],
+        }).render();
+      }
+
+      function cizWarranty(veri) {
+        if (bosMu('chart-warranty', veri)) return;
+        const ad = { active: 'Aktif', expiring_soon: 'Yakinda bitiyor', expired: 'Suresi dolmus' };
+        // Renkler uygulamadaki rozetlerle AYNI anlamda: mavi aktif, turuncu yakın, kırmızı dolmuş.
+        const renk = { active: '#696cff', expiring_soon: '#ffab00', expired: '#ff3e1d' };
+        new ApexCharts(document.getElementById('chart-warranty'), {
+          chart: { type: 'donut', height: 300 },
+          series: veri.map(d => Number(d.count)),
+          labels: veri.map(d => ad[d.status] || d.status),
+          colors: veri.map(d => renk[d.status] || RENKLER[5]),
+          legend: { position: 'bottom' },
+        }).render();
+      }
+
+      function cizCategory(veri) {
+        if (bosMu('chart-category', veri)) return;
+        new ApexCharts(document.getElementById('chart-category'), {
+          chart: { type: 'bar', height: 300, toolbar: { show: false } },
+          series: [{ name: 'Cihaz', data: veri.map(d => Number(d.count)) }],
+          xaxis: { categories: veri.map(d => gKategori(d.category)) },
+          plotOptions: { bar: { borderRadius: 6, distributed: true } },
+          legend: { show: false },
+          colors: RENKLER,
+          dataLabels: { enabled: false },
+        }).render();
+      }
+
+      function cizBrand(veri) {
+        if (bosMu('chart-brand', veri)) return;
+        new ApexCharts(document.getElementById('chart-brand'), {
+          chart: { type: 'bar', height: 300, toolbar: { show: false } },
+          series: [{ name: 'Cihaz', data: veri.map(d => Number(d.count)) }],
+          xaxis: { categories: veri.map(d => d.brand) },
+          plotOptions: { bar: { horizontal: true, borderRadius: 6 } },
+          colors: [RENKLER[2]],
+          dataLabels: { enabled: false },
+        }).render();
+      }
+
+      function recentCiz(veri) {
+        const tb = document.getElementById('recent-body');
+        if (!veri || !veri.length) {
+          tb.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-4">Kayit yok</td></tr>';
+          return;
+        }
+        // Kullanıcı verisi `gEsc` ile kaçırılıyor (gerekçe: garanmin-api.js).
+        tb.innerHTML = veri.map(d => `
+          <tr>
+            <td><strong>${gEsc(d.name)}</strong></td>
+            <td>${gEsc(d.brand)}</td>
+            <td><span class="badge bg-label-primary">${gEsc(gKategori(d.category))}</span></td>
+            <td>${gDate(d.purchase_date)}</td>
+            <td>${gDate(d.warranty_end)}</td>
+            <td class="text-muted small">${gEsc(d.email || '-')}</td>
+          </tr>`).join('');
+      }
+
+      async function yukle() {
+        try {
+          /*
+            HEPSİ PARALEL. Sıraya dizilseydi sekiz ayrı gidiş-dönüş üst üste binerdi;
+            `Promise.all` ile toplam süre en yavaş çağrı kadar oluyor.
+          */
+          const [stats, signup, warranty, category, brand, recent] = await Promise.all([
+            garanminData('garanmin_stats'),
+            garanminData('garanmin_signup_trend'),
+            garanminData('garanmin_warranty_stats'),
+            garanminData('garanmin_device_categories'),
+            garanminData('garanmin_device_brands'),
+            garanminData('garanmin_recent_devices', { p_limit: 15 }),
+          ]);
+
+          kartCiz(stats);
+          cizSignup(signup);
+          cizWarranty(warranty);
+          cizCategory(category);
+          cizBrand(brand);
+          recentCiz(recent);
+          garanminStampUpdated();
+        } catch (e) {
+          gError(e.message);
+        }
+      }
+    </script>
+  </body>
+</html>

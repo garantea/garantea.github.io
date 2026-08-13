@@ -1,0 +1,22 @@
+# GaranTea — arama motoru kurallari
+#
+# ─── /garanmin/ NEDEN BURADA YAZILI ─────────────────────────────────────────
+#
+# Yonetim paneli `garanmin/` alt klasorunde ve o klasorun KENDI robots.txt dosyasi da
+# var — ama tarayicilar onu OKUMAZ. robots.txt yalnizca alan adinin KOKUNDE gecerli
+# (RFC 9309); `garantea.github.io/garanmin/robots.txt` hicbir tarayici tarafindan
+# dikkate alinmaz. Kural burada olmasaydi panel arama sonuclarina girerdi.
+#
+# BU BIR GUVENLIK ONLEMI DEGIL. robots.txt uymasi gonullu bir nezaket kurali ve bu
+# dosyanin kendisi herkese acik — yani panelin adresini ilan de ediyor. Asil koruma
+# sunucuda: her veri fonksiyonu gecerli bir oturum jetonu ariyor ve jeton yalnizca
+# bcrypt ile dogrulanan paroladan cikiyor (bkz. Garanmin/garanmin_setup.sql).
+#
+# Buradaki tek amac, panelin arama sonuclarinda cikip gereksiz yere hedef olmamasi.
+
+User-agent: *
+Disallow: /garanmin/
+
+# Tanitim sayfasi, gizlilik politikasi ve hesap silme sayfasi dizine GIRSIN:
+# ikisi de magaza incelemesinde ve kullanicilar tarafindan bulunabilir olmali.
+Allow: /

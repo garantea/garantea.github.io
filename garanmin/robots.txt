@@ -1,0 +1,9 @@
+# Garanmin yonetim paneli — arama motorlarina KAPALI.
+#
+# Bu dosya bir GUVENLIK onlemi DEGIL: robots.txt'e uymak tarayicinin insafina kalmis bir
+# nezaket kurali ve dosyanin kendisi de herkese acik. Asil koruma sunucuda — her veri
+# fonksiyonu gecerli bir oturum jetonu ariyor (bkz. garanmin_setup.sql, garanmin_guard).
+#
+# Buradaki amac yalnizca panelin arama sonuclarinda cikip gereksiz yere hedef olmamasi.
+User-agent: *
+Disallow: /
