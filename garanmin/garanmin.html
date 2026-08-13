@@ -23,18 +23,13 @@
     <link rel="stylesheet" href="assets/css/garanmin.css" />
   </head>
 
-  <body>
-    <!-- Tüm arkaplan için animasyonlu ve daha soft renkli gradyan -->
-    <div class="auth-shell" style="background: linear-gradient(270deg, #dbeafe, #bfdbfe, #93c5fd, #a5b4fc, #fecdd3, #fda4af); background-size: 400% 400%; animation: GaranminGradient 15s ease infinite;">
+  <body style="margin: 0; height: 100vh; overflow: hidden; display: flex; align-items: center; justify-content: center; background: linear-gradient(270deg, #dbeafe, #bfdbfe, #93c5fd, #a5b4fc, #fecdd3, #fda4af); background-size: 400% 400%; animation: GaranminGradient 15s ease infinite;">
+    
+    <!-- Giriş Kutusu (Glassmorphism efekti) -->
+    <div class="g-giris-kutu" style="background: rgba(255, 255, 255, 0.75); backdrop-filter: blur(16px); border-radius: 20px; padding: 40px 32px; box-shadow: 0 8px 32px rgba(0,0,0,0.08); text-align: center; border: 1px solid rgba(255,255,255,0.5);">
       
-      <!-- Tek sütun: form ortalanmış -->
-      <main class="auth-main" style="width: 100%; background: transparent; display: flex; align-items: center; justify-content: center;">
-        
-        <!-- Giriş Kutusu (Glassmorphism efekti) -->
-        <div class="g-giris-kutu" style="background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(12px); border-radius: 20px; padding: 40px 32px; box-shadow: 0 8px 32px rgba(0,0,0,0.05); text-align: center; border: 1px solid rgba(255,255,255,0.4);">
-          
-          <!-- BÜYÜK LOGO -->
-          <div id="logo-yuva" style="width: 140px; height: 140px; margin: 0 auto 16px;"></div>
+      <!-- BÜYÜK LOGO (Metne çok yakın) -->
+      <div id="logo-yuva" style="width: 180px; height: 180px; margin: 0 auto 0px; display: flex; justify-content: center; align-items: center;"></div>
           
           <h1 style="font-family:'Inter Tight',sans-serif;font-size:32px;font-weight:700;letter-spacing:-.025em;margin:0 0 6px">
             <span style="color:var(--primary)">Garan</span><span style="color:var(--danger)">min</span>
@@ -65,8 +60,6 @@
             Başarısız denemeler kademeli olarak yavaşlatılır.
           </div>
         </div>
-      </main>
-    </div>
 
     <script src="assets/js/garanmin-api.js"></script>
     <script>
