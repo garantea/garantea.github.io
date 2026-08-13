@@ -24,48 +24,45 @@
   </head>
 
   <body>
-    <div class="auth-shell">
-      <!-- SOL: tanitim paneli -->
-      <aside class="auth-aside" style="background: linear-gradient(270deg, #03204e, #0B57D0, #4285F4, #8ab4f8, #EA4335, #B31412); background-size: 400% 400%; animation: GaranminGradient 15s ease infinite;">
-        <div class="auth-brand">
-          <span class="logo" id="logo-yuva"></span>
-          <span class="name">GaranTea</span>
-        </div>
-      </aside>
-
-      <!-- SAG: form -->
-      <main class="auth-main">
-        <div class="auth-main-top"></div>
-
-        <div class="g-giris-kutu" style="margin:auto;padding:40px 8px">
-          <span class="eyebrow" style="display:block;margin-bottom:10px">Oturum ac</span>
-          <h1 style="font-family:'Inter Tight',sans-serif;font-size:26px;font-weight:700;letter-spacing:-.025em;margin:0 0 6px">
+    <!-- Tüm arkaplan için animasyonlu ve daha soft renkli gradyan -->
+    <div class="auth-shell" style="background: linear-gradient(270deg, #dbeafe, #bfdbfe, #93c5fd, #a5b4fc, #fecdd3, #fda4af); background-size: 400% 400%; animation: GaranminGradient 15s ease infinite;">
+      
+      <!-- Tek sütun: form ortalanmış -->
+      <main class="auth-main" style="width: 100%; background: transparent; display: flex; align-items: center; justify-content: center;">
+        
+        <!-- Giriş Kutusu (Glassmorphism efekti) -->
+        <div class="g-giris-kutu" style="background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(12px); border-radius: 20px; padding: 40px 32px; box-shadow: 0 8px 32px rgba(0,0,0,0.05); text-align: center; border: 1px solid rgba(255,255,255,0.4);">
+          
+          <!-- BÜYÜK LOGO -->
+          <div id="logo-yuva" style="width: 140px; height: 140px; margin: 0 auto 16px;"></div>
+          
+          <h1 style="font-family:'Inter Tight',sans-serif;font-size:32px;font-weight:700;letter-spacing:-.025em;margin:0 0 6px">
             <span style="color:var(--primary)">Garan</span><span style="color:var(--danger)">min</span>
           </h1>
-          <p style="color:var(--t-muted);font-size:13.5px;margin:0 0 26px">
-            GaranTea yonetim paneline giris yapin.
+          <p style="color:var(--t-muted);font-size:14px;margin:0 0 32px">
+            Yönetim paneline giriş yapın
           </p>
 
-          <div id="hata" style="display:none"></div>
+          <div id="hata" style="display:none; text-align: left;"></div>
 
-          <form id="form" class="g-giris-form" autocomplete="off">
+          <form id="form" class="g-giris-form" autocomplete="off" style="text-align: left;">
             <div>
-              <label for="kullanici">Kullanici adi</label>
-              <input id="kullanici" autocomplete="username" required autofocus />
+              <label for="kullanici">Kullanıcı adı</label>
+              <input id="kullanici" autocomplete="username" required autofocus style="background: rgba(255,255,255,0.8);" />
             </div>
             <div>
               <label for="parola">Parola</label>
-              <input id="parola" type="password" autocomplete="current-password" required />
+              <input id="parola" type="password" autocomplete="current-password" required style="background: rgba(255,255,255,0.8);" />
             </div>
             <button class="btn btn--primary" id="btn" type="submit"
-                    style="justify-content:center;margin-top:4px;padding:11px 14px">
-              <span id="btn-yazi">Giris yap</span>
+                    style="justify-content:center;margin-top:12px;padding:12px 14px; font-weight: 600;">
+              <span id="btn-yazi">Giriş yap</span>
             </button>
           </form>
 
-          <div class="g-giris-not">
-            Oturum sekme kapaninca sona erer.<br>
-            Basarisiz denemeler kademeli olarak yavaslatilir.
+          <div class="g-giris-not" style="margin-top: 24px;">
+            Oturum sekme kapanınca sona erer.<br>
+            Başarısız denemeler kademeli olarak yavaşlatılır.
           </div>
         </div>
       </main>
