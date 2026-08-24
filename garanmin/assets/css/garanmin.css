@@ -345,14 +345,22 @@ html, body { margin: 0; height: 100%; overflow: hidden; }
 .apexcharts-canvas svg { max-width: 100%; height: 100%; }
 
 /*
-  Grafik kabı — Yükseklik %100 ve flex: 1. Bu sayede kart başlığından artan
-  kalan tüm alanı doldurur. ApexCharts resize event'lerine duyarlıdır.
+  Grafik kabı — Yükseklik flex ile kalan tüm alanı doldurur.
+  ApexCharts'ın %100 yükseklik hesaplayabilmesi için dış kabın mutlak
+  bir çerçevesi (position: absolute) olması gerekiyor.
 */
-.g-grafik { 
-  flex: 1; 
-  width: 100%; 
+.g-grafik-wrap {
+  flex: 1;
+  position: relative;
   min-height: 0;
-  position: relative; 
+  width: 100%;
+}
+.g-grafik { 
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
 }
 
 /* Şablonun 12 sütunlu ızgarasında eksik olan genişlikler. */
