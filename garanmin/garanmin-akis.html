@@ -122,8 +122,13 @@
         t.chart.type = 'bar';
         const g = new ApexCharts(gKap(hedef), Object.assign(t, {
           series: [{ name: 'Adet', data: veri }],
-          xaxis: { categories: etiketler, labels: { show: false } },
-          yaxis: { labels: { show: false } },
+          xaxis: { 
+            categories: etiketler, 
+            labels: { rotate: 0, hideOverlappingLabels: true, style: { fontSize: '10px' } } 
+          },
+          yaxis: { 
+            labels: { style: { fontSize: '10px' } } 
+          },
           plotOptions: { bar: { borderRadius: 3, columnWidth: '70%' } },
           colors: [renk],
         }));
