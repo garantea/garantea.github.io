@@ -254,10 +254,8 @@ const GARANMIN_MENU = [
     { href: 'garanmin-ekonomi.html', ad: 'Kredi Ekonomisi' },
     { href: 'garanmin-send-credits.html', ad: 'Kredi Transferi' },
   ]},
-  { ad: 'Destek', ikon: 'support', alt: [
-    { href: 'garanmin-support.html', ad: 'Talepler' },
-  ]},
-  { ad: 'İletişim', ikon: 'message', alt: [
+  { ad: 'İletişim & Destek', ikon: 'support', alt: [
+    { href: 'garanmin-support.html', ad: 'Destek Talepleri' },
     { href: 'garanmin-notifications.html', ad: 'Bildirimler' },
   ]},
 ];
