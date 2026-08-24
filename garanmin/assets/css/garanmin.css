@@ -519,7 +519,7 @@ html, body { margin: 0; height: 100%; overflow: hidden; }
 /* ApexCharts tooltip'i açıldığında body taşması yaratıp ResizeObserver döngüsüne
    (efsanelerin yanıp sönmesi) girmesini engellemek için yatay kaydırmayı kapatıyoruz. */
 body {
-  overflow-x: hidden;
+  overflow: hidden;
 }
 .apexcharts-tooltip {
   pointer-events: none !important;

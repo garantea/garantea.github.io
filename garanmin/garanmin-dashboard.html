@@ -129,7 +129,7 @@
             garanminData('garanmin_stats'),
             garanminData('garanmin_db_tables'),
             garanminData('garanmin_health'),
-            garanminData('garanmin_akis', { p_gun: 30 }),
+            garanminData('garanmin_akis', { p_gun: 7 }),
             garanminData('garanmin_warranty_stats'),
             garanminData('garanmin_device_categories'),
             garanminData('garanmin_device_brands'),
@@ -159,6 +159,7 @@
 
       function cizAkis(v) {
         if (gBos('c-akis', v)) return;
+        v.reverse();
         const t = gGrafikTemel();
         t.chart.type = 'area';
         new ApexCharts(gKap('c-akis'), Object.assign(t, {
