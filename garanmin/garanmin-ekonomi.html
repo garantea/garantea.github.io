@@ -47,7 +47,7 @@
           <div class="kpi-grid" id="serit"></div>
 
           <div class="grid">
-            <section class="card col-6">
+            <section class="card col-4">
               <div class="card-head">
                 <div class="card-title-wrap">
                   <span class="eyebrow">Defter</span>
@@ -57,18 +57,28 @@
               <div id="akis"></div>
             </section>
 
-            <section class="card col-6">
+            <section class="card col-8">
               <div class="card-head">
                 <div class="card-title-wrap">
-                  <span class="eyebrow">Siralama</span>
-                  <h2 class="card-title">En çok kredisi olanlar</h2>
+                  <span class="eyebrow">Tüm Kullanıcılar</span>
+                  <h2 class="card-title">Kredi Gecmisi ve Hareketler</h2>
                 </div>
               </div>
               <div class="g-tablo-kutu-esnek">
                 <table class="table">
-                  <colgroup><col style="width:50%"><col style="width:22%"><col style="width:28%"></colgroup>
-                  <thead><tr><th>E-posta</th><th class="sayi">Kredi</th><th class="sayi">Reklam</th></tr></thead>
-                  <tbody id="top"><tr><td colspan="3" class="soluk">Yukleniyor...</td></tr></tbody>
+                  <colgroup>
+                    <col style="width:40%"><col style="width:20%">
+                    <col style="width:20%"><col style="width:20%">
+                  </colgroup>
+                  <thead>
+                    <tr>
+                      <th>E-posta</th>
+                      <th class="sayi">Bakiye</th>
+                      <th class="sayi">Kazanilan (Reklam)</th>
+                      <th class="sayi">Harcanan (Cihaz)</th>
+                    </tr>
+                  </thead>
+                  <tbody id="top"><tr><td colspan="4" class="soluk">Yukleniyor...</td></tr></tbody>
                 </table>
               </div>
             </section>
@@ -122,7 +132,7 @@
         try {
           const [e, top] = await Promise.all([
             garanminData('garanmin_ekonomi'),
-            garanminData('garanmin_top_credit_users'),
+            garanminData('garanmin_users_list', { p_limit: 100, p_offset: 0, p_search: '' }),
           ]);
 
           const dagitilan = Number(e.mevcut_kredi) + Number(e.harcanan_kredi);
@@ -146,11 +156,15 @@
 
           document.getElementById('top').innerHTML = (top && top.length)
             ? top.map(function (u) {
-                return '<tr><td title="' + gEsc(u.email) + '">' + gEsc(u.email) + '</td>'
+                const kazanilan = u.ad_watch_count ? Math.floor(Number(u.ad_watch_count) / 5) : 0;
+                return '<tr style="cursor:pointer" onclick="location.href=\'garanmin-users.html?arama=\' + encodeURIComponent(gEsc(u.email))">'
+                  + '<td title="' + gEsc(u.email) + '">' + gEsc(u.email) + '</td>'
                   + '<td class="sayi">' + gNum(u.credits) + '</td>'
-                  + '<td class="sayi">' + gNum(u.ads) + '</td></tr>';
+                  + '<td class="sayi"><span class="badge success">+' + gNum(kazanilan) + ' kr</span> <span class="soluk" style="font-size:10px">(' + gNum(u.ad_watch_count) + ' rklm)</span></td>'
+                  + '<td class="sayi"><span class="badge danger">-' + gNum(u.device_count) + ' kr</span> <span class="soluk" style="font-size:10px">(' + gNum(u.device_count) + ' chz)</span></td>'
+                  + '</tr>';
               }).join('')
-            : '<tr><td colspan="3" class="soluk">Kayit yok</td></tr>';
+            : '<tr><td colspan="4" class="soluk">Kayit yok</td></tr>';
 
           document.getElementById('akis').innerHTML =
             gKv('Dagitilan toplam', gNum(dagitilan), 'dolasimda + harcanan')
