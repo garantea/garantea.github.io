@@ -233,18 +233,12 @@ function gIkon(ad, sinif) {
 const GARANMIN_MENU = [
   { ad: 'Genel', ikon: 'grid', alt: [
     { href: 'garanmin-dashboard.html', ad: 'Özet' },
-    { href: 'garanmin-sistem.html',    ad: 'Sistem Durumu' },
+    { href: 'garanmin-akis.html', ad: 'Zaman Akışı' },
+    { href: 'garanmin-users.html', ad: 'Kullanıcı Listesi' },
   ]},
   { ad: 'Veri Tabanı', ikon: 'database', alt: [
     { href: 'garanmin-db.html',   ad: 'Tablolar' },
-    { href: 'garanmin-akis.html', ad: 'Zaman Akışı' },
-  ]},
-  /* Kullanıcı detayi MENUDE YOK: listeden bir satira tiklaninca MODAL olarak
-     aciliyor. Ayri bir sayfa olsaydi geri donuldugunde arama kutusu bosalir,
-     sayfa numarasi sifirlanir ve kullanici aradigi satiri yeniden bulmak
-     zorunda kalirdi. */
-  { ad: 'Kullanıcılar', ikon: 'users', alt: [
-    { href: 'garanmin-users.html', ad: 'Liste' },
+    { href: 'garanmin-sistem.html',    ad: 'Sistem Durumu' },
   ]},
   { ad: 'Cihazlar', ikon: 'monitor', alt: [
     { href: 'garanmin-devices.html',     ad: 'Kırılımlar' },
