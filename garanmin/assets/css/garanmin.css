@@ -521,3 +521,6 @@ html, body { margin: 0; height: 100%; overflow: hidden; }
 body {
   overflow-x: hidden;
 }
+.apexcharts-tooltip {
+  pointer-events: none !important;
+}

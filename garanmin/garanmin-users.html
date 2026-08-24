@@ -135,13 +135,6 @@
               }).join('')
             : '<tr><td colspan="8" class="soluk">Bu kullanicinin cihazi yok</td></tr>';
 
-          const talepHtml = t.length
-            ? t.map(function (x) {
-                return '<tr><td class="soluk">' + gDateTime(x.created_at) + '</td>'
-                  + '<td>' + gEsc(x.kind) + '</td>'
-                  + '<td>' + gEsc(x.status) + '</td>'
-                  + '<td class="metin">' + gEsc(x.message) + '</td></tr>';
-              }).join('')
           document.getElementById('g-modal-govde').innerHTML =
             '<div class="kpi-grid" style="margin-bottom:0">'
             + gKpi([

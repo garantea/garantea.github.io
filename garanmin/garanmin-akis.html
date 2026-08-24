@@ -43,8 +43,8 @@
                   <h2 class="card-title">Kayıt akışı</h2>
                 </div>
                 <div class="g-arac">
-                  <button class="btn btn--ghost btn--sm"   onclick="setGun(7)"  id="g7">7 gun</button>
-                  <button class="btn btn--primary btn--sm" onclick="setGun(30)" id="g30">30 gun</button>
+                  <button class="btn btn--primary btn--sm" onclick="setGun(7)"  id="g7">7 gun</button>
+                  <button class="btn btn--ghost btn--sm"   onclick="setGun(30)" id="g30">30 gun</button>
                   <button class="btn btn--ghost btn--sm"   onclick="setGun(90)" id="g90">90 gun</button>
                 </div>
               </div>
@@ -96,7 +96,7 @@
     <script src="assets/vendor/libs/apex-charts/apexcharts.js"></script>
     <script src="assets/js/garanmin-api.js"></script>
     <script>
-      let gun = 30;
+      let gun = 7;
       /* Cizilen grafikler tutuluyor: aralik degistiginde eskisi YOK EDILMELI.
          Yok edilmezse ApexCharts ayni kapsayiciya ikinci bir grafik cizer ve
          ustuste binen iki tablo olusur. */
@@ -139,6 +139,7 @@
         try {
           temizle();
           const v = await garanminData('garanmin_akis', { p_gun: gun });
+          v.reverse(); // Gelen veri en yeniden eskiye, grafikte soldan saga (eskiden yeniye) cizmek icin ters cevir.
           const etiket = v.map(function (d) { return gDate(d.gun); });
           const k = v.map(function (d) { return Number(d.kullanici); });
           const c = v.map(function (d) { return Number(d.cihaz); });
