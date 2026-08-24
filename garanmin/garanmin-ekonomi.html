@@ -137,7 +137,7 @@
         try {
           const [e, top] = await Promise.all([
             garanminData('garanmin_ekonomi'),
-            garanminData('garanmin_users_list', { p_limit: 100, p_offset: 0, p_search: '' }),
+            garanminData('garanmin_users_list', { p_limit: 1000, p_offset: 0, p_search: '' }),
           ]);
 
           const dagitilan = Number(e.mevcut_kredi) + Number(e.harcanan_kredi);
@@ -159,8 +159,16 @@
             })).render();
           }
 
-          document.getElementById('top').innerHTML = (top && top.length)
-            ? top.map(function (u) {
+          let aktifTop = top ? top.filter(function(u) {
+            return Number(u.credits) > 0 || Number(u.ad_watch_count) > 0 || Number(u.device_count) > 0;
+          }).sort(function(a, b) {
+            const aSkor = Number(a.credits) + Number(a.ad_watch_count) + Number(a.device_count);
+            const bSkor = Number(b.credits) + Number(b.ad_watch_count) + Number(b.device_count);
+            return bSkor - aSkor;
+          }).slice(0, 100) : [];
+
+          document.getElementById('top').innerHTML = aktifTop.length
+            ? aktifTop.map(function (u) {
                 const kazanilan = u.ad_watch_count ? Math.floor(Number(u.ad_watch_count) / 5) : 0;
                 return '<tr style="cursor:pointer" onclick="location.href=\'garanmin-users.html?arama=\' + encodeURIComponent(gEsc(u.email))">'
                   + '<td title="' + gEsc(u.email) + '">' + gEsc(u.email) + '</td>'
