@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="tr" data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Garanmin — Kredi Transferi</title>
+    <link rel="icon" type="image/x-icon" href="assets/img/favicon/favicon.ico" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="assets/adminator/adminator.css" />
+    <link rel="stylesheet" href="assets/css/garanmin.css" />
+  </head>
+  <body>
+    <div class="shell" id="g-app">
+      <aside class="d-sidebar" id="garanmin-menu"></aside>
+      <div class="main">
+        <header class="d-topbar" id="garanmin-navbar"></header>
+        <main class="content">
+          <!-- VERITABANI BAGLANTISI YOK UYARISI -->
+          <div class="g-uyari warning" style="margin-bottom:20px;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+            <span>
+              <b>Sistem Notu:</b> Veritabanı modülleri devredışı olduğu için "Manuel Kredi Gönderimi" şu anda yalnızca arayüz olarak çalışmaktadır. Yapılan transferler veritabanına işlenmeyecek, sadece tarayıcı önbelleğinde listelenecektir.
+            </span>
+          </div>
+
+          <div class="grid">
+            <!-- KREDI GONDERIM FORMU -->
+            <section class="card col-4">
+              <div class="card-head">
+                <div class="card-title-wrap">
+                  <span class="eyebrow">Yönetim</span>
+                  <h2 class="card-title">Kredi Tanımla</h2>
+                </div>
+              </div>
+              <div class="card-body" style="padding:20px; display:flex; flex-direction:column; gap:16px;">
+                
+                <div>
+                  <label style="display:block; font-size:13px; font-weight:500; margin-bottom:6px;">Kullanıcı E-posta</label>
+                  <input type="text" id="kullanici_email" placeholder="Örn: ahmet@example.com" class="form-control" style="width:100%; padding:8px; border-radius:6px; border:1px solid var(--border);">
+                </div>
+
+                <div>
+                  <label style="display:block; font-size:13px; font-weight:500; margin-bottom:6px;">Eklenecek Kredi Miktarı</label>
+                  <input type="number" id="miktar" placeholder="Örn: 50" min="1" class="form-control" style="width:100%; padding:8px; border-radius:6px; border:1px solid var(--border);">
+                </div>
+
+                <div>
+                  <label style="display:block; font-size:13px; font-weight:500; margin-bottom:6px;">Açıklama / İşlem Nedeni</label>
+                  <input type="text" id="aciklama" placeholder="Örn: Hediye, Telafi vb." class="form-control" style="width:100%; padding:8px; border-radius:6px; border:1px solid var(--border);">
+                </div>
+                
+                <button class="btn btn-primary" onclick="krediGonder()" style="margin-top:8px; display:flex; justify-content:center; gap:8px;">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M12 12h.01"/><path d="M17 12h.01"/><path d="M7 12h.01"/></svg>
+                  Krediyi Yükle
+                </button>
+                <div id="islem-sonuc" style="font-size:13px; text-align:center; min-height:20px; font-weight:500;"></div>
+              </div>
+            </section>
+
+            <!-- GECMIS TRANSFERLER -->
+            <section class="card col-8">
+              <div class="card-head">
+                <div class="card-title-wrap">
+                  <span class="eyebrow">Geçmiş (Yerel Tarayıcı Önbelleği)</span>
+                  <h2 class="card-title">Manuel Transfer Geçmişi</h2>
+                </div>
+              </div>
+              <div class="g-tablo-kutu g-tablo-kutu-esnek" style="max-height:600px; overflow-y:auto;">
+                <table class="table" style="table-layout:fixed; width:100%;">
+                  <colgroup>
+                    <col style="width:20%">
+                    <col style="width:30%">
+                    <col style="width:15%">
+                    <col style="width:35%">
+                  </colgroup>
+                  <thead>
+                    <tr>
+                      <th>Tarih</th>
+                      <th>Kullanıcı</th>
+                      <th class="sayi">Miktar</th>
+                      <th>Açıklama</th>
+                    </tr>
+                  </thead>
+                  <tbody id="gecmis">
+                    <tr><td colspan="4" class="soluk" style="text-align:center;">Geçmiş işlem bulunamadı.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </section>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <!-- Modal Perdesi (Gerekirse) -->
+    <div class="g-modal-perde" id="g-modal" onclick="if(event.target===this) garanminModalKapat()">
+      <div class="g-modal">
+        <div class="g-modal-bas">
+          <div id="g-modal-baslik"></div>
+          <button class="icon-btn" onclick="garanminModalKapat()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+          </button>
+        </div>
+        <div class="g-modal-govde" id="g-modal-govde"></div>
+      </div>
+    </div>
+
+    <script src="assets/js/garanmin-api.js"></script>
+    <script>
+      let yerelGecmis = [];
+
+      function yukle() {
+        // Yerel onbellekten cek
+        const kayit = localStorage.getItem('garanmin_krediler');
+        if (kayit) {
+          try {
+            yerelGecmis = JSON.parse(kayit);
+          } catch (e) { yerelGecmis = []; }
+        }
+        tabloCiz();
+      }
+
+      function tabloCiz() {
+        const tb = document.getElementById('gecmis');
+        if (yerelGecmis.length === 0) {
+          tb.innerHTML = '<tr><td colspan="4" class="soluk" style="text-align:center;">Henüz manuel kredi yüklemesi yapılmadı (veya önbellek temizlendi).</td></tr>';
+          return;
+        }
+
+        const html = yerelGecmis.map(b => {
+          return '<tr>'
+            + '<td class="soluk">' + gDate(b.tarih) + '</td>'
+            + '<td title="' + gEsc(b.email) + '">' + gEsc(b.email) + '</td>'
+            + '<td class="sayi"><span class="badge success">+' + gNum(b.miktar) + ' kr</span></td>'
+            + '<td class="soluk" title="' + gEsc(b.aciklama) + '">' + gEsc(b.aciklama) + '</td>'
+            + '</tr>';
+        }).join('');
+        tb.innerHTML = html;
+      }
+
+      function krediGonder() {
+        const email = document.getElementById('kullanici_email').value.trim();
+        const miktar = parseInt(document.getElementById('miktar').value, 10);
+        const aciklama = document.getElementById('aciklama').value.trim();
+        const sonuc = document.getElementById('islem-sonuc');
+
+        if (!email || !miktar || isNaN(miktar) || miktar <= 0) {
+          sonuc.innerHTML = '<span style="color:var(--danger)">Geçerli e-posta ve miktar giriniz.</span>';
+          return;
+        }
+
+        // Backend entegrasyonu olmadigi icin mock basari mesaji ve local kayit yapiyoruz.
+        sonuc.innerHTML = '<span style="color:var(--info)">Kredi tanımlanıyor...</span>';
+        
+        setTimeout(() => {
+          yerelGecmis.unshift({
+            tarih: new Date().toISOString(),
+            email: email,
+            miktar: miktar,
+            aciklama: aciklama || 'Manuel Yükleme'
+          });
+          // Maks 20 tane tut
+          if (yerelGecmis.length > 20) yerelGecmis.pop();
+          localStorage.setItem('garanmin_krediler', JSON.stringify(yerelGecmis));
+          
+          tabloCiz();
+          
+          document.getElementById('kullanici_email').value = '';
+          document.getElementById('miktar').value = '';
+          document.getElementById('aciklama').value = '';
+          sonuc.innerHTML = '<span style="color:var(--success)">Kredi başarıyla yüklendi (Simülasyon).</span>';
+          
+          setTimeout(() => { sonuc.innerHTML = ''; }, 3000);
+        }, 800);
+      }
+
+      if (garanminGuardPage()) {
+        garanminShell('garanmin-send-credits.html', 'Kredi Transferi', 'Gelir Gider');
+        yukle();
+      }
+    </script>
+  </body>
+</html>

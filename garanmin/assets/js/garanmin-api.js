@@ -252,6 +252,7 @@ const GARANMIN_MENU = [
   ]},
   { ad: 'Gelir Gider', ikon: 'wallet', alt: [
     { href: 'garanmin-ekonomi.html', ad: 'Kredi Ekonomisi' },
+    { href: 'garanmin-send-credits.html', ad: 'Kredi Transferi' },
   ]},
   { ad: 'Destek', ikon: 'support', alt: [
     { href: 'garanmin-support.html', ad: 'Talepler' },
