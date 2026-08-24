@@ -47,28 +47,25 @@
           <div class="kpi-grid" id="serit"></div>
 
           <div class="grid">
-            <section class="card col-7">
+            <section class="card col-6">
               <div class="card-head">
                 <div class="card-title-wrap">
-                  <span class="eyebrow">Kullanıcı basina</span>
-                  <h2 class="card-title">Kredi dagilimi</h2>
+                  <span class="eyebrow">Defter</span>
+                  <h2 class="card-title">Kredi akisi</h2>
                 </div>
               </div>
-              <div class="g-grafik-wrap">
-                <div class="g-grafik uzun" id="c-dagilim"></div>
-              </div>
+              <div id="akis"></div>
             </section>
 
-            <section class="card col-5">
+            <section class="card col-6">
               <div class="card-head">
                 <div class="card-title-wrap">
                   <span class="eyebrow">Siralama</span>
                   <h2 class="card-title">En çok kredisi olanlar</h2>
                 </div>
               </div>
-              <div class="g-tablo-kutu-esnek" style="max-height:270px">
+              <div class="g-tablo-kutu-esnek">
                 <table class="table">
-                  <!-- Sutun genislikleri SABIT (gerekce: garanmin.css). Toplam %100. -->
                   <colgroup><col style="width:50%"><col style="width:22%"><col style="width:28%"></colgroup>
                   <thead><tr><th>E-posta</th><th class="sayi">Kredi</th><th class="sayi">Reklam</th></tr></thead>
                   <tbody id="top"><tr><td colspan="3" class="soluk">Yukleniyor...</td></tr></tbody>
@@ -79,11 +76,13 @@
             <section class="card col-4">
               <div class="card-head">
                 <div class="card-title-wrap">
-                  <span class="eyebrow">Defter</span>
-                  <h2 class="card-title">Kredi akisi</h2>
+                  <span class="eyebrow">Kullanıcı basina</span>
+                  <h2 class="card-title">Kredi dagilimi</h2>
                 </div>
               </div>
-              <div id="akis"></div>
+              <div class="g-grafik-wrap">
+                <div class="g-grafik kisa" id="c-dagilim"></div>
+              </div>
             </section>
 
             <section class="card col-4">
@@ -94,7 +93,7 @@
                 </div>
               </div>
               <div class="g-grafik-wrap">
-                <div class="g-grafik" id="c-kullanici"></div>
+                <div class="g-grafik kisa" id="c-kullanici"></div>
               </div>
             </section>
 

@@ -454,9 +454,10 @@ html, body { margin: 0; height: 100%; overflow: hidden; }
 }
 
 .kpi-grid { 
-  margin-bottom: 14px; gap: 10px; flex-shrink: 0; display: grid;
-  grid-template-columns: repeat(8, minmax(0, 1fr));
+  margin-bottom: 14px; gap: 10px; flex-shrink: 0; 
+  display: flex; width: 100%;
 }
+.kpi-grid > * { flex: 1; min-width: 0; }
 .kpi-card { padding: 12px 10px; }
 .kpi-card .kpi-value { font-size: clamp(16px, 1.4vw, 22px); }
 .kpi-card .g-kv-etiket { font-size: 11px; }
@@ -472,7 +473,7 @@ html, body { margin: 0; height: 100%; overflow: hidden; }
 }
 
 @media (max-width: 1400px) {
-  .kpi-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .kpi-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); }
   .grid { grid-template-rows: auto; overflow-y: auto; display: flex; flex-direction: column; }
   .grid > .card { min-height: 400px; flex: none; }
 }

@@ -142,8 +142,6 @@
                   + '<td>' + gEsc(x.status) + '</td>'
                   + '<td class="metin">' + gEsc(x.message) + '</td></tr>';
               }).join('')
-            : '<tr><td colspan="4" class="soluk">Talep yok</td></tr>';
-
           document.getElementById('g-modal-govde').innerHTML =
             '<div class="kpi-grid" style="margin-bottom:0">'
             + gKpi([
@@ -153,20 +151,41 @@
                 { etiket: 'Destek talebi',  deger: gNum(t.length),  ikon: 'support', renk: 'danger' },
               ])
             + '</div>'
-
             + '<div class="grid">'
-            +   '<section class="card col-4">'
-            +     '<div class="card-head"><div class="card-title-wrap">'
-            +       '<span class="eyebrow">Hesap</span><h2 class="card-title">Profil</h2>'
-            +     '</div></div>'
-            +     gKv('Kayit tarihi', gDate(p.created_at))
-            +     gKv('Son giris', gGoreli(p.last_sign_in_at))
-            +     gKv('Giris yontemi', gEsc(p.saglayici))
-            +     gKv('Aktif garanti', gNum(g.active || 0))
-            +     gKv('Yakinda bitiyor', gNum(g.expiring_soon || 0))
-            +     gKv('Suresi dolmus', gNum(g.expired || 0))
-            +   '</section>'
-
+            +   '<div class="col-4" style="display: flex; flex-direction: column; gap: 14px; min-height: 0;">'
+            +     '<section class="card" style="flex: none;">'
+            +       '<div class="card-head"><div class="card-title-wrap">'
+            +         '<span class="eyebrow">Hesap</span><h2 class="card-title">Profil</h2>'
+            +       '</div></div>'
+            +       gKv('Kayit tarihi', gDate(p.created_at))
+            +       gKv('Son giris', gGoreli(p.last_sign_in_at))
+            +       gKv('Giris yontemi', gEsc(p.saglayici))
+            +       gKv('Aktif garanti', gNum(g.active || 0))
+            +       gKv('Yakinda bitiyor', gNum(g.expiring_soon || 0))
+            +       gKv('Suresi dolmus', gNum(g.expired || 0))
+            +     '</section>'
+            +     '<section class="card" style="flex: 1; min-height: 0;">'
+            +       '<div class="card-head"><div class="card-title-wrap">'
+            +         '<span class="eyebrow">Iletisim</span><h2 class="card-title">Destek talepleri</h2>'
+            +       '</div></div>'
+            +       '<div class="g-tablo-kutu-esnek">'
+            +         '<table class="table">'
+            +           '<colgroup>'
+            +             '<col style="width:25%"><col style="width:25%">'
+            +             '<col style="width:50%">'
+            +           '</colgroup>'
+            +           '<thead><tr>'
+            +             '<th>Tarih</th><th>Tur/Durum</th><th>Mesaj</th>'
+            +           '</tr></thead><tbody>' 
+            +           (t.length ? t.map(function (x) {
+                          return '<tr><td class="soluk">' + gDateTime(x.created_at) + '</td>'
+                            + '<td>' + gEsc(x.kind) + '<br><span class="soluk" style="font-size:10px">' + gEsc(x.status) + '</span></td>'
+                            + '<td class="metin">' + gEsc(x.message) + '</td></tr>';
+                        }).join('') : '<tr><td colspan="3" class="soluk">Talep yok</td></tr>') 
+            +           '</tbody></table>'
+            +       '</div>'
+            +     '</section>'
+            +   '</div>'
             +   '<section class="card col-8">'
             +     '<div class="card-head">'
             +       '<div class="card-title-wrap">'
@@ -178,9 +197,6 @@
             +         '<span class="badge danger">' + gNum(g.expired || 0) + ' dolmus</span>'
             +       '</div>'
             +     '</div>'
-            /* Cihaz listesi kendi kutusunda kayiyor: 40 cihazi olan bir
-               kullanicida modal ekrandan tasmasin, 2 cihazi olanda da bos yer
-               kalmasin. */
             +     '<div class="g-tablo-kutu-esnek">'
             +       '<table class="table">'
             +         '<colgroup>'
@@ -192,22 +208,6 @@
             +           '<th>Cihaz</th><th>Marka</th><th>Kategori</th><th>Oda</th>'
             +           '<th>Alim</th><th>Bitis</th><th>Durum</th><th>Fatura</th>'
             +         '</tr></thead><tbody>' + cihazHtml + '</tbody></table>'
-            +     '</div>'
-            +   '</section>'
-
-            +   '<section class="card col-12">'
-            +     '<div class="card-head"><div class="card-title-wrap">'
-            +       '<span class="eyebrow">Iletisim</span><h2 class="card-title">Destek talepleri</h2>'
-            +     '</div></div>'
-            +     '<div class="g-tablo-kutu-esnek">'
-            +       '<table class="table">'
-            +         '<colgroup>'
-            +           '<col style="width:16%"><col style="width:14%">'
-            +           '<col style="width:12%"><col style="width:58%">'
-            +         '</colgroup>'
-            +         '<thead><tr>'
-            +           '<th>Tarih</th><th>Tur</th><th>Durum</th><th>Mesaj</th>'
-            +         '</tr></thead><tbody>' + talepHtml + '</tbody></table>'
             +     '</div>'
             +   '</section>'
             + '</div>';
