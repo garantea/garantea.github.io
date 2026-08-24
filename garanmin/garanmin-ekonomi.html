@@ -44,30 +44,27 @@
 
           <div class="g-uyari warning" id="uyari"></div>
 
-          <div class="grid">
-            <div class="col-2" style="display: flex; flex-direction: column; gap: 14px; min-height: 0;">
-              <!-- KPI kutulari dikey olarak ust uste binecek -->
-              <div class="kpi-grid" id="serit" style="flex-direction: column; margin-bottom: 0;"></div>
-              
-              <section class="card" style="flex: 1; min-height: 0;">
-                <div class="card-head">
-                  <div class="card-title-wrap">
-                    <span class="eyebrow">Defter</span>
-                    <h2 class="card-title">Kredi akisi</h2>
-                  </div>
+          <div class="kpi-grid" id="serit"></div>
+          
+          <div class="grid" style="margin-top: 16px;">
+            <section class="card col-3" style="display: flex; flex-direction: column; min-height: 0;">
+              <div class="card-head">
+                <div class="card-title-wrap">
+                  <span class="eyebrow">Defter</span>
+                  <h2 class="card-title">Kredi akisi</h2>
                 </div>
-                <div id="akis"></div>
-              </section>
-            </div>
+              </div>
+              <div id="akis" style="flex: 1; padding: 16px;"></div>
+            </section>
 
-            <section class="card col-10">
+            <section class="card col-9">
               <div class="card-head">
                 <div class="card-title-wrap">
                   <span class="eyebrow">Tüm Kullanıcılar</span>
                   <h2 class="card-title">Kredi Gecmisi ve Hareketler</h2>
                 </div>
               </div>
-              <div class="g-tablo-kutu-esnek">
+              <div class="g-tablo-kutu-esnek" style="max-height: 400px; overflow-y: auto;">
                 <table class="table">
                   <colgroup>
                     <col style="width:25%"><col style="width:15%"><col style="width:15%">
