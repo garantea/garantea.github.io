@@ -341,8 +341,8 @@ html, body { margin: 0; height: 100%; overflow: hidden; }
 /* ApexCharts kendi SVG'sine piksel genişlik yazıyor; yanlış ölçtüğü durumda bu
    genişlik kabı aşıyordu. Şablonun genel `svg { max-width: 100% }` kuralı
    ApexCharts'ın satır içi genişliğini yenemediği için burada tekrarlanıyor. */
-.apexcharts-canvas { max-width: 100% !important; }
-.apexcharts-canvas svg { max-width: 100%; }
+.apexcharts-canvas { max-width: 100% !important; height: 100% !important; }
+.apexcharts-canvas svg { max-width: 100%; height: 100%; }
 
 /*
   Grafik kabı — Yükseklik %100 ve flex: 1. Bu sayede kart başlığından artan
@@ -350,7 +350,6 @@ html, body { margin: 0; height: 100%; overflow: hidden; }
 */
 .g-grafik { 
   flex: 1; 
-  height: 100%; 
   width: 100%; 
   min-height: 0;
   position: relative; 
