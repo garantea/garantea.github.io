@@ -45,7 +45,7 @@
           <div class="g-uyari warning" id="uyari"></div>
 
           <div class="grid">
-            <div class="col-3" style="display: flex; flex-direction: column; gap: 14px; min-height: 0;">
+            <div class="col-2" style="display: flex; flex-direction: column; gap: 14px; min-height: 0;">
               <!-- KPI kutulari dikey olarak ust uste binecek -->
               <div class="kpi-grid" id="serit" style="flex-direction: column; margin-bottom: 0;"></div>
               
@@ -60,7 +60,7 @@
               </section>
             </div>
 
-            <section class="card col-9">
+            <section class="card col-10">
               <div class="card-head">
                 <div class="card-title-wrap">
                   <span class="eyebrow">Tüm Kullanıcılar</span>
@@ -70,18 +70,20 @@
               <div class="g-tablo-kutu-esnek">
                 <table class="table">
                   <colgroup>
-                    <col style="width:40%"><col style="width:20%">
-                    <col style="width:20%"><col style="width:20%">
+                    <col style="width:25%"><col style="width:15%"><col style="width:15%">
+                    <col style="width:15%"><col style="width:15%"><col style="width:15%">
                   </colgroup>
                   <thead>
                     <tr>
                       <th>E-posta</th>
+                      <th>Kayıt</th>
+                      <th>Son Giriş</th>
                       <th class="sayi">Bakiye</th>
                       <th class="sayi">Kazanilan (Reklam)</th>
                       <th class="sayi">Harcanan (Cihaz)</th>
                     </tr>
                   </thead>
-                  <tbody id="top"><tr><td colspan="4" class="soluk">Yukleniyor...</td></tr></tbody>
+                  <tbody id="top"><tr><td colspan="6" class="soluk">Yukleniyor...</td></tr></tbody>
                 </table>
               </div>
             </section>
@@ -167,17 +169,22 @@
             return bSkor - aSkor;
           }).slice(0, 100) : [];
 
+          // Modal verisi icin
+          window.EKONOMI_KULLANICILAR = aktifTop;
+
           document.getElementById('top').innerHTML = aktifTop.length
             ? aktifTop.map(function (u) {
                 const kazanilan = u.ad_watch_count ? Math.floor(Number(u.ad_watch_count) / 5) : 0;
-                return '<tr style="cursor:pointer" onclick="location.href=\'garanmin-users.html?arama=\' + encodeURIComponent(gEsc(u.email))">'
+                return '<tr style="cursor:pointer" onclick="detay(\'' + gEsc(u.id) + '\')">'
                   + '<td title="' + gEsc(u.email) + '">' + gEsc(u.email) + '</td>'
+                  + '<td class="soluk">' + gDate(u.created_at) + '</td>'
+                  + '<td class="soluk">' + gGoreli(u.last_sign_in_at) + '</td>'
                   + '<td class="sayi">' + gNum(u.credits) + '</td>'
                   + '<td class="sayi"><span class="badge success">+' + gNum(kazanilan) + ' kr</span> <span class="soluk" style="font-size:10px">(' + gNum(u.ad_watch_count) + ' rklm)</span></td>'
                   + '<td class="sayi"><span class="badge danger">-' + gNum(u.device_count) + ' kr</span> <span class="soluk" style="font-size:10px">(' + gNum(u.device_count) + ' chz)</span></td>'
                   + '</tr>';
               }).join('')
-            : '<tr><td colspan="4" class="soluk">Kayit yok</td></tr>';
+            : '<tr><td colspan="6" class="soluk">Kayit yok</td></tr>';
 
           document.getElementById('akis').innerHTML =
             gKv('Dagitilan toplam', gNum(dagitilan), 'dolasimda + harcanan')
@@ -190,10 +197,10 @@
 
           document.getElementById('reklam').innerHTML =
             gKv('Toplam izlenme', gNum(e.reklam_izlenme))
-            + gKv('Kazandirdigi kredi', gNum(e.reklam_kredi), '5 reklam = 1 kredi')
-            + gKv('Izlenme / kullanici',
-                gNum((Number(e.reklam_izlenme) / Math.max(1, toplamK)).toFixed(1)));
-
+            + gKv('Dagitilan kredi', gNum(e.reklam_kredi))
+            + gKv('Bekleyen', gNum(e.reklam_bekleyen), '5 izlemeyi doldurmayan')
+            + gKv('Maliyet karsiligi', gNum(Math.floor(Number(e.reklam_izlenme) / 5)), '1 k = 5 iz');
+            
           /* Hic kullanici yoksa halka CIZILMIYOR: iki dilimi de sifir olan bir
              halka, "veri gelmedi" ile "deger sifir" arasindaki farki gizliyor. */
           if (toplamK === 0) { gBos('c-kullanici', null); return; }
@@ -207,6 +214,38 @@
             plotOptions: { pie: { donut: { size: '60%' } } },
           })).render();
         } catch (err) { gError(err.message); }
+      }
+
+      function detay(id) {
+        if (!window.EKONOMI_KULLANICILAR) return;
+        const p = window.EKONOMI_KULLANICILAR.find(function(x) { return x.id === id; });
+        if (!p) return;
+        const kazanilan = p.ad_watch_count ? Math.floor(Number(p.ad_watch_count) / 5) : 0;
+        
+        garanminModalAc(
+          '<div class="g-modal-kim">'
+          + '<span class="avatar">' + gEsc(p.email.slice(0, 2).toUpperCase()) + '</span>'
+          + '<div style="min-width:0">'
+          + '<div class="eyebrow" style="color:var(--t-muted)">Kredi Hareketleri (Ozet)</div>'
+          + '<h2 style="font-size:16px;margin:2px 0 0;overflow:hidden;text-overflow:ellipsis">' + gEsc(p.email) + '</h2>'
+          + '</div></div>',
+          '<div class="g-uyari info" style="margin:0">' + gIkon('info') 
+          + '<span>Veritabanında islem logu tutulmadigi icin kullanicinin kronolojik islem gecmisi yerine guncel kredi bilancosu gosterilmektedir.</span></div>'
+          + '<div class="kpi-grid">'
+          + gKpi([
+              { etiket: 'Bakiye', deger: gNum(p.credits), ikon: 'star', renk: 'warning' },
+              { etiket: 'Reklam Kazanci', deger: '+' + gNum(kazanilan) + ' kr', ikon: 'tv', renk: 'success' },
+              { etiket: 'Cihaz Harcamasi', deger: '-' + gNum(p.device_count) + ' kr', ikon: 'monitor', renk: 'danger' }
+            ])
+          + '</div>'
+          + '<div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:8px;">'
+          + gKv('Toplam Izlenen Reklam', gNum(p.ad_watch_count))
+          + gKv('Toplam Eklenen Cihaz', gNum(p.device_count))
+          + gKv('Kayıt Tarihi', gDate(p.created_at))
+          + gKv('Son Giris', gGoreli(p.last_sign_in_at))
+          + '</div>'
+          + '<div style="text-align:right; margin-top:16px;"><button class="btn btn-primary" onclick="location.href=\'garanmin-users.html?arama=\' + encodeURIComponent(\'' + gEsc(p.email) + '\')">Kullanıcı Detaylarina Git</button></div>'
+        );
       }
 
       if (garanminGuardPage()) {

@@ -401,7 +401,7 @@ function garanminShell(aktif, baslik, ustBil) {
   const menuHtml = GARANMIN_MENU.map((g, i) => {
     const grupAktif = g.alt.some(a => a.href === aktif);
     return `
-      <div class="nav-item-group${grupAktif ? ' is-open' : ''}" data-grup="${i}">
+      <div class="nav-item-group is-open" data-grup="${i}">
         <a class="nav-link${grupAktif ? ' is-active' : ''}" href="javascript:void(0)"
            onclick="garanminGrupAc(${i})" title="${gEsc(g.ad)}">
           ${gIkon(g.ikon)}
@@ -473,10 +473,7 @@ function garanminGrupAc(i) {
     garanminKatlaUygula(false);
   }
   const hedef = document.querySelector('.nav-item-group[data-grup="' + i + '"]');
-  const zatenAcik = hedef && hedef.classList.contains('is-open');
-  document.querySelectorAll('.nav-item-group').forEach(el => el.classList.remove('is-open'));
-  // Açık olana tekrar tıklamak kapatıyor; başkasına tıklamak öbürünü kapatıp bunu açıyor.
-  if (hedef && !zatenAcik) hedef.classList.add('is-open');
+  if (hedef) hedef.classList.toggle('is-open');
 }
 
 function garanminKatla() {
