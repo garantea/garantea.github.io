@@ -256,6 +256,9 @@ const GARANMIN_MENU = [
   { ad: 'Destek', ikon: 'support', alt: [
     { href: 'garanmin-support.html', ad: 'Talepler' },
   ]},
+  { ad: 'İletişim', ikon: 'message', alt: [
+    { href: 'garanmin-notifications.html', ad: 'Bildirimler' },
+  ]},
 ];
 
 /**
