@@ -195,8 +195,12 @@
         t.chart.type = 'bar';
         new ApexCharts(gKap('c-kategori'), Object.assign(t, {
           series: [{ name: 'Cihaz', data: v.map(function (d) { return Number(d.count); }) }],
-          xaxis: { categories: v.map(function (d) { return gKategori(d.category); }) },
-          plotOptions: { bar: { borderRadius: 5, distributed: true, columnWidth: '55%' } },
+          xaxis: { 
+            categories: v.map(function (d) { return gKategori(d.category); }),
+            labels: { style: { fontSize: '11px' } }
+          },
+          yaxis: { labels: { style: { fontSize: '11px', fontWeight: 500 } } },
+          plotOptions: { bar: { horizontal: true, borderRadius: 5, distributed: true, barHeight: '60%' } },
           legend: { show: false },
         })).render();
       }

@@ -488,6 +488,10 @@ html, body { margin: 0; height: 100%; overflow: hidden; }
   /* Ekranı maksimum kullanmak için dış boşlukları daraltalım */
   .content { padding: 8px; }
   .card { padding: 10px; }
-  .kpi-card { padding: 10px; }
-  .d-topbar { padding: 0 10px; }
+}
+
+/* ApexCharts tooltip'i açıldığında body taşması yaratıp ResizeObserver döngüsüne
+   (efsanelerin yanıp sönmesi) girmesini engellemek için yatay kaydırmayı kapatıyoruz. */
+body {
+  overflow-x: hidden;
 }

@@ -829,9 +829,9 @@ window.Apex = {
   grid: { borderColor: '#eef1f5', strokeDashArray: 4, padding: { left: 6, right: 6 } },
   xaxis: {
     axisBorder: { show: false }, axisTicks: { show: false },
-    labels: { style: { colors: '#94a3b8', fontSize: '11px' } },
+    labels: { style: { colors: '#94a3b8', fontSize: '10.5px' }, rotate: -45, rotateAlways: false, hideOverlappingLabels: true },
   },
-  yaxis: { labels: { style: { colors: '#94a3b8', fontSize: '11px' } } },
+  yaxis: { labels: { style: { colors: '#94a3b8', fontSize: '10.5px' } } },
   legend: {
     fontSize: '12px', fontWeight: 500, labels: { colors: '#64748b' },
     markers: { radius: 12, width: 9, height: 9 }, itemMargin: { horizontal: 7, vertical: 2 },
