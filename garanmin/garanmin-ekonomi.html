@@ -44,20 +44,23 @@
 
           <div class="g-uyari warning" id="uyari"></div>
 
-          <div class="kpi-grid" id="serit"></div>
-
           <div class="grid">
-            <section class="card col-4">
-              <div class="card-head">
-                <div class="card-title-wrap">
-                  <span class="eyebrow">Defter</span>
-                  <h2 class="card-title">Kredi akisi</h2>
+            <div class="col-3" style="display: flex; flex-direction: column; gap: 14px; min-height: 0;">
+              <!-- KPI kutulari dikey olarak ust uste binecek -->
+              <div class="kpi-grid" id="serit" style="flex-direction: column; margin-bottom: 0;"></div>
+              
+              <section class="card" style="flex: 1; min-height: 0;">
+                <div class="card-head">
+                  <div class="card-title-wrap">
+                    <span class="eyebrow">Defter</span>
+                    <h2 class="card-title">Kredi akisi</h2>
+                  </div>
                 </div>
-              </div>
-              <div id="akis"></div>
-            </section>
+                <div id="akis"></div>
+              </section>
+            </div>
 
-            <section class="card col-8">
+            <section class="card col-9">
               <div class="card-head">
                 <div class="card-title-wrap">
                   <span class="eyebrow">Tüm Kullanıcılar</span>
@@ -82,7 +85,9 @@
                 </table>
               </div>
             </section>
+          </div>
 
+          <div class="grid" style="margin-top: 14px;">
             <section class="card col-4">
               <div class="card-head">
                 <div class="card-title-wrap">
