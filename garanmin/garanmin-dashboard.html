@@ -40,13 +40,12 @@
         <main class="content">
           <div id="garanmin-error"></div>
 
-          <!-- VERITABANI SERIDI -->
-          <div class="kpi-grid" id="db-serit"></div>
-          <!-- IS METRIKLERI -->
-          <div class="kpi-grid" id="is-serit"></div>
+          <!-- KPI SERIDI (8 Kutu Tek Satir) -->
+          <div class="kpi-grid" id="kpi-serit"></div>
 
           <div class="grid">
-            <section class="card col-8">
+            <!-- UST SATIR (Yari Yariya) -->
+            <section class="card col-6">
               <div class="card-head">
                 <div class="card-title-wrap">
                   <span class="eyebrow">Son 30 gün</span>
@@ -54,19 +53,27 @@
                 </div>
                 <span class="badge">kullanici · cihaz · destek</span>
               </div>
-              <div class="g-grafik uzun" id="c-akis"></div>
+              <div class="g-grafik" id="c-akis"></div>
             </section>
 
-            <section class="card col-4">
+            <section class="card col-6">
               <div class="card-head">
                 <div class="card-title-wrap">
-                  <span class="eyebrow">Cihazlar</span>
-                  <h2 class="card-title">Garanti durumu</h2>
+                  <span class="eyebrow">Canli</span>
+                  <h2 class="card-title">Son eklenen cihazlar</h2>
                 </div>
               </div>
-              <div class="g-grafik uzun" id="c-garanti"></div>
+              <div class="g-tablo-kutu-esnek">
+                <table class="table">
+                  <!-- Sutun genislikleri SABIT (gerekce: garanmin.css). Toplam %100. -->
+                  <colgroup><col style="width:40%"><col style="width:24%"><col style="width:36%"></colgroup>
+                  <thead><tr><th>Cihaz</th><th>Marka</th><th>Kullanıcı</th></tr></thead>
+                  <tbody id="son-cihaz"><tr><td colspan="3" class="soluk">Yukleniyor...</td></tr></tbody>
+                </table>
+              </div>
             </section>
 
+            <!-- ALT SATIR (Uclu Dagilim) -->
             <section class="card col-4">
               <div class="card-head">
                 <div class="card-title-wrap">
@@ -90,18 +97,11 @@
             <section class="card col-4">
               <div class="card-head">
                 <div class="card-title-wrap">
-                  <span class="eyebrow">Canli</span>
-                  <h2 class="card-title">Son eklenen cihazlar</h2>
+                  <span class="eyebrow">Cihazlar</span>
+                  <h2 class="card-title">Garanti durumu</h2>
                 </div>
               </div>
-              <div class="g-tablo-kutu" style="max-height:220px">
-                <table class="table">
-                  <!-- Sutun genislikleri SABIT (gerekce: garanmin.css). Toplam %100. -->
-                  <colgroup><col style="width:40%"><col style="width:24%"><col style="width:36%"></colgroup>
-                  <thead><tr><th>Cihaz</th><th>Marka</th><th>Kullanıcı</th></tr></thead>
-                  <tbody id="son-cihaz"><tr><td colspan="3" class="soluk">Yukleniyor...</td></tr></tbody>
-                </table>
-              </div>
+              <div class="g-grafik" id="c-garanti"></div>
             </section>
           </div>
         </main>
@@ -130,14 +130,11 @@
 
           const satir = tablolar.reduce(function (t, x) { return t + Number(x.satir); }, 0);
 
-          gKpiYaz('db-serit', [
+          gKpiYaz('kpi-serit', [
             { etiket: 'Veritabanı boyutu', deger: saglik.db_size_text, ikon: 'database', renk: 'purple' },
             { etiket: 'Toplam satir',      deger: gNum(satir),         ikon: 'list',     renk: 'primary' },
             { etiket: 'Tablo',             deger: tablolar.length,     ikon: 'layers',   renk: 'info' },
             { etiket: 'Cihaz kaydi',       deger: gNum(stats.total_devices), ikon: 'monitor', renk: 'success' },
-          ]);
-
-          gKpiYaz('is-serit', [
             { etiket: 'Kullanıcı',     deger: gNum(stats.total_users),           ikon: 'users',   renk: 'primary' },
             { etiket: 'Aylık aktif',   deger: gNum(stats.mau),                   ikon: 'activity',renk: 'success' },
             { etiket: 'Toplam kredi',  deger: gNum(stats.total_credits_sum),     ikon: 'star',    renk: 'warning' },

@@ -345,29 +345,22 @@ html, body { margin: 0; height: 100%; overflow: hidden; }
 .apexcharts-canvas svg { max-width: 100%; }
 
 /*
-  Grafik kabı — ApexCharts yüzde yükseklik için TANIMLI bir yükseklik istiyor;
-  kabın yüksekliği içeriğe bağlı kalsaydı grafik sıfır yükseklikte çizilirdi.
-
-  YÜKSEKLİKLER CÖMERT. Bir halka grafiğin altındaki gösterge, çubuk grafiğin
-  eksen etiketleri ve tarih dizisi hep aynı yüksekliği paylaşıyor; kap dar
-  olduğunda ApexCharts önce göstergeyi, sonra etiketleri kısaltıyor ve grafik
-  "sıkışmış" görünüyor. Kart zaten sayfayla birlikte uzuyor, bu yüzden burada
-  cimrilik etmenin bir kazancı yok.
+  Grafik kabı — Yükseklik %100 ve flex: 1. Bu sayede kart başlığından artan
+  kalan tüm alanı doldurur. ApexCharts resize event'lerine duyarlıdır.
 */
 .g-grafik { 
-  flex: none; 
-  height: 50%; 
-  width: 50%; 
-  margin: auto; 
+  flex: 1; 
+  height: 100%; 
+  width: 100%; 
+  min-height: 0;
   position: relative; 
 }
-.g-grafik.kisa { }
-.g-grafik.uzun { }
 
 /* Şablonun 12 sütunlu ızgarasında eksik olan genişlikler. */
 .col-3 { grid-column: span 3; }
 .col-4 { grid-column: span 4; }
 .col-5 { grid-column: span 5; }
+.col-6 { grid-column: span 6; }
 .col-7 { grid-column: span 7; }
 .col-8 { grid-column: span 8; }
 .col-9 { grid-column: span 9; }
@@ -419,25 +412,41 @@ html, body { margin: 0; height: 100%; overflow: hidden; }
 
 /*
   TEK EKRANA SIĞDIRMA.
-
-  `.main` taşmayı kırpıyor ve `.content` alanı esnek olarak kalan yüksekliği
-  dolduruyor. İçerideki `.grid` kendi yüksekliğini aşan içeriği kaydırmak yerine
-  kırpıyor: her sayfa viewport'un içinde kalıyor, sayfa seviyesinde hiçbir
-  kaydırma çubuğu çıkmıyor.
 */
 .shell { min-height: 0; height: 100vh; overflow: hidden; }
 .main  { height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
 .d-topbar { height: 50px; flex-shrink: 0; }
 .content { padding: 16px 20px; flex: 1; min-height: 0; display: flex; flex-direction: column; overflow: hidden; }
-.grid { flex: 1; min-height: 0; gap: 14px; overflow: hidden; display: grid; grid-auto-rows: minmax(0, 1fr); }
+.grid { flex: 1; min-height: 0; gap: 14px; overflow: hidden; display: grid; grid-template-rows: 55% minmax(0, 1fr); }
 .card { padding: 14px 16px; display: flex; flex-direction: column; min-height: 0; }
 .card-head { margin-bottom: 10px; padding: 0 0 6px; flex-shrink: 0; }
-.kpi-grid { margin-bottom: 14px; gap: 14px; flex-shrink: 0; }
-.kpi-card { padding: 12px 14px; }
+
+.kpi-grid { 
+  margin-bottom: 14px; gap: 10px; flex-shrink: 0; display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+}
+.kpi-card { padding: 12px 10px; }
+.kpi-card .kpi-value { font-size: clamp(16px, 1.4vw, 22px); }
+.kpi-card .g-kv-etiket { font-size: 11px; }
+
+.g-tablo-kutu-esnek {
+  flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden;
+}
+.g-tablo-kutu-esnek::-webkit-scrollbar { width: 5px; }
+.g-tablo-kutu-esnek::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+.g-tablo-kutu-esnek .table thead th {
+  position: sticky; top: 0; z-index: 2; background: var(--bg-card);
+  border-bottom: 0; box-shadow: inset 0 -1px 0 var(--border);
+}
+
+@media (max-width: 1400px) {
+  .kpi-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .grid { grid-template-rows: auto; overflow-y: auto; display: flex; flex-direction: column; }
+  .grid > .card { min-height: 400px; flex: none; }
+}
 
 @media (max-width: 1200px) {
-  .kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .col-3, .col-4, .col-5, .col-7, .col-8, .col-9 { grid-column: span 6; }
+  .col-3, .col-4, .col-5, .col-6, .col-7, .col-8, .col-9 { grid-column: span 6; }
 }
 @media (max-width: 992px) {
   /* Menü zorla simge durumuna geçiyor: 248 piksel bu genişlikte içerikten çalıyor.
@@ -454,7 +463,24 @@ html, body { margin: 0; height: 100%; overflow: hidden; }
   .d-topbar { padding: 0 18px; }
 }
 @media (max-width: 720px) {
-  .kpi-grid { grid-template-columns: 1fr; }
+  .kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .grid > * { grid-column: span 12 !important; }
   .g-saat { display: none; }
+  
+  /* Telefondan girildiğinde katlı (dar) menü tamamen gizlensin ki yer açılsın */
+  .shell.dar { --g-kenar: 0px; }
+  .shell.dar .d-sidebar { display: none; }
+  
+  /* Telefondaki üst çubuk çok sıkışmasın diye markanın yazısını da silebiliriz */
+  .shell.dar .g-marka-yazi { display: none; }
+}
+
+@media (max-width: 480px) {
+  /* Çok küçük telefonlarda (iPhone SE vs) 1 sütuna düşsün */
+  .kpi-grid { grid-template-columns: 1fr; }
+  /* Ekranı maksimum kullanmak için dış boşlukları daraltalım */
+  .content { padding: 8px; }
+  .card { padding: 10px; }
+  .kpi-card { padding: 10px; }
+  .d-topbar { padding: 0 10px; }
 }
