@@ -246,11 +246,11 @@ const GARANMIN_MENU = [
   ]},
   { ad: 'Gelir Gider', ikon: 'wallet', alt: [
     { href: 'garanmin-ekonomi.html', ad: 'Kredi Ekonomisi' },
-    { href: 'garanmin-send-credits.html', ad: 'Kredi Transferi' },
   ]},
-  { ad: 'İletişim & Destek', ikon: 'support', alt: [
+  { ad: 'Uygulama Etkileşimi', ikon: 'message', alt: [
     { href: 'garanmin-support.html', ad: 'Destek Talepleri' },
     { href: 'garanmin-notifications.html', ad: 'Bildirimler' },
+    { href: 'garanmin-send-credits.html', ad: 'Kredi Transferi' },
   ]},
 ];
 
