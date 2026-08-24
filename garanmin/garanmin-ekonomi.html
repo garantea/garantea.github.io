@@ -44,27 +44,30 @@
 
           <div class="g-uyari warning" id="uyari" style="margin-bottom: 16px;"></div>
 
-          <div class="kpi-grid" id="serit" style="margin-bottom: 16px;"></div>
-          
           <div class="grid" style="margin-bottom: 16px;">
-            <section class="card col-3" style="display: flex; flex-direction: column; min-height: 0;">
-              <div class="card-head">
-                <div class="card-title-wrap">
-                  <span class="eyebrow">Defter</span>
-                  <h2 class="card-title">Kredi akisi</h2>
+            <div class="col-4" style="display: flex; flex-direction: column; min-height: 0;">
+              <!-- 2 KPI yan yana -->
+              <div class="kpi-grid" id="serit" style="grid-template-columns: repeat(2, 1fr); margin-bottom: 16px;"></div>
+              
+              <section class="card" style="flex: 1; display: flex; flex-direction: column; min-height: 0;">
+                <div class="card-head">
+                  <div class="card-title-wrap">
+                    <span class="eyebrow">Defter</span>
+                    <h2 class="card-title">Kredi akisi</h2>
+                  </div>
                 </div>
-              </div>
-              <div id="akis" style="flex: 1; padding: 16px;"></div>
-            </section>
+                <div id="akis" style="flex: 1; padding: 16px;"></div>
+              </section>
+            </div>
 
-            <section class="card col-9">
+            <section class="card col-8" style="display: flex; flex-direction: column; min-height: 0;">
               <div class="card-head">
                 <div class="card-title-wrap">
                   <span class="eyebrow">Tüm Kullanıcılar</span>
                   <h2 class="card-title">Kredi Gecmisi ve Hareketler</h2>
                 </div>
               </div>
-              <div class="g-tablo-kutu-esnek" style="max-height: 400px; overflow-y: auto;">
+              <div class="g-tablo-kutu-esnek" style="flex: 1; min-height: 0; overflow-y: auto;">
                 <table class="table">
                   <colgroup>
                     <col style="width:25%"><col style="width:15%"><col style="width:15%">
@@ -143,9 +146,7 @@
 
           gKpiYaz('serit', [
             { etiket: 'Dolasimda kredi',      deger: gNum(e.mevcut_kredi),    ikon: 'star',  renk: 'warning' },
-            { etiket: 'Harcanan kredi',       deger: gNum(e.harcanan_kredi),  ikon: 'minus', renk: 'danger' },
-            { etiket: 'Reklamla kazanilan',   deger: gNum(e.reklam_kredi),    ikon: 'tv',    renk: 'success' },
-            { etiket: 'Kullanıcı basina ort.',deger: gNum(e.ortalama_kredi),  ikon: 'calc',  renk: 'primary' },
+            { etiket: 'Harcanan kredi',       deger: gNum(e.harcanan_kredi),  ikon: 'minus', renk: 'danger' }
           ]);
 
           if (!gBos('c-dagilim', e.dagilim)) {
