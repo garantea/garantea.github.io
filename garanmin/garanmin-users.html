@@ -150,12 +150,14 @@
             +       '<div class="card-head"><div class="card-title-wrap">'
             +         '<span class="eyebrow">Hesap</span><h2 class="card-title">Profil</h2>'
             +       '</div></div>'
-            +       gKv('Kayit tarihi', gDate(p.created_at))
-            +       gKv('Son giris', gGoreli(p.last_sign_in_at))
-            +       gKv('Giris yontemi', gEsc(p.saglayici))
-            +       gKv('Aktif garanti', gNum(g.active || 0))
-            +       gKv('Yakinda bitiyor', gNum(g.expiring_soon || 0))
-            +       gKv('Suresi dolmus', gNum(g.expired || 0))
+            +       '<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">'
+            +         gKv('Kayit', gDate(p.created_at))
+            +         gKv('Son giris', gGoreli(p.last_sign_in_at))
+            +         gKv('Yontem', gEsc(p.saglayici))
+            +         gKv('Aktif', gNum(g.active || 0))
+            +         gKv('Yakin', gNum(g.expiring_soon || 0))
+            +         gKv('Dolmus', gNum(g.expired || 0))
+            +       '</div>'
             +     '</section>'
             +     '<section class="card" style="flex: 1; min-height: 0;">'
             +       '<div class="card-head"><div class="card-title-wrap">'
