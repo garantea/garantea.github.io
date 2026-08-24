@@ -528,3 +528,11 @@ body {
 /* Sol panel daraltilinca is-active ikonu tasmamasi icin fix */
 .shell.dar .nav-link.is-active::before { left: 0; width: 100%; border-radius: 0; z-index: -1; }
 .shell.dar .nav-link.is-active { padding-left: 0; padding-right: 0; }
+
+/* Sol panelin tek ekrana sigmasi (scrollsuz) icin sikistirma */
+.d-sidebar { overflow-y: hidden !important; }
+.nav-link { padding: 8px 16px !important; }
+.nav-submenu a { padding: 4px 14px !important; }
+.nav-item-group.is-open .nav-submenu { padding: 2px 0 6px !important; }
+.nav-section { gap: 2px; }
+.g-marka { padding-top: 10px; padding-bottom: 10px; }
