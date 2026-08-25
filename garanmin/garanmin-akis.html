@@ -139,7 +139,6 @@
         try {
           temizle();
           const v = await garanminData('garanmin_akis', { p_gun: gun });
-          v.reverse(); // Gelen veri en yeniden eskiye, grafikte soldan saga (eskiden yeniye) cizmek icin ters cevir.
           const etiket = v.map(function (d) { return gDate(d.gun); });
           const k = v.map(function (d) { return Number(d.kullanici); });
           const c = v.map(function (d) { return Number(d.cihaz); });
