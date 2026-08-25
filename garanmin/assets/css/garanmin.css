@@ -523,6 +523,8 @@ body {
 }
 .apexcharts-tooltip {
   pointer-events: none !important;
+  transition: none !important;
+  animation: none !important;
 }
 
 /* Sol panel daraltilinca is-active ikonu tasmamasi icin fix */
