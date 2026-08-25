@@ -36,7 +36,7 @@
           <div class="kpi-grid" id="serit"></div>
 
           <div class="grid">
-            <section class="card col-12">
+            <section class="card col-8">
               <div class="card-head">
                 <div class="card-title-wrap">
                   <span class="eyebrow">Gunluk</span>
@@ -50,6 +50,18 @@
               </div>
               <div class="g-grafik-wrap">
                 <div class="g-grafik uzun" id="c-akis"></div>
+              </div>
+            </section>
+
+            <section class="card col-4">
+              <div class="card-head">
+                <div class="card-title-wrap">
+                  <span class="eyebrow">Toplam Büyüme</span>
+                  <h2 class="card-title">Kümülatif Gelişim</h2>
+                </div>
+              </div>
+              <div class="g-grafik-wrap">
+                <div class="g-grafik uzun" id="c-kumulatif"></div>
               </div>
             </section>
 
@@ -169,6 +181,26 @@
               legend: { position: 'top', horizontalAlign: 'right' },
             }));
             g.render(); grafikler.push(g);
+          }
+
+          if (!gBos('c-kumulatif', v)) {
+            const kumK = []; let sumK = 0; k.forEach(function(val) { sumK += val; kumK.push(sumK); });
+            const kumC = []; let sumC = 0; c.forEach(function(val) { sumC += val; kumC.push(sumC); });
+            const base2 = gGrafikTemel();
+            base2.chart.type = 'area';
+            const g2 = new ApexCharts(gKap('c-kumulatif'), Object.assign(base2, {
+              series: [
+                { name: 'Kullanıcı (Kümülatif)', data: kumK },
+                { name: 'Cihaz (Kümülatif)',     data: kumC }
+              ],
+              xaxis: { categories: etiket, labels: { rotate: 0, hideOverlappingLabels: true } },
+              stroke: { curve: 'smooth', width: 2.5 },
+              fill: { type: 'gradient', gradient: { opacityFrom: .28, opacityTo: .02 } },
+              markers: { size: gun <= 7 ? 4 : 0 },
+              colors: [G_RENK[0], G_RENK[1]],
+              legend: { position: 'top', horizontalAlign: 'right' },
+            }));
+            g2.render(); grafikler.push(g2);
           }
 
           mini('c-k', k, etiket, G_RENK[0]);
