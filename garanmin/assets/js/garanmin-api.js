@@ -833,7 +833,18 @@ window.Apex = {
 };
 
 function gGrafikTemel(yukseklik) {
-  return { chart: { height: yukseklik || '100%', width: '100%' }, colors: G_RENK };
+  return { 
+    chart: { height: yukseklik || '100%', width: '100%' }, 
+    colors: G_RENK,
+    tooltip: {
+      fixed: {
+        enabled: true,
+        position: 'topLeft',
+        offsetY: 0,
+        offsetX: 0
+      }
+    }
+  };
 }
 
 /*
