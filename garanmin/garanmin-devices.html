@@ -119,18 +119,15 @@
             xaxis: { categories: kategori.map(function (d) { return gKategori(d.category); }) },
             plotOptions: { bar: { borderRadius: 5, distributed: true, columnWidth: '55%' } },
             legend: { show: false },
-            chart: {
-              events: {
-                dataPointSelection: function(event, chartContext, config) {
-                  if (config.dataPointIndex >= 0) {
-                    const rawCategory = kategori[config.dataPointIndex].category;
-                    const catName = gKategori(rawCategory);
-                    kategoriCihazGoster(rawCategory, catName);
-                  }
-                }
+          }, kategori, {
+            dataPointSelection: function(event, chartContext, config) {
+              if (config.dataPointIndex >= 0) {
+                const rawCategory = kategori[config.dataPointIndex].category;
+                const catName = gKategori(rawCategory);
+                kategoriCihazGoster(rawCategory, catName);
               }
             }
-          }, kategori);
+          });
 
           ciz('c-garanti', 'donut', {
             series: garanti.map(function (d) { return Number(d.count); }),
@@ -159,14 +156,12 @@
       /* Veri yoksa grafik CIZILMIYOR, "veri yok" yaziliyor: ApexCharts bos bir
          dizide eksenleri ve bos bir izgarayi yine de cizer ve bu, "veri gelmedi"
          ile "veri sifir" arasindaki farki gorunmez kilar. */
-      function ciz(hedef, tip, ayar, veri) {
+      function ciz(hedef, tip, ayar, veri, events) {
         if (gBos(hedef, veri)) return;
         const t = gGrafikTemel();
         t.chart.type = tip;
-        // Eğer ayar icinde chart.events varsa temel ayarlardakilerle birlestir (ezme)
-        if (ayar.chart && ayar.chart.events) {
-            t.chart.events = Object.assign(t.chart.events || {}, ayar.chart.events);
-            delete ayar.chart.events;
+        if (events) {
+            t.chart.events = events;
         }
         new ApexCharts(gKap(hedef), Object.assign(t, ayar)).render();
       }
