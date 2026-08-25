@@ -33,71 +33,75 @@
 
         <main class="content">
           <div id="garanmin-error"></div>
-          <div class="kpi-grid" id="serit"></div>
-
-          <div class="grid">
-            <section class="card col-8">
-              <div class="card-head">
-                <div class="card-title-wrap">
-                  <span class="eyebrow">Gunluk</span>
-                  <h2 class="card-title">Kayıt akışı</h2>
+          <div class="grid" style="flex: 1.5; margin-bottom: 14px;">
+            <div class="col-6" style="display: flex; flex-direction: column; min-height: 0;">
+              <div class="kpi-grid" id="serit" style="grid-template-columns: repeat(2, 1fr); margin-bottom: 14px;"></div>
+              
+              <section class="card" style="flex: 1; display: flex; flex-direction: column; min-height: 0;">
+                <div class="card-head">
+                  <div class="card-title-wrap">
+                    <span class="eyebrow">Gunluk</span>
+                    <h2 class="card-title">Kayıt akışı</h2>
+                  </div>
+                  <div class="g-arac">
+                    <button class="btn btn--primary btn--sm" onclick="setGun(7)"  id="g7">7 gun</button>
+                    <button class="btn btn--ghost btn--sm"   onclick="setGun(30)" id="g30">30 gun</button>
+                    <button class="btn btn--ghost btn--sm"   onclick="setGun(90)" id="g90">90 gun</button>
+                  </div>
                 </div>
-                <div class="g-arac">
-                  <button class="btn btn--primary btn--sm" onclick="setGun(7)"  id="g7">7 gun</button>
-                  <button class="btn btn--ghost btn--sm"   onclick="setGun(30)" id="g30">30 gun</button>
-                  <button class="btn btn--ghost btn--sm"   onclick="setGun(90)" id="g90">90 gun</button>
+                <div class="g-grafik-wrap" style="flex: 1; min-height: 0;">
+                  <div class="g-grafik" id="c-akis" style="height: 100%"></div>
                 </div>
-              </div>
-              <div class="g-grafik-wrap">
-                <div class="g-grafik uzun" id="c-akis"></div>
-              </div>
-            </section>
+              </section>
+            </div>
 
-            <section class="card col-4">
+            <section class="card col-6" style="display: flex; flex-direction: column; min-height: 0;">
               <div class="card-head">
                 <div class="card-title-wrap">
                   <span class="eyebrow">Toplam Büyüme</span>
                   <h2 class="card-title">Kümülatif Gelişim</h2>
                 </div>
               </div>
-              <div class="g-grafik-wrap">
-                <div class="g-grafik uzun" id="c-kumulatif"></div>
+              <div class="g-grafik-wrap" style="flex: 1; min-height: 0;">
+                <div class="g-grafik" id="c-kumulatif" style="height: 100%"></div>
               </div>
             </section>
+          </div>
 
-            <section class="card col-4">
+          <div class="grid" style="flex: 1;">
+            <section class="card col-4" style="display: flex; flex-direction: column; min-height: 0;">
               <div class="card-head">
                 <div class="card-title-wrap">
                   <span class="eyebrow">Gunluk</span>
                   <h2 class="card-title">Kullanıcı</h2>
                 </div>
               </div>
-              <div class="g-grafik-wrap">
-                <div class="g-grafik kisa" id="c-k"></div>
+              <div class="g-grafik-wrap" style="flex: 1; min-height: 0;">
+                <div class="g-grafik" id="c-k" style="height: 100%"></div>
               </div>
             </section>
 
-            <section class="card col-4">
+            <section class="card col-4" style="display: flex; flex-direction: column; min-height: 0;">
               <div class="card-head">
                 <div class="card-title-wrap">
                   <span class="eyebrow">Gunluk</span>
                   <h2 class="card-title">Cihaz</h2>
                 </div>
               </div>
-              <div class="g-grafik-wrap">
-                <div class="g-grafik kisa" id="c-c"></div>
+              <div class="g-grafik-wrap" style="flex: 1; min-height: 0;">
+                <div class="g-grafik" id="c-c" style="height: 100%"></div>
               </div>
             </section>
 
-            <section class="card col-4">
+            <section class="card col-4" style="display: flex; flex-direction: column; min-height: 0;">
               <div class="card-head">
                 <div class="card-title-wrap">
                   <span class="eyebrow">Gunluk</span>
                   <h2 class="card-title">Destek</h2>
                 </div>
               </div>
-              <div class="g-grafik-wrap">
-                <div class="g-grafik kisa" id="c-t"></div>
+              <div class="g-grafik-wrap" style="flex: 1; min-height: 0;">
+                <div class="g-grafik" id="c-t" style="height: 100%"></div>
               </div>
             </section>
           </div>
