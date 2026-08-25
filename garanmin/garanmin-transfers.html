@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="tr" data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Garanmin — Kredi Transferleri</title>
+    <link rel="icon" type="image/x-icon" href="assets/img/favicon/favicon.ico" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="assets/adminator/adminator.css" />
+    <link rel="stylesheet" href="assets/css/garanmin.css" />
+  </head>
+
+  <body>
+    <div class="shell" id="g-app">
+      <aside class="d-sidebar" id="garanmin-menu"></aside>
+
+      <div class="main">
+        <header class="d-topbar" id="garanmin-navbar"></header>
+
+        <main class="content">
+          <div id="garanmin-error"></div>
+          
+          <div class="grid">
+            <section class="card col-12">
+              <div class="card-head">
+                <div class="card-title-wrap">
+                  <span class="eyebrow">İşlem Geçmişi</span>
+                  <h2 class="card-title">Kredi Transferleri</h2>
+                </div>
+              </div>
+
+              <div class="g-tablo-kutu-esnek">
+                <table class="table">
+                  <colgroup>
+                    <col style="width:20%">
+                    <col style="width:25%">
+                    <col style="width:25%">
+                    <col style="width:10%">
+                    <col style="width:10%">
+                    <col style="width:10%">
+                  </colgroup>
+                  <thead>
+                    <tr>
+                      <th>Tarih</th>
+                      <th>Gönderen</th>
+                      <th>Alıcı</th>
+                      <th class="sayi">Miktar</th>
+                      <th>Durum</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody id="transfer-tablo">
+                    <tr><td colspan="6" style="text-align:center; padding:40px;">Yükleniyor...</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </section>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <script src="assets/js/garanmin-api.js"></script>
+    <script>
+      const sahteVeri = [
+        { id: 1, tarih: '2026-08-25T14:30:00Z', gonderen: 'ahmet@example.com', alici: 'mehmet@example.com', miktar: 50, durum: 'Basarili' },
+        { id: 2, tarih: '2026-08-25T12:15:00Z', gonderen: 'ayse@example.com', alici: 'fatma@example.com', miktar: 150, durum: 'Basarili' },
+        { id: 3, tarih: '2026-08-24T09:45:00Z', gonderen: 'mehmet@example.com', alici: 'ahmet@example.com', miktar: 20, durum: 'Iptal Edildi' },
+        { id: 4, tarih: '2026-08-23T18:20:00Z', gonderen: 'veli@example.com', alici: 'ayse@example.com', miktar: 100, durum: 'Basarili' }
+      ];
+
+      function tabloCiz() {
+        const tb = document.getElementById('transfer-tablo');
+        if (gBos('transfer-tablo', sahteVeri)) return;
+
+        tb.innerHTML = sahteVeri.map(function(t, idx) {
+          const btn = t.durum === 'Basarili'
+            ? '<button class="btn btn--danger btn--sm" onclick="islemIptal(' + idx + ')">İptal Et</button>'
+            : '<span class="badge danger">İptal Edildi</span>';
+          
+          return '<tr>'
+            + '<td>' + gDateTime(t.tarih) + '</td>'
+            + '<td>' + gEsc(t.gonderen) + '</td>'
+            + '<td>' + gEsc(t.alici) + '</td>'
+            + '<td class="sayi">' + t.miktar + '</td>'
+            + '<td>' + (t.durum === 'Basarili' ? '<span class="badge success">Başarılı</span>' : '') + '</td>'
+            + '<td style="text-align:right;">' + btn + '</td>'
+            + '</tr>';
+        }).join('');
+      }
+
+      window.islemIptal = function(idx) {
+        if (confirm('Bu işlemi iptal etmek (geri almak) istediğinize emin misiniz?')) {
+          sahteVeri[idx].durum = 'Iptal Edildi';
+          tabloCiz();
+          gError('İşlem iptal edildi ve krediler iade edildi (Mock).');
+          setTimeout(() => { document.getElementById('garanmin-error').innerHTML = ''; }, 3000);
+        }
+      };
+
+      // INIT
+      if (garanminGuardPage()) {
+        garanminShell('garanmin-transfers.html', 'Kredi Transferleri', 'Gelir Gider');
+        tabloCiz();
+      }
+    </script>
+  </body>
+</html>

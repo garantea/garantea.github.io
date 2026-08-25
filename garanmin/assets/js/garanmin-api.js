@@ -28,6 +28,10 @@
 /* ══════════════════════════════════════════════════════════════════════════
    YAPILANDIRMA
    ══════════════════════════════════════════════════════════════════════════ */
+(function() {
+  const t = localStorage.getItem('garanmin_theme') || 'light';
+  document.documentElement.setAttribute('data-theme', t);
+})();
 
 const GARANMIN = {
   supabaseUrl: 'https://mcsygnkhdjnkmqcntwvh.supabase.co',
@@ -206,6 +210,9 @@ const G_IKON = {
   file:      '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/>',
   idCard:    '<rect x="2" y="4" width="20" height="16" rx="2"/><circle cx="8" cy="12" r="2.5"/><path d="M14 10h5M14 14h5M4 17c.7-1.7 2.2-2.5 4-2.5s3.3.8 4 2.5"/>',
   refresh:   '<path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 3v6h-6"/>',
+  sun:       '<circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>',
+  moon:      '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>',
+  bell:      '<path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>',
 };
 
 /**
@@ -443,6 +450,18 @@ function garanminShell(aktif, baslik, ustBil) {
         <div class="s" id="g-saat">--:--:--</div>
         <div class="t" id="g-tarih">-</div>
       </div>
+      <button class="icon-btn" id="g-tema-btn" onclick="garanminTemaDegistir()" title="Tema Degistir" aria-label="Tema">
+        ${gIkon(document.documentElement.getAttribute('data-theme') === 'dark' ? 'sun' : 'moon')}
+      </button>
+      <div style="position:relative; display:inline-block;">
+        <button class="icon-btn" id="g-bildirim-btn" onclick="garanminBildirimAc()" title="Bildirimler" aria-label="Bildirimler">
+          ${gIkon('bell')}<span class="badge danger" id="g-bell-badge" style="position:absolute; top:4px; right:4px; width:8px; height:8px; padding:0; border-radius:50%; display:none;"></span>
+        </button>
+        <div id="g-bildirim-kutu" style="display:none; position:absolute; right:0; top:40px; width:280px; background:var(--bg-card); border:1px solid var(--border); border-radius:8px; box-shadow:var(--shadow-lg); z-index:100; padding:10px; text-align:left;">
+          <div class="eyebrow" style="margin-bottom:8px;">Son Dakika</div>
+          <div id="g-bildirim-liste" style="font-size:12.5px; color:var(--t-base); max-height:200px; overflow-y:auto;">Henuz bildirim yok.</div>
+        </div>
+      </div>
       <button class="icon-btn" onclick="location.reload()" title="Yenile"
               aria-label="Yenile">${gIkon('refresh')}</button>
       <button class="icon-btn" onclick="garanminLogout()" title="Çıkış"
@@ -453,7 +472,8 @@ function garanminShell(aktif, baslik, ustBil) {
   garanminKatlaUygula(localStorage.getItem('garanmin_dar') === '1');
   garanminSaatBaslat();
   garanminNabizBaslat();
-  garanminGrafikGozlemci();
+  if (typeof garanminGrafikGozlemci === 'function') garanminGrafikGozlemci();
+  garanminMockBildirimBaslat();
 }
 
 /**
@@ -493,6 +513,47 @@ function garanminKatlaUygula(dar) {
   document.getElementById('g-app').classList.toggle('dar', !!dar);
   localStorage.setItem('garanmin_dar', dar ? '1' : '0');
   setTimeout(function () { window.dispatchEvent(new Event('resize')); }, 240);
+}
+
+function garanminTemaDegistir() {
+  const current = document.documentElement.getAttribute('data-theme') || 'light';
+  const next = current === 'light' ? 'dark' : 'light';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('garanmin_theme', next);
+  const btn = document.getElementById('g-tema-btn');
+  if (btn) btn.innerHTML = gIkon(next === 'light' ? 'moon' : 'sun');
+}
+
+function garanminBildirimAc() {
+  const kutu = document.getElementById('g-bildirim-kutu');
+  if (!kutu) return;
+  kutu.style.display = kutu.style.display === 'none' ? 'block' : 'none';
+  const badge = document.getElementById('g-bell-badge');
+  if (badge) badge.style.display = 'none';
+}
+
+function garanminMockBildirimBaslat() {
+  setInterval(function() {
+    const badge = document.getElementById('g-bell-badge');
+    if (badge) {
+      badge.style.display = 'block';
+      const liste = document.getElementById('g-bildirim-liste');
+      const msgList = [
+        'Ahmet yeni bir cihaz ekledi.',
+        'Yeni bir destek talebi geldi.',
+        'Sistem yedegi alindi.',
+        'Kredi transferi gerceklesti.',
+        'Yeni bir kullanici kaydoldu.'
+      ];
+      const msg = msgList[Math.floor(Math.random() * msgList.length)];
+      if (liste.innerText.includes('yok')) liste.innerHTML = '';
+      const saatStr = new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute:'2-digit' });
+      liste.innerHTML = '<div style="padding:8px 0; border-bottom:1px solid var(--border-soft); display:flex; gap:8px;">' 
+                      + '<div style="color:var(--primary); margin-top:2px;">' + gIkon('info') + '</div>'
+                      + '<div><div style="font-weight:500;">' + msg + '</div><div style="font-size:10px; color:var(--t-muted);">' + saatStr + '</div></div>'
+                      + '</div>' + liste.innerHTML;
+    }
+  }, 30000);
 }
 
 /* ══════════════════════════════════════════════════════════════════════════

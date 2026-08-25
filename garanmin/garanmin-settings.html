@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="tr" data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Garanmin — Sistem Ayarları</title>
+    <link rel="icon" type="image/x-icon" href="assets/img/favicon/favicon.ico" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="assets/adminator/adminator.css" />
+    <link rel="stylesheet" href="assets/css/garanmin.css" />
+  </head>
+
+  <body>
+    <div class="shell" id="g-app">
+      <aside class="d-sidebar" id="garanmin-menu"></aside>
+
+      <div class="main">
+        <header class="d-topbar" id="garanmin-navbar"></header>
+
+        <main class="content">
+          <div id="garanmin-error"></div>
+          
+          <div class="grid">
+            <section class="card col-12">
+              <div class="card-head">
+                <div class="card-title-wrap">
+                  <span class="eyebrow">Yönetim</span>
+                  <h2 class="card-title">Sistem Ayarları</h2>
+                </div>
+              </div>
+
+              <div class="g-giris-form" style="padding: 20px 0; max-width: 600px;">
+                <form id="settings-form" onsubmit="ayarlariKaydet(event)">
+                  <div style="margin-bottom: 24px;">
+                    <label for="maintenanceMode" style="display:flex; align-items:center; gap:8px;">
+                      <input type="checkbox" id="maintenanceMode" />
+                      Sistemi Bakım Moduna Al (Kullanıcılar giremez)
+                    </label>
+                  </div>
+
+                  <div style="margin-bottom: 24px;">
+                    <label for="allowNewUsers" style="display:flex; align-items:center; gap:8px;">
+                      <input type="checkbox" id="allowNewUsers" checked />
+                      Yeni Üye Alımına İzin Ver
+                    </label>
+                  </div>
+
+                  <div style="margin-bottom: 24px;">
+                    <label for="adReward">Reklam İzleme Başına Verilecek Kredi (Ödül):</label>
+                    <input type="number" id="adReward" value="5" min="1" max="100" />
+                  </div>
+
+                  <div style="margin-bottom: 24px;">
+                    <label for="maxDevices">Kullanıcı Başına Maksimum Cihaz Sınırı:</label>
+                    <input type="number" id="maxDevices" value="10" min="1" max="100" />
+                  </div>
+
+                  <button type="submit" class="btn btn--primary">Ayarları Kaydet</button>
+                  <span id="save-indicator" style="margin-left:12px; font-weight:500; color:var(--success); opacity:0; transition:opacity 0.3s;">
+                    Başarıyla kaydedildi!
+                  </span>
+                </form>
+              </div>
+            </section>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <script src="assets/js/garanmin-api.js"></script>
+    <script>
+      function ayarlariKaydet(e) {
+        e.preventDefault();
+        
+        // Form değerlerini okuyup localStorage'a kaydedelim (Mock)
+        const maintenance = document.getElementById('maintenanceMode').checked;
+        const allowNew = document.getElementById('allowNewUsers').checked;
+        const reward = document.getElementById('adReward').value;
+        const maxDev = document.getElementById('maxDevices').value;
+        
+        localStorage.setItem('gSettings_maintenance', maintenance);
+        localStorage.setItem('gSettings_allowNew', allowNew);
+        localStorage.setItem('gSettings_reward', reward);
+        localStorage.setItem('gSettings_maxDev', maxDev);
+
+        const ind = document.getElementById('save-indicator');
+        ind.style.opacity = '1';
+        setTimeout(() => { ind.style.opacity = '0'; }, 3000);
+      }
+
+      function ayarlariYukle() {
+        if (localStorage.getItem('gSettings_maintenance') !== null) {
+          document.getElementById('maintenanceMode').checked = (localStorage.getItem('gSettings_maintenance') === 'true');
+        }
+        if (localStorage.getItem('gSettings_allowNew') !== null) {
+          document.getElementById('allowNewUsers').checked = (localStorage.getItem('gSettings_allowNew') === 'true');
+        }
+        if (localStorage.getItem('gSettings_reward') !== null) {
+          document.getElementById('adReward').value = localStorage.getItem('gSettings_reward');
+        }
+        if (localStorage.getItem('gSettings_maxDev') !== null) {
+          document.getElementById('maxDevices').value = localStorage.getItem('gSettings_maxDev');
+        }
+      }
+
+      // INIT
+      if (garanminGuardPage()) {
+        garanminShell('garanmin-settings.html', 'Sistem Ayarları', 'Veri Tabanı'); // "Veri Tabanı" menüsü altına koyabiliriz
+        ayarlariYukle();
+      }
+    </script>
+  </body>
+</html>

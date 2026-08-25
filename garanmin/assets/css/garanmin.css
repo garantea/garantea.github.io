@@ -29,6 +29,26 @@
    çözülmez ve sayfa siyah beyaz açılır. Koyu tema bilinçli olarak kullanılmıyor.
    ========================================================================== */
 
+[data-theme="dark"] {
+  --bg-body: #0f172a;
+  --bg-card: #1e293b;
+  --t-base: #f8fafc;
+  --t-light: #94a3b8;
+  --t-muted: #64748b;
+  --border: #334155;
+  --border-soft: #1e293b;
+  --primary: #3b82f6;
+  --primary-soft: rgba(59, 130, 246, 0.2);
+  --success: #10b981;
+  --success-soft: rgba(16, 185, 129, 0.2);
+  --warning: #f59e0b;
+  --warning-soft: rgba(245, 158, 11, 0.2);
+  --danger: #ef4444;
+  --danger-soft: rgba(239, 68, 68, 0.2);
+  --info: #0ea5e9;
+  --info-soft: rgba(14, 165, 233, 0.2);
+}
+
 /* ══════════════════════════════════════════════════════════════════════════
    1. İSKELET — katlanabilir kenar çubuğu
    ══════════════════════════════════════════════════════════════════════════ */

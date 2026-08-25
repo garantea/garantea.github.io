@@ -46,17 +46,23 @@
                   <span class="eyebrow">Son 200 kayit</span>
                   <h2 class="card-title">Talepler</h2>
                 </div>
+                <div class="g-arac">
+                  <button class="btn btn--danger btn--sm" id="btn-toplu-kapat" onclick="topluKapat()" title="Secili Olanlari Kapat">Seçilileri Kapat</button>
+                </div>
               </div>
               <div class="g-tablo-kutu-esnek">
                 <table class="table">
                   <!-- Sutun genislikleri SABIT (gerekce: garanmin.css). Toplam %100.
                        Mesaj sutunu en genis: kesilmek yerine saran tek sutun o. -->
                   <colgroup>
-                    <col style="width:16%"><col style="width:20%"><col style="width:12%">
+                    <col style="width:4%"><col style="width:14%"><col style="width:18%"><col style="width:12%">
                     <col style="width:9%"><col style="width:12%"><col style="width:31%">
                   </colgroup>
                   <thead>
-                    <tr><th>Tarih</th><th>Kullanıcı</th><th>Tur</th><th>Durum</th><th>Cihaz</th><th>Mesaj</th></tr>
+                    <tr>
+                      <th><input type="checkbox" id="chk-hepsi" onclick="hepsiniSec(this)"></th>
+                      <th>Tarih</th><th>Kullanıcı</th><th>Tur</th><th>Durum</th><th>Cihaz</th><th>Mesaj</th>
+                    </tr>
                   </thead>
                   <tbody id="tbody"><tr><td colspan="6" class="soluk">Yukleniyor...</td></tr></tbody>
                 </table>
@@ -112,6 +118,7 @@
             ? liste.map(function (t) {
                 const js = btoa(unescape(encodeURIComponent(JSON.stringify(t))));
                 return '<tr style="cursor:pointer" onclick="detay(\'' + js + '\')">'
+                  + '<td onclick="event.stopPropagation()"><input type="checkbox" class="chk-bilet"></td>'
                   + '<td class="soluk">' + gDateTime(t.created_at) + '</td>'
                   + '<td title="' + gEsc(t.email || '-') + '">' + gEsc(t.email || '-') + '</td>'
                   + '<td>' + gEsc(TUR[t.kind] || t.kind) + '</td>'
@@ -170,9 +177,33 @@
         btn.classList.add('success');
         btn.disabled = true;
         setTimeout(function() {
-          const k = document.querySelector('.g-modal-kapat');
+          const k = document.querySelector('.g-modal-kapat') || document.querySelector('.g-modal-bas .icon-btn');
           if (k) k.click();
+          else garanminModalKapat();
         }, 1200);
+      }
+
+      function hepsiniSec(chk) {
+        document.querySelectorAll('.chk-bilet').forEach(c => c.checked = chk.checked);
+      }
+      function topluKapat() {
+        const checked = document.querySelectorAll('.chk-bilet:checked');
+        if (checked.length === 0) {
+          gError('Lutfen once kapatilacak kayitlari secin.');
+          setTimeout(() => { document.getElementById('garanmin-error').innerHTML = ''; }, 3000);
+          return;
+        }
+        if (confirm(checked.length + ' adet secili talebi topluca kapatmak istediginize emin misiniz?')) {
+          checked.forEach(c => {
+             const row = c.closest('tr');
+             const statusCell = row.querySelectorAll('td')[4];
+             statusCell.innerHTML = '<span class="badge success">closed</span>';
+             c.checked = false;
+          });
+          document.getElementById('chk-hepsi').checked = false;
+          gError(checked.length + ' talep basariyla kapatildi (Mock).');
+          setTimeout(() => { document.getElementById('garanmin-error').innerHTML = ''; }, 3000);
+        }
       }
 
       if (garanminGuardPage()) {
