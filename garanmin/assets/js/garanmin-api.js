@@ -880,9 +880,9 @@ function garanminGrafikGozlemci() {
   if (typeof ResizeObserver !== 'undefined') {
     let sonGenislik = 0;
     new ResizeObserver(function (kayitlar) {
-      const g = Math.round(kayitlar[0].contentRect.width);
-      if (g === sonGenislik) return;   // yalnızca GENİŞLİK önemli; yükseklik değişimi
-      sonGenislik = g;                 // grafiği ilgilendirmiyor ve döngü yaratırdı
+      const g = kayitlar[0].contentRect.width;
+      if (Math.abs(g - sonGenislik) < 2) return;   // küçük dalgalanmaları (1px altı/üstü) yoksay
+      sonGenislik = g;
       olc();
     }).observe(hedef);
   }
