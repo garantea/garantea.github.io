@@ -110,7 +110,8 @@
           const tb = document.getElementById('tbody');
           tb.innerHTML = liste.length
             ? liste.map(function (t) {
-                return '<tr>'
+                const js = btoa(unescape(encodeURIComponent(JSON.stringify(t))));
+                return '<tr style="cursor:pointer" onclick="detay(\'' + js + '\')">'
                   + '<td class="soluk">' + gDateTime(t.created_at) + '</td>'
                   + '<td title="' + gEsc(t.email || '-') + '">' + gEsc(t.email || '-') + '</td>'
                   + '<td>' + gEsc(TUR[t.kind] || t.kind) + '</td>'
@@ -133,6 +134,45 @@
             })).render();
           }
         } catch (e) { gError(e.message); }
+      }
+
+      function detay(js) {
+        const t = JSON.parse(decodeURIComponent(escape(atob(js))));
+        const modalBody = `
+          <div style="display:flex; flex-direction:column; gap: 14px;">
+            <div class="card" style="padding: 16px; background: var(--bg-body); border: 1px solid var(--b-base); box-shadow: none;">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                <span class="eyebrow">${gEsc(TUR[t.kind] || t.kind)} - ${gEsc(t.device_name || 'Genel')}</span>
+                <span class="soluk" style="font-size:11px">${gDateTime(t.created_at)}</span>
+              </div>
+              <div style="font-size: 14px; line-height: 1.5;">${gEsc(t.message)}</div>
+            </div>
+            <div style="display:flex; flex-direction:column; gap: 8px;">
+              <div class="eyebrow" style="color: var(--t-base);">Kullanıcıya Yanıt Gönder</div>
+              <textarea class="input" style="width:100%; height: 120px; resize: none; padding: 12px; font-family: inherit;" placeholder="Merhaba, talebinizle ilgili..."></textarea>
+              <div style="display: flex; justify-content: flex-end; margin-top: 4px;">
+                <button class="btn btn--primary" onclick="sahteCevap(this)">Yanıtı İlet</button>
+              </div>
+            </div>
+          </div>
+        `;
+        garanminModalAc(
+          '<div class="g-modal-kim">'
+          + '<span class="avatar">' + gEsc((t.email || '?').slice(0, 2).toUpperCase()) + '</span>'
+          + '<div><span class="eyebrow">Talep Sahibi</span>'
+          + '<div class="modal-title">' + gEsc(t.email || 'Bilinmeyen Kullanıcı') + '</div></div></div>',
+          modalBody
+        );
+      }
+
+      function sahteCevap(btn) {
+        btn.innerHTML = gIkon('check') + ' Gönderildi';
+        btn.classList.add('success');
+        btn.disabled = true;
+        setTimeout(function() {
+          const k = document.querySelector('.g-modal-kapat');
+          if (k) k.click();
+        }, 1200);
       }
 
       if (garanminGuardPage()) {
