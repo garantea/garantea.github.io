@@ -302,25 +302,27 @@
        */
       async function detay(id, email) {
         garanminModalAc(
-          '<div class="g-modal-kim">'
-          + '<span class="avatar" id="g-modal-avatar">' + gEsc((email || '?').slice(0, 2).toUpperCase()) + '</span>'
-          + '<div><span class="eyebrow">Kullanıcı detayi</span>'
-          + '<div class="modal-title">' + gEsc(email) + '</div></div></div>',
+          '<div class="g-modal-kim" style="display:flex; align-items:center; gap:16px;">'
+          + '<span class="avatar" id="g-modal-avatar" style="width:64px; height:64px; font-size:24px; flex-shrink:0;">' + gEsc((email || '?').slice(0, 2).toUpperCase()) + '</span>'
+          + '<div style="display:flex; flex-direction:column; justify-content:center;">'
+          + '<span class="eyebrow" style="margin-bottom:4px;">Kullanıcı detayı</span>'
+          + '<div class="modal-title" style="font-size:18px; line-height:1.2;">' + gEsc(email) + '</div></div></div>',
           '<div class="g-bos">' + gIkon('refresh') + '<span>Yukleniyor...</span></div>'
         );
 
         try {
           const v = await garanminData('garanmin_user_detail', { p_user_id: id });
-          const p = v.profil, g = v.garanti || {}, c = v.cihazlar || [], t = v.talepler || [];
+          const p = v.profil || {}, g = v.garanti || {}, c = v.cihazlar || [], t = v.talepler || [];
 
-          // Fotoğraf güncellemesi (Mock profil fotosu veya DB'den gelen avatar_url)
-          const avatarPic = p.avatar_url || ('https://i.pravatar.cc/150?u=' + gEsc(id));
-          const avatarEl = document.getElementById('g-modal-avatar');
-          if (avatarEl) {
-            avatarEl.innerHTML = '<img src="' + avatarPic + '" style="width:100%; height:100%; object-fit:cover; border-radius:50%;" onerror="this.style.display=\'none\'; this.parentElement.innerText=\'' + gEsc((email || '?').slice(0, 2).toUpperCase()) + '\';">';
-            avatarEl.style.padding = '0';
-            avatarEl.style.overflow = 'hidden';
-            avatarEl.style.backgroundColor = 'transparent';
+          // Sadece veritabanından gelen avatar_url varsa kullan (Mock kullanma)
+          if (p.avatar_url) {
+            const avatarEl = document.getElementById('g-modal-avatar');
+            if (avatarEl) {
+              avatarEl.innerHTML = '<img src="' + gEsc(p.avatar_url) + '" style="width:100%; height:100%; object-fit:cover; border-radius:50%;" onerror="this.style.display=\'none\'; this.parentElement.innerText=\'' + gEsc((email || '?').slice(0, 2).toUpperCase()) + '\';">';
+              avatarEl.style.padding = '0';
+              avatarEl.style.overflow = 'hidden';
+              avatarEl.style.backgroundColor = 'transparent';
+            }
           }
 
           const cihazHtml = c.length
