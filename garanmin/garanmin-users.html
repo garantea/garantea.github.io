@@ -353,6 +353,11 @@
             +         gKv('Yakin', gNum(g.expiring_soon || 0))
             +         gKv('Dolmus', gNum(g.expired || 0))
             +       '</div>'
+            +       '<div style="margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--b-base); display: flex; gap: 8px;">'
+            +         '<button class="btn btn--primary btn--sm" style="flex:1" onclick="sahteIslem(this, \'Kredi Yüklendi\')">Kredi Yükle</button>'
+            +         '<button class="btn btn--danger btn--sm" style="flex:1" onclick="sahteIslem(this, \'Hesap Askıya Alındı\')">Askıya Al</button>'
+            +         '<button class="btn btn--ghost btn--sm" style="flex:1" onclick="sahteIslem(this, \'Şifre Sıfırlama Gönderildi\')">Şifre Sıfırla</button>'
+            +       '</div>'
             +     '</section>'
             +     '<section class="card" style="flex: 1; min-height: 0;">'
             +       '<div class="card-head"><div class="card-title-wrap">'
@@ -406,6 +411,16 @@
             '<div class="g-uyari danger" style="margin:0">' + gIkon('alert')
             + '<span>' + gEsc(e.message) + '</span></div>';
         }
+      }
+
+      function sahteIslem(btn, mesaj) {
+        const eski = btn.innerHTML;
+        btn.innerHTML = gIkon('check') + ' Başarılı';
+        btn.classList.add('success');
+        setTimeout(function() {
+          btn.innerHTML = eski;
+          btn.classList.remove('success');
+        }, 2000);
       }
 
       async function yukle() {
