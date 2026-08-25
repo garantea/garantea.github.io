@@ -675,6 +675,36 @@ function gBayt(v) {
   return (n / 1048576).toFixed(1) + ' MB';
 }
 
+
+
+/**
+ * Tablo verilerini CSV formatında dışa aktarır.
+ *
+ * @param dosyaAdi  Indirilecek dosyanin adi (orn: "kullanicilar.csv")
+ * @param basliklar Sütun başlıkları dizisi (orn: ['E-posta', 'Kayıt Tarihi'])
+ * @param veriler   Satırlar dizisi, her satır da hücreler dizisinden oluşur
+ */
+function garanminExportCSV(dosyaAdi, basliklar, veriler) {
+  let csv = basliklar.join(',') + '\n';
+  veriler.forEach(function(satir) {
+    csv += satir.map(function(hucre) {
+      let t = (hucre === null || hucre === undefined) ? '' : String(hucre);
+      t = t.replace(/"/g, '""'); // CSV'de tırnakları escape et
+      if (t.search(/("|,|\n)/g) >= 0) t = '"' + t + '"'; // virgül veya satır sonu varsa tırnak içine al
+      return t;
+    }).join(',') + '\n';
+  });
+  
+  const blob = new Blob(["\ufeff" + csv], { type: 'text/csv;charset=utf-8;' }); // BOM ekle (Türkçe karakterler için)
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.setAttribute('href', url);
+  a.setAttribute('download', dosyaAdi);
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+
 function gDate(v) {
   if (!v) return '-';
   const d = new Date(v);

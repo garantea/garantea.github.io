@@ -44,6 +44,7 @@
                   <button class="btn btn--primary btn--sm" onclick="setAdet(50)"  id="a50">50</button>
                   <button class="btn btn--ghost btn--sm"   onclick="setAdet(100)" id="a100">100</button>
                   <button class="btn btn--ghost btn--sm"   onclick="setAdet(200)" id="a200">200</button>
+                  <button class="btn btn--ghost btn--sm" id="indir-btn" title="Tabloyu İndir">İndir</button>
                 </div>
               </div>
               <div class="g-tablo-kutu-esnek">
@@ -118,6 +119,24 @@
           }).join('');
         } catch (e) { gError(e.message); }
       }
+
+      document.getElementById('indir-btn').onclick = function () {
+        const trs = document.querySelectorAll('#tbody tr');
+        if (!trs.length || (trs.length === 1 && trs[0].cells.length === 1)) return;
+        
+        const basliklar = ['Cihaz', 'Marka', 'Kategori', 'Alım Tarihi', 'Garanti Bitiş', 'Durum', 'Kullanıcı', 'Kayıt Zamanı'];
+        const veriler = [];
+        trs.forEach(function(tr) {
+          if (tr.cells.length >= 8) {
+            veriler.push([
+              tr.cells[0].innerText, tr.cells[1].innerText, tr.cells[2].innerText,
+              tr.cells[3].innerText, tr.cells[4].innerText, tr.cells[5].innerText,
+              tr.cells[6].innerText, tr.cells[7].innerText
+            ]);
+          }
+        });
+        garanminExportCSV('son_eklenen_cihazlar.csv', basliklar, veriler);
+      };
 
       if (garanminGuardPage()) {
         garanminShell('garanmin-devices-son.html', 'Son Eklenen Cihazlar', 'Cihazlar');

@@ -54,6 +54,7 @@
                   <input id="arama" class="input" placeholder="E-posta ara..." />
                   <button class="btn btn--primary btn--sm" id="ara-btn" title="Ara">Ara</button>
                   <button class="btn btn--ghost btn--sm" id="temizle-btn" title="Temizle">Temizle</button>
+                  <button class="btn btn--ghost btn--sm" id="indir-btn" title="Tabloyu İndir">İndir</button>
                 </div>
               </div>
 
@@ -490,6 +491,24 @@
         offset = Math.max(0, offset - SAYFA); yukle();
       };
       document.getElementById('sonraki').onclick = function () { offset += SAYFA; yukle(); };
+
+      document.getElementById('indir-btn').onclick = function () {
+        const trs = document.querySelectorAll('#tbody tr');
+        if (!trs.length || (trs.length === 1 && trs[0].cells.length === 1)) return;
+        
+        const basliklar = ['E-posta', 'Kayıt Tarihi', 'Son Giriş', 'Cihaz', 'Kredi', 'Reklam', 'Talep'];
+        const veriler = [];
+        trs.forEach(function(tr) {
+          if (tr.cells.length >= 7) {
+            veriler.push([
+              tr.cells[0].innerText, tr.cells[1].innerText, tr.cells[2].innerText,
+              tr.cells[3].innerText, tr.cells[4].innerText, tr.cells[5].innerText,
+              tr.cells[6].innerText
+            ]);
+          }
+        });
+        garanminExportCSV('kullanicilar.csv', basliklar, veriler);
+      };
 
       /* ── İLK ÇAĞRI EN SONDA (yukarıdaki nota bakın) ────────────────────── */
       if (garanminGuardPage()) {
