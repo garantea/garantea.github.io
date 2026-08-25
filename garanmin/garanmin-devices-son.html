@@ -56,9 +56,16 @@
                     <col style="width:16%"><col style="width:8%">
                   </colgroup>
                   <thead>
-                    <tr><th>Cihaz</th><th>Marka</th><th>Kategori</th>
-                        <th>Alim</th><th>Garanti bitisi</th><th>Durum</th>
-                        <th>Kullanıcı</th><th>Kayit</th></tr>
+                    <tr>
+                        <th style="cursor:pointer" onclick="tabloSirala(0, this)">Cihaz</th>
+                        <th style="cursor:pointer" onclick="tabloSirala(1, this)">Marka</th>
+                        <th style="cursor:pointer" onclick="tabloSirala(2, this)">Kategori</th>
+                        <th style="cursor:pointer" onclick="tabloSirala(3, this)">Alim</th>
+                        <th style="cursor:pointer" onclick="tabloSirala(4, this)">Garanti bitisi</th>
+                        <th style="cursor:pointer" onclick="tabloSirala(5, this)">Durum</th>
+                        <th style="cursor:pointer" onclick="tabloSirala(6, this)">Kullanıcı</th>
+                        <th style="cursor:pointer" onclick="tabloSirala(7, this)">Kayit</th>
+                    </tr>
                   </thead>
                   <tbody id="tbody"><tr><td colspan="8" class="soluk">Yukleniyor...</td></tr></tbody>
                 </table>
@@ -137,6 +144,49 @@
         });
         garanminExportCSV('son_eklenen_cihazlar.csv', basliklar, veriler);
       };
+
+      function tabloSirala(n, th) {
+        var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
+        table = document.getElementById("tbody");
+        if (!table || table.rows.length <= 1) return;
+        switching = true;
+        dir = "asc"; 
+        
+        while (switching) {
+          switching = false;
+          rows = table.rows;
+          for (i = 0; i < (rows.length - 1); i++) {
+            shouldSwitch = false;
+            x = rows[i].getElementsByTagName("TD")[n];
+            y = rows[i + 1].getElementsByTagName("TD")[n];
+            if (!x || !y) continue;
+            var cmpX = x.innerText.toLowerCase();
+            var cmpY = y.innerText.toLowerCase();
+            
+            // Eğer tarih formatıysa (DD.MM.YYYY)
+            if (cmpX.match(/^\d{2}\.\d{2}\.\d{4}/)) {
+                var dX = cmpX.split('.'); cmpX = dX[2] + dX[1] + dX[0];
+                var dY = cmpY.split('.'); cmpY = dY[2] + dY[1] + dY[0];
+            }
+
+            if (dir == "asc") {
+              if (cmpX > cmpY) { shouldSwitch = true; break; }
+            } else if (dir == "desc") {
+              if (cmpX < cmpY) { shouldSwitch = true; break; }
+            }
+          }
+          if (shouldSwitch) {
+            rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+            switching = true;
+            switchcount ++;
+          } else {
+            if (switchcount == 0 && dir == "asc") {
+              dir = "desc";
+              switching = true;
+            }
+          }
+        }
+      }
 
       if (garanminGuardPage()) {
         garanminShell('garanmin-devices-son.html', 'Son Eklenen Cihazlar', 'Cihazlar');

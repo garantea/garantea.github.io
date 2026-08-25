@@ -119,6 +119,17 @@
             xaxis: { categories: kategori.map(function (d) { return gKategori(d.category); }) },
             plotOptions: { bar: { borderRadius: 5, distributed: true, columnWidth: '55%' } },
             legend: { show: false },
+            chart: {
+              events: {
+                dataPointSelection: function(event, chartContext, config) {
+                  if (config.dataPointIndex >= 0) {
+                    const rawCategory = kategori[config.dataPointIndex].category;
+                    const catName = gKategori(rawCategory);
+                    kategoriCihazGoster(rawCategory, catName);
+                  }
+                }
+              }
+            }
           }, kategori);
 
           ciz('c-garanti', 'donut', {
@@ -152,7 +163,42 @@
         if (gBos(hedef, veri)) return;
         const t = gGrafikTemel();
         t.chart.type = tip;
+        // Eğer ayar icinde chart.events varsa temel ayarlardakilerle birlestir (ezme)
+        if (ayar.chart && ayar.chart.events) {
+            t.chart.events = Object.assign(t.chart.events || {}, ayar.chart.events);
+            delete ayar.chart.events;
+        }
         new ApexCharts(gKap(hedef), Object.assign(t, ayar)).render();
+      }
+
+      async function kategoriCihazGoster(rawCat, catName) {
+        garanminModalAc(
+          '<div class="g-modal-kim">'
+          + '<div style="display:flex; align-items:center; gap:16px;">'
+          + '<div class="avatar" style="width:48px; height:48px; display:flex; align-items:center; justify-content:center; background:var(--primary-soft); color:var(--primary); font-size:20px; border-radius:8px;">' + gIkon('box') + '</div>'
+          + '<div><span class="eyebrow">Kategori Detayı</span>'
+          + '<div class="modal-title">' + gEsc(catName) + '</div></div></div></div>',
+          '<div class="g-bos">' + gIkon('refresh') + '<span>Yükleniyor...</span></div>'
+        );
+        try {
+          const all = await garanminData('garanmin_recent_devices', { p_limit: 1000 });
+          const filtered = all.filter(c => c.category === rawCat);
+          
+          if (!filtered.length) {
+            document.getElementById('g-modal-govde').innerHTML = '<div class="g-bos">Bu kategoride son eklenen bir cihaz bulunamadı.</div>';
+            return;
+          }
+          
+          const tbody = filtered.map(d => {
+             return '<tr><td>' + gEsc(d.name) + '</td><td>' + gEsc(d.brand) + '</td><td>' + gDate(d.purchase_date) + '</td></tr>';
+          }).join('');
+          
+          document.getElementById('g-modal-govde').innerHTML = '<div class="g-tablo-kutu-esnek" style="max-height:400px; overflow-y:auto; padding:0;">'
+            + '<table class="table" style="margin:0;"><thead><tr><th>Cihaz</th><th>Marka</th><th>Alım Tarihi</th></tr></thead>'
+            + '<tbody>' + tbody + '</tbody></table></div>';
+        } catch(e) {
+            document.getElementById('g-modal-govde').innerHTML = '<div class="g-uyari danger">' + gEsc(e.message) + '</div>';
+        }
       }
 
       if (garanminGuardPage()) {
